@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   tests:
@@ -24,7 +24,7 @@ jobs:
     outputs:
       commit-ref: ${{ steps.create-ref.outputs.commit-ref }}
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - id: create-ref
         run: |
           COMMIT_REF=$(git rev-parse --short $GITHUB_SHA)
