@@ -1,0 +1,50 @@
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v*
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yaml
+    secrets:
+      ACR_SECRET: ${{ secrets.ACR_SECRET }}
+      DMSS_DEPLOY_KEY: ${{ secrets.DMSS_DEPLOY_KEY }}
+
+  publish-prod-tag:
+    needs: tests
+    uses: ./.github/workflows/publish.yaml
+    with:
+      image-tag: production
+      oauth-redirect-url: https://data-modelling-tool.app.radix.equinor.com
+    secrets:
+      ACR_SECRET: ${{ secrets.ACR_SECRET }}
+
+  set-tag-ref:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - id: create-ref
+        run: |
+          TAG_REF=$(echo $GITHUB_REF | cut -d / -f 3)
+          echo "::set-output name=tag-ref::TAG_REF"
+    outputs:
+      tag-ref: ${{ steps.create-ref.outputs.tag-ref }}
+      oauth-redirect-url: https://data-modelling-tool.app.radix.equinor.com
+
+  publish-tag-ref:
+    needs: [set-tag-ref, tests]
+    uses: ./.github/workflows/publish.yaml
+    with:
+      image-tag: ${{ needs.set-tag-ref.outputs.tag-ref }}
+      oauth-redirect-url: https://data-modelling-tool.app.radix.equinor.com
+    secrets:
+      ACR_SECRET: ${{ secrets.ACR_SECRET }}
+
+  deploy:
+    needs: publish-prod-tag
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      radix-environment: 'prod'
+    secrets:
+      APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.APP_SERVICE_ACCOUNT_TOKEN }}

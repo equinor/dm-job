@@ -1,0 +1,44 @@
+name: build adocs
+
+on:
+  push:
+    branches:
+    - master
+    - docs
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    name: Build and deploy docs to Github pages 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: "16"
+
+    - name: Install Yarn
+      run: npm install -g yarn
+
+    - name: Generate typedocs
+      run: |
+        cd web/packages/dmt-core
+        yarn install
+        cd ../../../docs
+        yarn install
+        yarn run generate-typedocs
+
+    - name: Build docs
+      run: |
+         cd docs
+         yarn install
+         yarn run build
+
+    - name: Deploy docs to github pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: docs/build
