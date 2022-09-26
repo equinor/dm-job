@@ -1,17 +1,6 @@
 version: "3.4"
 
 services:
-  nginx:
-    restart: unless-stopped
-    build:
-      context: ./nginx
-    image: datamodelingtool.azurecr.io/dmt/nginx
-    ports:
-      - "80:8080"
-    links:
-      - web
-      - api
-
   dmss:
     image: datamodelingtool.azurecr.io/dmss:latest
     restart: unless-stopped
@@ -52,12 +41,6 @@ services:
     ports:
       - "5000:5000"
 
-  web:
-    build: ./web
-    image: datamodelingtool.azurecr.io/dmt/web
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
 
   job-store:
     image: redis:6.2.5-alpine
