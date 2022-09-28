@@ -1,80 +1,66 @@
-# Data Modelling Tool
-[![License][license-badge]][license]
-[![On main push][on-main-push-branch-badge]][on-main-push-branch-action]
+# Job API (for data modeling)
 
-The data modelling tool is a tool for modelling complex domain models.
+## Job Scheduler
 
-Some features:
+The job scheduler relies on JobHandler() to delegate the jobs.
+The only ones supported now are a "ShellJob" for testing. It is unsafe and runs ANY shell script in the local container.
+And a AzureContainerInstancesJob. This requires configuration for an Azure subscription, a resource group,
+and a ServicePrincipal(App registration with app secret) which has the required access level on the resource group.
+The job scheduler also needs a redis instance where jobs are kept track of.
 
-* Create, view, and search models
-* Create applications containing custom views, models, and actions
-* Generate code that reflects models
+You can also supply your own JobHandlers by volume mounting the python modules into ${HOME}/${myApp}/job_handlers/${my_job_handler_module}.
+These modules MUST be a folder with a `_init_.py`-file with a `JobHandler`-class, and a global variable `_SUPPORTED_TYPE`
 
-## Documentation
+Example;
 
-You can find the Data Modelling Tool documentation here; [https://equinor.github.io/data-modelling-tool](https://equinor.github.io/data-modelling-tool).
+```python
+_SUPPORTED_TYPE = "SomeDataSource/SomePackage/AJobBlueprint"
 
-## Developing
- 
-When running locally, in development mode, DMSS need to be running alongside DMT. Since DMT use the same virtual network as DMSS, DMSS needs to be started first.
+class JobHandler(JobHandlerInterface):
+    def __init__(self, data_source: str, job_entity: dict):
+        super().__init__(data_source, job_entity)
 
-### Starting
+    def start(self) -> str:
+        raise NotImplementedError
 
-```shell
-cd ../data-modelling-storage-service
-docker-compose up
-cd ../data-modelling-tool
-docker-compose up
+    def remove(self) -> str:
+        raise NotImplementedError
+
+    def progress(self) -> Tuple[JobStatus, str]:
+        raise NotImplementedError
+
 ```
 
-The web app will be served at http://localhost
+##
 
-### Import data and reset database
+## Python packages
 
-Import local documents to the configured DMSS_HOST (from /api/home directory).  
-Token is optional, but required if DMSS is configured with authentication.  
-Token can be acquired from the DMT Web application.
+This project uses [Poetry](https://poetry.eustace.io/docs/) for its Python package management.
 
-```shell
-docker-compose run --rm api reset-app --token=Eyxx.xxxx.xxxx
-```
+* If you like Poetry to create venv in the project directory, configure it like so;  
+```poetry config settings.virtualenvs.in-project true```
+* To create a virtual environment run `poetry install`
+* To add packages run `poetry add myPackage` (Remember to rebuild the Docker image)
 
-If the data is corrupted or in a bad state, a hard reset of the DMSS is often a solution.
-This command will remove every _mongo database using the same database host as the core_, and upload DMSS's core documents.
+### Using the DMSS python package
+The python API uses the DMSS python package available on [PyPi](https://pypi.org/project/dmss-api/).
+If you want to use a local version of this package, you can: 
 
-```shell
-docker-compose run --rm dmss reset-app
-```
+1) Build the local python package from the cloned DMSS repo, by running the generate-python-package.sh script.
+2) Update the DMT docker-compose.override.yml file by adding / uncomment the volume mount: ../data-modelling-storage-service/gen/dmss_api:/dmss_api
 
-### Running Tests
+## Running / debugging
 
-Unit tests:
+TODO: How to add debug?
 
-`docker-compose run --rm api pytest`  
-`docker-compose run --rm web yarn test`
+## Troubleshooting
 
-### Pre-commit
+#### Intellij Docker issue with pydevd
 
-We use pre-commit to do a minimum of checks on the developer pc before committing. The same checks, plus a few more are
-also run in the build pipeline.  
-You should catch any errors early to save time.
+* Try open idea from terminal.
 
-Setup;
+Mac:  /Applications/IntelliJ\ IDEA.app/Contents/MacOS/idea
 
-```shell
-pip install pre-commit  # Should be installed in global python environment
-pre-commit install  # Pre-commit will now run on every commit (can be skipped with 'git commit --no-verify')
+`python: can't open file '/opt/.pycharm_helpers/pydev/pydevd.py': [Errno 2] No such file or directory`
 
-# To run manually on all files
-pre-commit run -a 
-```
-
-## Contributing 
-
-Read our [contributors' guide](https://https://equinor.github.io/data-modelling-tool/contribute-guide.html) to get started.
-
-[license-badge]: https://img.shields.io/badge/License-MIT-yellow.svg
-[license]: https://github.com/equinor/data-modelling-tool/blob/main/LICENSE
-[releases]: https://github.com/equinor/data-modelling-tool/releases
-[on-main-push-branch-badge]: https://github.com/equinor/data-modelling-tool/actions/workflows/on-master-push.yaml/badge.svg
-[on-main-push-branch-action]: https://github.com/equinor/data-modelling-tool/actions/workflows/on-master-push.yaml
+<https://chkr.at/wordpress/?p=227>
