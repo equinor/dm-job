@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   tests:
@@ -16,7 +16,6 @@ jobs:
     uses: ./.github/workflows/publish.yaml
     with:
       image-tag: latest
-      oauth-redirect-url: https://proxy-data-modelling-tool-dev.radix.equinor.com
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
 
@@ -24,9 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit-ref: ${{ steps.create-ref.outputs.commit-ref }}
-      oauth-redirect-url: https://proxy-data-modelling-tool-dev.radix.equinor.com
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - id: create-ref
         run: |
           COMMIT_REF=$(git rev-parse --short $GITHUB_SHA)
@@ -37,14 +35,5 @@ jobs:
     uses: ./.github/workflows/publish.yaml
     with:
       image-tag: ${{ needs.set-commit-ref.outputs.commit-ref }}
-      oauth-redirect-url: https://proxy-data-modelling-tool-dev.radix.equinor.com
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
-
-  deploy:
-    needs: publish-latest
-    uses: ./.github/workflows/deploy.yaml
-    with:
-      radix-environment: 'dev'
-    secrets:
-      APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.APP_SERVICE_ACCOUNT_TOKEN }}
