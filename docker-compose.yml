@@ -22,7 +22,7 @@ services:
   api:
     build:
       context: ./api
-    image: datamodelingtool.azurecr.io/dmt/api
+    image: datamodelingtool.azurecr.io/dm-job
     restart: unless-stopped
     environment:
       ENVIRONMENT: azure
