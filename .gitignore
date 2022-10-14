@@ -1,11 +1,11 @@
 # Created by https://www.gitignore.io/api/macos
 # Edit at https://www.gitignore.io/?templates=macos
 data/
-api/src/home/analysis-platform/data/AnalysisPlatformDS/Data/sima_test/srs.stask
+src/home/analysis-platform/data/AnalysisPlatformDS/Data/sima_test/srs.stask
 redis_data
-api/src/script.sh
+src/script.sh
 h5/
-/api/src/home/first-run-false
+/src/home/first-run-false
 
 ### macOS ###
 # General
@@ -147,15 +147,15 @@ api/core/domain/dynamic_models/__init__.py
 .generated/
 api/.pytest_cachefirst-run-false
 api/first-run-false
-/api/src/first-run-false
+/src/first-run-false
 /web/app/build/
 /web/app/public/version.txt
 /sre-wrapper/sima.lic
 /sre-wrapper/tmp/
 /web/packages/home/public/version.txt
-/api/src/home/analysis-platform/data/AnalysisPlatformDS/Data/sima_test/forapp.stask
+/src/home/analysis-platform/data/AnalysisPlatformDS/Data/sima_test/forapp.stask
 /sima.lic
-/api/src/home/analysis-platform/data/AnalysisPlatformDS/Data/sima_test/srs.stask
+/src/home/analysis-platform/data/AnalysisPlatformDS/Data/sima_test/srs.stask
 /scripts/analysis.json
 /scripts/testSTask.stask
 /web/packages/home/build/

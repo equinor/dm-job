@@ -1,11 +1,10 @@
 version: "3.4"
 
 services:
-  api:
+  job-api:
     build:
-      context: ./api
       target: development
-    image: api-development
+    image: job-api-development
     environment:
       API_DEBUG: 1
       API_ENV: testing

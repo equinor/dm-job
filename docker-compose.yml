@@ -19,9 +19,9 @@ services:
       MONGO_INITDB_ROOT_USERNAME: maf
       MONGO_INITDB_ROOT_PASSWORD: maf
 
-  api:
+  job-api:
     build:
-      context: ./api
+      context: .
     image: datamodelingtool.azurecr.io/dm-job
     restart: unless-stopped
     environment:
