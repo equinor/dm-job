@@ -12,7 +12,7 @@ from azure.mgmt.containerinstance import ContainerInstanceManagementClient
 from azure.mgmt.containerinstance.models import EnvironmentVariable
 
 from config import config
-from default_job_handlers.omnia_classic_azure_container_instances.ARM_deployer import (
+from job_handler_plugins.omnia_classic_azure_container_instances.ARM_deployer import (
     Deployer,
 )
 from restful.exceptions import NotFoundException

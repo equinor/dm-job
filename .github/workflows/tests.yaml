@@ -15,7 +15,7 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
 
       - name: Set up python
         id: setup-python
@@ -50,11 +50,11 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
 
       - name: Build API image
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login $IMAGE_REGISTRY -u $GITHUB_ACTOR --password-stdin
+          echo ${{ secrets.ACR_SECRET }} | docker login $IMAGE_REGISTRY -u datamodelingtool --password-stdin
           docker pull $API_IMAGE
           DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development --cache-from $API_IMAGE .
 

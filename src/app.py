@@ -36,7 +36,7 @@ def create_app():
     all_routes.include_router(authenticated_routes, dependencies=[Security(auth_with_jwt)])
     app.include_router(all_routes)
 
-    @app.get("/", operation_id="redirect_to_docs", response_class=RedirectResponse)
+    @app.get("/", operation_id="redirect_to_docs", response_class=RedirectResponse, include_in_schema=False)
     def redirect_to_docs():
         """
         Redirects any requests to the servers root ('/') to '/docs'

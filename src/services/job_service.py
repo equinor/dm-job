@@ -25,6 +25,7 @@ from services.job_scheduler import scheduler
 from utils.logging import logger
 from utils.string_helpers import split_absolute_ref
 
+# TODO: Support cron jobs
 # def is_cron_job(blueprint_ref: str) -> bool:
 #     """Checks if the type SIMOS.CRONJOB is in the list of types the blueprint extends from"""
 #     all_extends = get_extends_from(blueprint_ref)
@@ -94,7 +95,7 @@ class JobService:
         return get_document_by_uid(data_source_id, job_entity_id, attribute=attribute, token=token, depth=0)
 
     @staticmethod
-    def _insert_reference(document_id: str, reference: dict, token: str = ""):
+    def _insert_reference(document_id: str, reference: dict, token: str = ""):  # nosec
         headers = {"Access-Key": token}
         req = requests.put(f"{config.DMSS_API}/api/v1/reference/{document_id}", json=reference, headers=headers)
         req.raise_for_status()
@@ -107,19 +108,6 @@ class JobService:
 
     def _get_job_handler(self, job: Job) -> JobHandlerInterface:
         data_source_id = job.dmss_id.split("/", 1)[0]
-
-        # job_handler_directories =
-        # for app in config.APP_NAMES:
-        #     try:
-        #         for f in Path(f"{config.APPLICATION_HOME}/{app}/job_handlers").iterdir():
-        #             if f.is_dir() and f.name[0] != "_":  # Python modules can not start with "_"
-        #                 job_handler_directories.append(str(f))
-        #     except FileNotFoundError:
-        #         pass
-
-        # module_paths = [
-        #     f"home{f.removeprefix(config.APPLICATION_HOME).replace('/', '.')}" for f in ("default_job_handlers","job_handler_plugins")
-        # ]
 
         try:
             modules = [importlib.import_module(module) for module in ("default_job_handlers", "job_handler_plugins")]
