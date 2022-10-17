@@ -6,46 +6,58 @@ on:
     secrets:
       ACR_SECRET:
         required: false
-      DMSS_DEPLOY_KEY:
-        required: false
 
 env:
   IMAGE_REGISTRY: datamodelingtool.azurecr.io
   API_IMAGE: datamodelingtool.azurecr.io/dm-job
 
 jobs:
-  test-api:
+  linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@master
 
-      - name: "Docker Login"
-        run: docker login -u datamodelingtool -p ${{ secrets.ACR_SECRET }} $IMAGE_REGISTRY
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-      - name: "Pull latest"
-        run: docker pull $API_IMAGE
+      - name: Install pre-commit
+        run: pip install pre-commit
 
-      - name: "Clone DMSS for blueprints"
+      # Caches the venv at the end of the job and reloads for quicker pre-commit.
+      # Uses pyproject.toml and pre-commit-config file to create hash.
+      - name: Cache venv
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            ~/work/dm-job/dm-job/.venv
+            ~/.cache/pre-commit
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Set up venv
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          eval $(ssh-agent)
-          export GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' &&
-          ssh-add - <<< "${{ secrets.DMSS_DEPLOY_KEY }}" &&
-          git clone git@github.com:equinor/data-modelling-storage-service api/src/dmss
+          pip install poetry
+          poetry config virtualenvs.in-project true
+          poetry install
 
-      - name: "Build API test image"
-        run: docker build --cache-from $API_IMAGE --target development --tag api-development ./api
+      - name: Run pre-commit
+        run: pre-commit run --all-files --verbose
 
-      - name: "Black Linting"
-        run: docker run --rm api-development black --check  --target-version py310 --diff --exclude dmss .
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
 
-      - name: "flake8 style check"
-        run: docker run --rm api-development python -m flake8 --config=.flake8
+      - name: Build API image
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login $IMAGE_REGISTRY -u $GITHUB_ACTOR --password-stdin
+          docker pull $API_IMAGE
+          DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development --cache-from $API_IMAGE .
 
-      - name: "Bandit Static Code Security Analyzis"
-        run: docker run --rm api-development bandit --recursive . --exclude ./tests,./dmss
-
-      - name: "Safety - Dependencies CVE Check"
-        run: docker run --rm api-development safety check
-
-#      - name: "API UnitTests"
-#        run: docker run --rm api-development pytest tests
+      # TODO: Add tests and enable this
+#      - name: Pytest Integration tests
+#        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run --rm job-api pytest

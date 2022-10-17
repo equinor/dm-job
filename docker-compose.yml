@@ -26,7 +26,6 @@ services:
     restart: unless-stopped
     environment:
       ENVIRONMENT: azure
-      JOB_SERVICE_ENABLED: 1
       SCHEDULER_ENVS_TO_EXPORT: "PUBLIC_DMSS_API,SIMA_LICENSE"
       SCHEDULER_REDIS_HOST: job-store
       SCHEDULER_REDIS_PORT: 6379
@@ -34,7 +33,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: maf
       MONGO_INITDB_ROOT_PASSWORD: maf
       APPLICATION_HOME: /code/src/home
-      API_ENV: development
       DMSS_API: http://dmss:5000
     depends_on:
       - job-store
