@@ -9,15 +9,6 @@ jobs:
     uses: ./.github/workflows/tests.yaml
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
-      DMSS_DEPLOY_KEY: ${{ secrets.DMSS_DEPLOY_KEY }}
-
-  publish-prod-tag:
-    needs: tests
-    uses: ./.github/workflows/publish.yaml
-    with:
-      image-tag: production
-    secrets:
-      ACR_SECRET: ${{ secrets.ACR_SECRET }}
 
   set-tag-ref:
     runs-on: ubuntu-latest

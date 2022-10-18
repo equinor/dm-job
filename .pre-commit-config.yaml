@@ -21,41 +21,46 @@ repos:
     - id: black
       language_version: python3.10
       args: [--target-version, py310]
-      files: ^api/src/.*\.py$
+      files: ^src/.*\.py$
 
 - repo: https://github.com/PyCQA/bandit
   rev: 1.7.4
   hooks:
     - id: bandit
       args: [-l, --recursive, -x, tests]
-      files: ^api/.*\.py$
+      files: ^.*\.py$
 
 
 - repo: https://github.com/hadialqattan/pycln
   rev: v1.3.5
   hooks:
     - id: pycln
-      args: [./api/src, --all]
-      pass_filenames: false
+      args: [--config=pyproject.toml]
 
 - repo: https://github.com/pycqa/isort
   rev: 5.10.1
   hooks:
     - id: isort
       name: isort (python)
-      files: ^api/src/.*\.py$
+      files: ^src/.*\.py$
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: 'v0.982'
+  hooks:
+    - id: mypy
+      args: [--config-file=pyproject.toml]
+      additional_dependencies:
+        - types-cachetools >= 5.2.0
+        - types-requests >= 2.27.30
+        - types-ujson >= 5.3.0
+        - types-redis >= 2.3.21.1
 
 
-- repo: local
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 4.0.1
   hooks:
     - id: flake8
-      # The provided hook fails to read config file. Therefore this wrapper.
-      name: Python style checking
-      entry: sh -c "api/.venv/bin/python -m flake8 --config=api/.flake8 api/src"
-      language: system
-#    - id: pytest
-#      name: API Unit Tests
-#      entry: sh -c "export PYTHONPATH=./api/src && api/.venv/bin/python -m pytest api/src/tests"
-#      language: system
-#      pass_filenames: false
+      files: ^src/.*\.py$
+      args: [ '--max-line-length=119', '--max-complexity=18', '--select=B,C,E,F,W,T4,B9', '--ignore=E203,E266,E501,W503' ]
+
 

@@ -11,4 +11,3 @@ jobs:
     uses: ./.github/workflows/tests.yaml
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
-      DMSS_DEPLOY_KEY: ${{ secrets.DMSS_DEPLOY_KEY }}

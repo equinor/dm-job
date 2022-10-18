@@ -1,0 +1,19 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yaml
+    secrets:
+      ACR_SECRET: ${{ secrets.ACR_SECRET }}
+
+  publish-latest:
+    needs: tests
+    uses: ./.github/workflows/publish.yaml
+    with:
+      image-tag: latest
+    secrets:
+      ACR_SECRET: ${{ secrets.ACR_SECRET }}
