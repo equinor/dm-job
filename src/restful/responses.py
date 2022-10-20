@@ -14,6 +14,7 @@ from restful.exceptions import (
     BadRequestException,
     MissingPrivilegeException,
     NotFoundException,
+    NotImplementedException,
     ValidationException,
 )
 from utils.logging import logger
@@ -64,9 +65,9 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 return response_class(result, status_code=status.HTTP_200_OK)
             except HTTPError as http_error:
                 error_response = ErrorResponse(
-                    status=http_error.response.status,
-                    message="Failed to fetch an external resource",
-                    debug=http_error.response,
+                    status=http_error.response.status_code,
+                    message=http_error.response.text,
+                    debug=f"The HTTP call to '{http_error.response.url}' failed",
                 )
                 logger.error(error_response)
                 return JSONResponse(error_response.dict(), status_code=error_response.status)
@@ -86,6 +87,9 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
             except MissingPrivilegeException as e:
                 logger.warning(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_403_FORBIDDEN)
+            except NotImplementedException as e:
+                logger.warning(e)
+                return JSONResponse(e.dict(), status_code=status.HTTP_501_NOT_IMPLEMENTED)
             except Exception as e:
                 traceback.print_exc()
                 logger.error(f"Unexpected unhandled exception: {e}")

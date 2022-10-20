@@ -2,6 +2,7 @@ import importlib
 import json
 import traceback
 from datetime import datetime
+from pathlib import Path
 from typing import Callable, Tuple, Union
 from uuid import UUID, uuid4
 
@@ -11,7 +12,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from redis import AuthenticationError
 
 from config import config
-from restful.exceptions import NotFoundException
+from restful.exceptions import NotFoundException, NotImplementedException
 from services.dmss import (
     get_document_by_uid,
     get_personal_access_token,
@@ -109,8 +110,14 @@ class JobService:
     def _get_job_handler(self, job: Job) -> JobHandlerInterface:
         data_source_id = job.dmss_id.split("/", 1)[0]
 
+        job_handler_directories = []
+        for handler_location in ("default_job_handlers", "job_handler_plugins"):
+            for file in Path(handler_location).iterdir():
+                if file.is_dir() and file.name[0] != "_":  # Python modules can not start with "_"
+                    job_handler_directories.append(str(file).replace("/", "."))
+
         try:
-            modules = [importlib.import_module(module) for module in ("default_job_handlers", "job_handler_plugins")]
+            modules = [importlib.import_module(module) for module in job_handler_directories]
             for job_handler_module in modules:
                 if job.entity["runner"]["type"] == job_handler_module._SUPPORTED_TYPE:
                     return job_handler_module.JobHandler(job, data_source_id)
@@ -127,6 +134,11 @@ class JobService:
 
     def _run_job(self, job_uid: UUID) -> str:
         job: Job = self._get_job(job_uid)
+        if not job:
+            raise NotFoundException(
+                message=f"The job with uid '{job_uid}' was not found",
+                debug=f"The job with uid '{job_uid}' was not found",
+            )
         try:
             job_handler = self._get_job_handler(job)
             job.started = datetime.now()
@@ -195,7 +207,13 @@ class JobService:
         if not job:
             raise NotFoundException(f"No job with uid '{job_uid}' is registered")
         job_handler = self._get_job_handler(job)
-        status, log = job_handler.progress()
+        try:
+            status, log = job_handler.progress()
+        except NotImplementedError:
+            raise NotImplementedException(
+                message="The job handler does not support the operation",
+                debug="The job handler does not implement the 'progress' method",
+            )
         if status is JobStatus.COMPLETED:
             result_reference = self._get_job_entity(job.dmss_id, job.token)["result"]
             job.entity["result"] = result_reference
@@ -214,7 +232,13 @@ class JobService:
         if not job:
             raise NotFoundException(f"No job with id '{job_uid}' is registered")
         job_handler = self._get_job_handler(job)
-        remove_message = job_handler.remove()
+        try:
+            remove_message = job_handler.remove()
+        except NotImplementedError:
+            raise NotImplementedException(
+                message="The job handler does not support the operation",
+                debug="The job handler does not implement the 'remove' method",
+            )
         self.job_store.delete(str(job_uid))
         return remove_message  # type: ignore
 
@@ -223,4 +247,10 @@ class JobService:
         if not job:
             raise NotFoundException(f"No job with id '{job_uid}' is registered")
         job_handler = self._get_job_handler(job)
-        return job_handler.result()  # type: ignore
+        try:
+            return job_handler.result()  # type: ignore
+        except NotImplementedError:
+            raise NotImplementedException(
+                message="The job handler does not support the operation",
+                debug="The job handler does not implement the 'result' method",
+            )
