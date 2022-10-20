@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import APIRouter, FastAPI, Security
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse
@@ -10,8 +11,9 @@ from features.jobs import jobs
 from middleware.store_headers import StoreHeadersMiddleware
 from restful.responses import responses
 from utils.exception_handlers import validation_exception_handler
+from utils.logging import logger
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(authorizationUrl="", tokenUrl="")
+oauth2_scheme = OAuth2AuthorizationCodeBearer(authorizationUrl="", tokenUrl="", auto_error=False)
 
 
 def auth_with_jwt(jwt_token: str = Security(oauth2_scheme)):
@@ -32,6 +34,17 @@ def create_app():
         exception_handlers={RequestValidationError: validation_exception_handler},
         middleware=[Middleware(StoreHeadersMiddleware)],
     )
+
+    if config.ENVIRONMENT == "local":
+        logger.warning("CORS has been turned off. This should only occur in in development.")
+        # Turn off CORS when running locally. allow_origins argument can be replaced with a list of URLs.
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins="*",
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     all_routes.include_router(authenticated_routes, dependencies=[Security(auth_with_jwt)])
     app.include_router(all_routes)

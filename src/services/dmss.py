@@ -2,11 +2,9 @@ import json
 
 import requests
 from dmss_api.apis import DefaultApi
-from requests import HTTPError
 
 from config import Config
 from middleware.store_headers import get_access_key_header, get_auth_header
-from utils.logging import logger
 
 dmss_api = DefaultApi()
 dmss_api.api_client.configuration.host = Config.DMSS_API
@@ -62,15 +60,12 @@ def update_document_by_uid(document_id: str, document: dict, token: str = None) 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.put(
-        f"{Config.DMSS_API}/api/v1/documents/{document_id}/?update_uncontained=False",
+        f"{Config.DMSS_API}/api/v1/documents/{document_id}",
         data=form_data,
         headers=headers,
+        params={"update_uncontained": "False"},
     )
-    try:
-        req.raise_for_status()
-    except HTTPError as error:
-        logger.error(error.response.text)
-        raise HTTPError(error.response.text)
+    req.raise_for_status()
     return req.json()  # type: ignore
 
 

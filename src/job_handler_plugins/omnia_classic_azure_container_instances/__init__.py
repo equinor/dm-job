@@ -16,7 +16,7 @@ from job_handler_plugins.omnia_classic_azure_container_instances.ARM_deployer im
     Deployer,
 )
 from restful.exceptions import NotFoundException
-from services.job_handler_interface import JobStatus, ServiceJobHandlerInterface
+from services.job_handler_interface import JobHandlerInterface, JobStatus
 from utils.logging import logger
 
 AccessToken = namedtuple("AccessToken", ["token", "expires_on"])
@@ -33,7 +33,7 @@ def inject_environment_variables(template: dict, variables: List[EnvironmentVari
     return template
 
 
-class JobHandler(ServiceJobHandlerInterface):
+class JobHandler(JobHandlerInterface):
     """
     Job handler plugin for Azure Container Instances.
     Support both executable jobs and job services

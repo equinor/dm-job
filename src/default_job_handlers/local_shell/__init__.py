@@ -7,7 +7,7 @@ from services.dmss import dmss_api
 from services.job_handler_interface import JobHandlerInterface, JobStatus
 from utils.logging import logger
 
-_SUPPORTED_TYPE = ("DMT-Internal/DMT/ShellJob", "DMT-Internal/DMT/CronShellJob")
+_SUPPORTED_TYPE = ("WorkflowDS/Blueprint/Shell", "WorkflowDS/Blueprint/CronShellJob")
 
 
 class JobHandler(JobHandlerInterface):

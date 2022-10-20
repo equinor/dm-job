@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 
 class JobStatus(str, Enum):
     REGISTERED = "registered"
+    NOT_STARTED = "not started"
     STARTING = "starting"
     RUNNING = "running"
     FAILED = "failed"

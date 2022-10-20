@@ -1,0 +1,37 @@
+{
+  "type": "system/SIMOS/Blueprint",
+  "name": "Container",
+  "description": "A container job",
+  "extends": [
+    "system/SIMOS/DefaultUiRecipes",
+    "WorkflowDS/Blueprints/JobHandler"
+  ],
+  "attributes": [
+    {
+      "attributeType": "string",
+      "type": "system/SIMOS/BlueprintAttribute",
+      "name": "label",
+      "optional": true
+    },
+    {
+      "attributeType": "WorkflowDS/Blueprints/ContainerImage",
+      "type": "system/SIMOS/BlueprintAttribute",
+      "name": "image"
+    },
+    {
+      "attributeType": "string",
+      "type": "system/SIMOS/BlueprintAttribute",
+      "name": "customCommand",
+      "optional": true
+    }
+  ],
+  "uiRecipes": [
+    {
+      "name": "Edit",
+      "type": "system/SIMOS/UiRecipe",
+      "plugin": "edit-container-job",
+      "configType": "",
+      "category": "edit"
+    }
+  ]
+}

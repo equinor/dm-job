@@ -94,6 +94,18 @@ class ValidationException(ApplicationException):
         self.status = request_status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
+class NotImplementedException(ApplicationException):
+    def __init__(
+        self,
+        message: str = "The job handler does not implement that method",
+        debug: str = "The job handler does not implement that method",
+        data: dict = None,
+    ):
+        super().__init__(message, debug, data)
+        self.type = self.__class__.__name__
+        self.status = request_status.HTTP_501_NOT_IMPLEMENTED
+
+
 credentials_exception = HTTPException(
     status_code=request_status.HTTP_401_UNAUTHORIZED,
     detail="Token validation failed",
