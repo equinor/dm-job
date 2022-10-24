@@ -29,8 +29,8 @@ jobs:
           echo "Tagging with ${{ inputs.image-tag }}"
           docker login -u $REGISTRY_USER -p ${{ secrets.ACR_SECRET }} $IMAGE_REGISTRY
           docker pull $API_IMAGE
-          echo $(git log -n 1 --format=format:'%h% %>(12) %cs %>(12,mtrunc)%aN%  %s %D') > ./api/src/version.txt
-          docker build --cache-from $API_IMAGE --target prod --tag $API_IMAGE ./api
+          echo $(git log -n 1 --format=format:'%h% %>(12) %cs %>(12,mtrunc)%aN%  %s %D') > ./src/version.txt
+          docker build --cache-from $API_IMAGE --target prod --tag $API_IMAGE .
           docker tag $API_IMAGE $API_IMAGE:${{ inputs.image-tag }}
           docker push $API_IMAGE:${{ inputs.image-tag }}
 
