@@ -69,6 +69,31 @@ def update_document_by_uid(document_id: str, document: dict, token: str = None) 
     return req.json()  # type: ignore
 
 
+def add_document_to_path(data_source: str, document: dict, directory: str, token: str = None) -> str:
+
+    headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
+    req = requests.post(
+        f"{Config.DMSS_API}/api/v1/documents/{data_source}/add-to-path",
+        data={"document": json.dumps(document), "directory": directory},
+        headers=headers,
+        params={"update_uncontained": True},
+    )
+    req.raise_for_status()
+    return req.json()["uid"]  # type: ignore
+
+
+def add_document_simple(data_source: str, document: dict, token: str = None) -> str:
+
+    headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
+    req = requests.post(
+        f"{Config.DMSS_API}/api/v1/documents/{data_source}/add-raw",
+        json=document,
+        headers=headers,
+    )
+    req.raise_for_status()
+    return req.text
+
+
 def get_blueprint(type_ref: str) -> dict:
     """
     Fetches a resolved blueprint from DMSS

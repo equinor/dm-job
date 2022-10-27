@@ -12,7 +12,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from redis import AuthenticationError
 
 from config import config
-from restful.exceptions import NotFoundException, NotImplementedException
+from restful.exceptions import (
+    BadRequestException,
+    NotFoundException,
+    NotImplementedException,
+)
 from services.dmss import (
     get_document_by_uid,
     get_personal_access_token,
@@ -246,6 +250,8 @@ class JobService:
         job = self._get_job(job_uid)
         if not job:
             raise NotFoundException(f"No job with id '{job_uid}' is registered")
+        if not job.status.COMPLETED:
+            raise BadRequestException("The job has not yet completed")
         job_handler = self._get_job_handler(job)
         try:
             return job_handler.result()  # type: ignore
