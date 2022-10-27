@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from typing import Tuple
 
 import requests
@@ -15,7 +17,14 @@ class JobHandler(JobHandlerInterface):
     A silly test jobHandler that creates a NamedEntity of the input with it's description reversed
     """
 
-    def __init__(self, job: Job, data_source: str):
+    results_directory = f"{Path(__file__).parent}/results"
+    os.makedirs(results_directory, exist_ok=True)
+
+    def __init__(
+        self,
+        job: Job,
+        data_source: str,
+    ):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token}
 
@@ -30,13 +39,20 @@ class JobHandler(JobHandlerInterface):
 
     def start(self) -> str:
         logger.info("Starting ReverseDescription job.")
-        # input_entity = self._get_by_id(f"{self.data_source}/{self.job.entity['applicationInput']['_id']}")
-        # result = input_entity.get("description", "")[::-1]
+        input_entity = self._get_by_id(f"{self.data_source}/{self.job.entity['applicationInput']['_id']}")
+        result = input_entity.get("description", "Backup")[::-1]
+        with open(f"{self.results_directory}/{self.job.job_uid}", "w") as result_file:
+            result_file.write(result)
         logger.info("ReverseDescription job completed")
         return "OK"
 
     def result(self) -> Tuple[str, bytes]:
-        return "Done", b"some value"
+        result_file_path = Path(f"{self.results_directory}/{self.job.job_uid}")
+        if not result_file_path.is_file():
+            return "No result file found", b""
+
+        with open(result_file_path, "rb") as result_file:
+            return "Done", result_file.read()
 
     def progress(self) -> Tuple[JobStatus, str]:
-        return JobStatus.RUNNING, "50%"
+        return self.job.status, "Progress tracking not implemented"

@@ -41,9 +41,9 @@ if [ "$1" = 'api' ]; then
   service_is_ready
     if [ "$ENVIRON" != "local" ]; then
     cat version.txt || true
-    gunicorn app:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5000
+    gunicorn /code/src/app:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5000
   else
-    python3 ./app.py
+    python3 /code/src/app.py
   fi
 else
   exec "$@"
