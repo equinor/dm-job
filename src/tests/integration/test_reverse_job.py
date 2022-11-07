@@ -31,4 +31,4 @@ class TestReverseDescription:
         start_job_response = test_client.post(f"/WorkflowDS/{job_document_dmss_id}").json()
         get_results_response = test_client.get(f"/{start_job_response['uid']}/result")
 
-        assert get_results_response.json()["result"] == ""
+        assert get_results_response.json()["result"] == "Stig Oskar"
