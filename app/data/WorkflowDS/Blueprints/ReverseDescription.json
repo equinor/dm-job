@@ -1,16 +1,16 @@
 {
-  "type": "system/SIMOS/Blueprint",
+  "type": "CORE:Blueprint",
   "name": "ReverseDescription",
   "extends": [
-    "WorkflowDS/Blueprints/JobHandler",
-    "system/SIMOS/DefaultUiRecipes"
+    "/JobHandler",
+    "CORE:DefaultUiRecipes"
   ],
   "description": "A job that takes an input of any type, and outputs a copy with the description reversed",
 
   "uiRecipes": [
     {
       "name": "Edit",
-      "type": "system/SIMOS/UiRecipe",
+      "type": "CORE:UiRecipe",
       "plugin": "edit-reverse-description",
       "configType": "",
       "category": "edit"
