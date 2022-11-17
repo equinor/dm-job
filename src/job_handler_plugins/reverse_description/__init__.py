@@ -8,7 +8,7 @@ from config import config
 from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from utils.logging import logger
 
-_SUPPORTED_TYPE = "WorkflowDS/Blueprints/ReverseDescription"
+_SUPPORTED_TYPE = "sys://WorkflowDS/Blueprints/ReverseDescription"
 
 
 # TODO: Make a more realistic example with progress and a result file.

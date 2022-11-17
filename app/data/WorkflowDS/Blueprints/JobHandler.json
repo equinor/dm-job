@@ -1,11 +1,11 @@
 {
-  "type": "system/SIMOS/Blueprint",
+  "type": "CORE:Blueprint",
   "name": "JobHandler",
   "description": "Base jobHandler type. Other jobHandlers should extend from this one",
   "attributes": [
 {
       "attributeType": "string",
-      "type": "system/SIMOS/BlueprintAttribute",
+      "type": "CORE:BlueprintAttribute",
       "name": "environmentVariables",
       "dimensions": "*",
       "optional": true,
@@ -14,7 +14,7 @@
     {
       "name": "type",
       "attributeType": "string",
-      "type": "system/SIMOS/BlueprintAttribute",
+      "type": "CORE:BlueprintAttribute",
       "optional": false
     }
   ]
