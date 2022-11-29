@@ -17,7 +17,7 @@ jobs:
       - id: create-ref
         run: |
           TAG_REF=$(echo $GITHUB_REF | cut -d / -f 3)
-          echo "::set-output name=tag-ref::TAG_REF"
+          echo "tag-ref=$TAG_REF" >> $GITHUB_OUTPUT
     outputs:
       tag-ref: ${{ steps.create-ref.outputs.tag-ref }}
 
