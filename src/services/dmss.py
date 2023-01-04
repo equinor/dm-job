@@ -48,7 +48,7 @@ def get_document_by_uid(
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute}
     req = requests.get(
-        f"{Config.DMSS_API}/api/v1/documents/{data_source_id}/{document_id}", params=params, headers=headers
+        f"{Config.DMSS_API}/api/documents/{data_source_id}/{document_id}", params=params, headers=headers
     )
     req.raise_for_status()
 
@@ -60,7 +60,7 @@ def update_document_by_uid(document_id: str, document: dict, token: str = None) 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.put(
-        f"{Config.DMSS_API}/api/v1/documents/{document_id}",
+        f"{Config.DMSS_API}/api/documents/{document_id}",
         data=form_data,
         headers=headers,
         params={"update_uncontained": "False"},
@@ -73,7 +73,7 @@ def add_document_to_path(data_source: str, document: dict, directory: str, token
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     req = requests.post(
-        f"{Config.DMSS_API}/api/v1/documents/{data_source}/add-to-path",
+        f"{Config.DMSS_API}/api/documents/{data_source}/add-to-path",
         data={"document": json.dumps(document), "directory": directory},
         headers=headers,
         params={"update_uncontained": True},
@@ -86,7 +86,7 @@ def add_document_simple(data_source: str, document: dict, token: str = None) -> 
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     req = requests.post(
-        f"{Config.DMSS_API}/api/v1/documents/{data_source}/add-raw",
+        f"{Config.DMSS_API}/api/documents/{data_source}/add-raw",
         json=document,
         headers=headers,
     )

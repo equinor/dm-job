@@ -102,7 +102,7 @@ class JobService:
     @staticmethod
     def _insert_reference(document_id: str, reference: dict, token: str = ""):  # nosec
         headers = {"Access-Key": token}
-        req = requests.put(f"{config.DMSS_API}/api/v1/reference/{document_id}", json=reference, headers=headers)
+        req = requests.put(f"{config.DMSS_API}/api/reference/{document_id}", json=reference, headers=headers)
         req.raise_for_status()
 
         return req.json()
