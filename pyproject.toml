@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10.4"
-dmss-api = "^0.3.17"
+dmss-api = "^0.3.24"
 redis = "^4.3.4"
 APScheduler = "^3.9.1"
 docker = "^5.0.3"
