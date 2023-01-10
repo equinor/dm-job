@@ -2,7 +2,6 @@
   "type": "CORE:Blueprint",
   "name": "Shell",
   "extends": [
-    "CORE:DefaultUiRecipes",
     "CORE:NamedEntity",
     "/JobHandler"
   ],

@@ -1,9 +1,6 @@
 {
   "name": "ContainerImage",
   "type": "CORE:Blueprint",
-  "extends": [
-    "CORE:DefaultUiRecipes"
-  ],
   "description": "Container image used as job runner for a task. Full container image name is name/subName",
   "attributes": [
       {
@@ -39,6 +36,5 @@
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string"
     }
-  ],
-  "uiRecipes": []
+  ]
 }
