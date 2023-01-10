@@ -3,7 +3,7 @@
   "name": "Shell",
   "extends": [
     "CORE:NamedEntity",
-    "/JobHandler"
+    "JobHandler"
   ],
   "description": "Description of a shell-job. That is a job that will run in the shell. Only for testing.",
   "attributes": [

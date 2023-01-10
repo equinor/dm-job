@@ -2,7 +2,7 @@
   "type": "CORE:Blueprint",
   "name": "Container",
   "description": "A container job",
-  "extends": ["/JobHandler"],
+  "extends": ["JobHandler"],
   "attributes": [
     {
       "attributeType": "string",
