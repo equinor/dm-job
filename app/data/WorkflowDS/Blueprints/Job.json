@@ -2,7 +2,6 @@
     "name": "Job",
     "abstract": true,
     "type": "CORE:Blueprint",
-    "extends": ["CORE:DefaultUiRecipes"],
     "attributes": [
       {
         "name": "uid",
@@ -78,22 +77,6 @@
         "label": "Reference target",
         "description": "Dotted id to an analysis entity's job result. Should be on the format: entityId.jobs.*index*.result. Must be generated at run time since the index can vary.",
         "optional": true
-      }
-    ],
-    "uiRecipes": [
-      {
-        "name": "Edit",
-        "type": "CORE:UiRecipe",
-        "plugin": "jobInputEdit",
-        "category": "edit",
-        "roles": ["dmss-admin", "domain-expert", "expert-operator", "operator"]
-      },
-      {
-        "name": "Control pane",
-        "type": "CORE:UiRecipe",
-        "plugin": "jobControl",
-        "category": "view",
-        "roles": ["dmss-admin", "domain-expert", "expert-operator", "operator"]
       }
     ]
   }

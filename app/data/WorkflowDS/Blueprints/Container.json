@@ -2,10 +2,7 @@
   "type": "CORE:Blueprint",
   "name": "Container",
   "description": "A container job",
-  "extends": [
-    "CORE:DefaultUiRecipes",
-    "/JobHandler"
-  ],
+  "extends": ["/JobHandler"],
   "attributes": [
     {
       "attributeType": "string",
@@ -23,15 +20,6 @@
       "type": "CORE:BlueprintAttribute",
       "name": "customCommand",
       "optional": true
-    }
-  ],
-  "uiRecipes": [
-    {
-      "name": "Edit",
-      "type": "CORE:UiRecipe",
-      "plugin": "edit-container-job",
-      "configType": "",
-      "category": "edit"
     }
   ]
 }

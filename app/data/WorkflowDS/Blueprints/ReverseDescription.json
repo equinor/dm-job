@@ -1,19 +1,6 @@
 {
   "type": "CORE:Blueprint",
   "name": "ReverseDescription",
-  "extends": [
-    "/JobHandler",
-    "CORE:DefaultUiRecipes"
-  ],
-  "description": "A job that takes an input of any type, and outputs a copy with the description reversed",
-
-  "uiRecipes": [
-    {
-      "name": "Edit",
-      "type": "CORE:UiRecipe",
-      "plugin": "edit-reverse-description",
-      "configType": "",
-      "category": "edit"
-    }
-  ]
+  "extends": ["/JobHandler"],
+  "description": "A job that takes an input of any type, and outputs a copy with the description reversed"
 }

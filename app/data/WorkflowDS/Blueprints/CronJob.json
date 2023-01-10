@@ -2,7 +2,7 @@
   "type": "CORE:Blueprint",
   "name": "CronJob",
   "description": "Blueprint for a job triggered by a time schedule",
-  "extends": ["CORE:DefaultUiRecipes", "CORE:NamedEntity"],
+  "extends": ["CORE:NamedEntity"],
   "attributes": [
     {
       "attributeType": "string",
