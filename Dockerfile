@@ -21,6 +21,7 @@ WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
 COPY .flake8 .bandit ./
+CMD ["api"]
 
 
 FROM base as prod
@@ -29,3 +30,4 @@ WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
 USER 1000
+CMD ["api"]
