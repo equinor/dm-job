@@ -20,7 +20,7 @@ env:
 
 jobs:
   build-and-publish-api-main:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@main
 
@@ -33,4 +33,3 @@ jobs:
           docker build --cache-from $API_IMAGE --target prod --tag $API_IMAGE .
           docker tag $API_IMAGE $API_IMAGE:${{ inputs.image-tag }}
           docker push $API_IMAGE:${{ inputs.image-tag }}
-
