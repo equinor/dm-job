@@ -108,9 +108,6 @@ If you want to use a local version of this package, you can:
 1) Build the local python package from the cloned DMSS repo, by running the generate-python-package.sh script.
 2) Update the DMT docker-compose.override.yml file by adding / uncomment the volume mount: ../data-modelling-storage-service/gen/dmss_api:/dmss_api
 
-## Running / debugging
-
-TODO: How to add debug?
 
 ## Troubleshooting
 
