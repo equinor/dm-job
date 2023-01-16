@@ -63,7 +63,7 @@
         "optional": true
       },
       {
-        "attributeType": "/JobHandler",
+        "attributeType": "JobHandler",
         "type": "CORE:BlueprintAttribute",
         "name": "runner",
         "label": "Runner",
