@@ -17,7 +17,7 @@ uvicorn = {extras = ["standard"], version = "^0.18.2"}
 azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
 azure-identity = "^1.11.0"
-dm-cli = "^0.1.12"
+dm-cli = "^0.1.27"
 
 
 
@@ -62,3 +62,8 @@ exclude = '''
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: mark a test as integration test",
+]

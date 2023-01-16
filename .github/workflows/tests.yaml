@@ -58,6 +58,10 @@ jobs:
           docker pull $API_IMAGE
           DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development --cache-from $API_IMAGE .
 
-      # TODO: Add tests and enable this
-#      - name: Pytest Integration tests
-#        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run --rm job-api pytest
+      - name: Pytest Integration tests
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+          sleep 50  # Wait for database to be ready
+          docker-compose -f docker-compose.yml -f docker-compose.ci.yml run dmss reset-app
+          docker-compose -f docker-compose.yml -f docker-compose.ci.yml run job-api dm --url http://dmss:5000 reset ../app
+          docker-compose -f docker-compose.yml -f docker-compose.ci.yml run --rm job-api pytest -c ../pyproject.toml --integration
