@@ -2,7 +2,7 @@
 import json
 
 import pytest
-from fastapi.testclient import TestClient
+from starlette.testclient import TestClient
 
 from app import create_app
 from services.dmss import dmss_api
