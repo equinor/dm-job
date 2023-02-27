@@ -16,6 +16,10 @@ router = APIRouter()
 @router.post("/{job_dmss_id:path}", operation_id="start_job", response_model=StartJobResponse)
 @create_response(JSONResponse)
 def start(job_dmss_id: str):
+    """Start a job.
+
+    job_dmss_id should be on the format: {data_source_id}/{id}.{attribute}
+    """
     return start_job_use_case(job_dmss_id=job_dmss_id).dict()
 
 

@@ -58,7 +58,7 @@ jobs:
           docker pull $API_IMAGE
           DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development --cache-from $API_IMAGE .
 
-      - name: Pytest Integration tests
+      - name: Pytest tests
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
           sleep 50  # Wait for database to be ready
