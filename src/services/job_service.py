@@ -97,7 +97,7 @@ class JobService:
     @staticmethod
     def _get_job_entity(dmss_id: str, token: str = None):
         data_source_id, job_entity_id, attribute = split_absolute_ref(dmss_id)
-        return get_document_by_uid(data_source_id, job_entity_id, attribute=attribute, token=token, depth=0)
+        return get_document_by_uid(id_reference=f"{data_source_id}/{job_entity_id}.{attribute}", token=token, depth=0)
 
     @staticmethod
     def _insert_reference(document_id: str, reference: dict, token: str = ""):  # nosec

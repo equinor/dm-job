@@ -34,22 +34,20 @@ def get_document(fully_qualified_path: str) -> dict:
     return dmss_api.document_get_by_path(data_source, path=path)["document"]  # type: ignore
 
 
-def get_document_by_uid(
-    data_source_id: str, document_id: str, depth: int = 999, ui_recipe="", attribute="", token: str = None
-) -> dict:
+def get_document_by_uid(id_reference: str, depth: int = 999, ui_recipe="", attribute="", token: str = None) -> dict:
     """
     The uid based DMSS document getter.
     Used by DocumentService.
     Inject a mock 'get_document_by_uid' in unit unit.
+
+    id_reference is on the format: <data_source>/<document_uuid>.<attribute>
     """
 
     # The generated API package was transforming data types. i.e. parsing datetime from strings...
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute}
-    req = requests.get(
-        f"{Config.DMSS_API}/api/documents/{data_source_id}/{document_id}", params=params, headers=headers
-    )
+    req = requests.get(f"{Config.DMSS_API}/api/documents/{id_reference}", params=params, headers=headers)
     req.raise_for_status()
 
     return req.json()  # type: ignore
