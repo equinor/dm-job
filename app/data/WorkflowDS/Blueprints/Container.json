@@ -20,6 +20,11 @@
       "type": "CORE:BlueprintAttribute",
       "name": "customCommand",
       "optional": true
+    },
+    {
+      "attributeType": "string",
+      "type": "CORE:BlueprintAttribute",
+      "name": "name"
     }
   ]
 }
