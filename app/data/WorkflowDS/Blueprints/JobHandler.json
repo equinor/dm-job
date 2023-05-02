@@ -3,6 +3,12 @@
   "name": "JobHandler",
   "description": "Base jobHandler type. Other jobHandlers should extend from this one",
   "attributes": [
+        {
+      "name": "type",
+      "attributeType": "string",
+      "type": "CORE:BlueprintAttribute",
+      "optional": false
+    },
     {
       "attributeType": "string",
       "type": "CORE:BlueprintAttribute",
@@ -10,12 +16,6 @@
       "dimensions": "*",
       "optional": true,
       "description": "a list of strings on format 'myVar=myValue'"
-    },
-    {
-      "name": "type",
-      "attributeType": "string",
-      "type": "CORE:BlueprintAttribute",
-      "optional": false
     }
   ]
 }
