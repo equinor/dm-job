@@ -7,7 +7,6 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10.4"
-dmss-api = "^1.1.0"
 redis = "^4.3.4"
 APScheduler = "^3.9.1"
 docker = "^5.0.3"
@@ -17,7 +16,7 @@ uvicorn = {extras = ["standard"], version = "^0.18.2"}
 azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
 azure-identity = "^1.11.0"
-dm-cli = "^1.0.0"
+dm-cli = "^1.0.7"
 
 
 

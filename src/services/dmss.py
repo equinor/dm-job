@@ -1,9 +1,9 @@
 import json
 
 import requests
-from dmss_api.apis import DefaultApi
 
 from config import Config
+from dmss_api.apis import DefaultApi
 from middleware.store_headers import get_access_key_header, get_auth_header
 
 dmss_api = DefaultApi()
@@ -27,11 +27,9 @@ def get_document(fully_qualified_path: str) -> dict:
     Used by DocumentService.
     Inject a mock 'get_document' in unit.
     """
-    # TODO: Update dmss endpoint to handle a singe ID string
     # TODO: Update dmss endpoint to only return the raw document, not the blueprint(?)
-    data_source, path = fully_qualified_path.split("/", 1)
     dmss_api.api_client.configuration.access_token = get_access_token()
-    return dmss_api.document_get_by_path(data_source, path=path)["document"]  # type: ignore
+    return dmss_api.document_get_by_path(fully_qualified_path)["document"]  # type: ignore
 
 
 def get_document_by_uid(id_reference: str, depth: int = 999, ui_recipe="", attribute="", token: str = None) -> dict:

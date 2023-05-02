@@ -2,13 +2,13 @@ import functools
 import traceback
 from typing import Callable, Type, TypeVar
 
-from dmss_api.exceptions import ServiceException
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 from requests import HTTPError
 from starlette import status
 from starlette.responses import JSONResponse, PlainTextResponse, Response
 
+from dmss_api.exceptions import ServiceException
 from restful.exceptions import (
     ApplicationException,
     BadRequestException,

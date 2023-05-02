@@ -6,6 +6,7 @@
     "version": "0.0.1",
     "dependencies": [
       {
+        "type": "CORE:Dependency",
         "alias": "CORE",
         "address": "system/SIMOS",
         "version": "0.0.1",
