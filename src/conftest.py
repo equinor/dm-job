@@ -16,4 +16,4 @@ def pytest_runtest_setup(item):
 def create_test_root_package():
     test_package = {"type": "dmss://system/SIMOS/Package", "name": "TestEntities", "isRoot": True}
     yield dmss_api.document_add("WorkflowDS", test_package)
-    dmss_api.document_remove_by_path("WorkflowDS", "TestEntities")
+    dmss_api.document_remove_by_path("WorkflowDS/TestEntities")
