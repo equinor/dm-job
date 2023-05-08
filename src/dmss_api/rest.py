@@ -17,7 +17,7 @@ from urllib.parse import urlencode
 
 import urllib3
 
-from dmss_api.exceptions import ApiException, UnauthorizedException, ForbiddenException, NotFoundException, ServiceException, ApiValueError
+from dm_cli.dmss_api.exceptions import ApiException, UnauthorizedException, ForbiddenException, NotFoundException, ServiceException, ApiValueError
 
 
 logger = logging.getLogger(__name__)

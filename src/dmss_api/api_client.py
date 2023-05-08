@@ -20,10 +20,10 @@ from urllib.parse import quote
 from urllib3.fields import RequestField
 
 
-from dmss_api import rest
-from dmss_api.configuration import Configuration
-from dmss_api.exceptions import ApiTypeError, ApiValueError, ApiException
-from dmss_api.model_utils import (
+from dm_cli.dmss_api import rest
+from dm_cli.dmss_api.configuration import Configuration
+from dm_cli.dmss_api.exceptions import ApiTypeError, ApiValueError, ApiException
+from dm_cli.dmss_api.model_utils import (
     ModelNormal,
     ModelSimple,
     ModelComposed,

@@ -11,8 +11,8 @@
 import re  # noqa: F401
 import sys  # noqa: F401
 
-from dmss_api.api_client import ApiClient, Endpoint as _Endpoint
-from dmss_api.model_utils import (  # noqa: F401
+from dm_cli.dmss_api.api_client import ApiClient, Endpoint as _Endpoint
+from dm_cli.dmss_api.model_utils import (  # noqa: F401
     check_allowed_values,
     check_validations,
     date,
@@ -21,15 +21,15 @@ from dmss_api.model_utils import (  # noqa: F401
     none_type,
     validate_and_convert_types
 )
-from dmss_api.model.acl import ACL
-from dmss_api.model.data_source_information import DataSourceInformation
-from dmss_api.model.data_source_request import DataSourceRequest
-from dmss_api.model.entity import Entity
-from dmss_api.model.error_response import ErrorResponse
-from dmss_api.model.get_blueprint_response import GetBlueprintResponse
-from dmss_api.model.lookup import Lookup
-from dmss_api.model.pat_data import PATData
-from dmss_api.model.reference import Reference
+from dm_cli.dmss_api.model.acl import ACL
+from dm_cli.dmss_api.model.data_source_information import DataSourceInformation
+from dm_cli.dmss_api.model.data_source_request import DataSourceRequest
+from dm_cli.dmss_api.model.entity import Entity
+from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
+from dm_cli.dmss_api.model.lookup import Lookup
+from dm_cli.dmss_api.model.pat_data import PATData
+from dm_cli.dmss_api.model.reference import Reference
 
 
 class DefaultApi(object):
@@ -1484,22 +1484,22 @@ class DefaultApi(object):
             callable=__document_add_to_path
         )
 
-        def __document_get_by_id(
+        def __document_get(
             self,
-            id_reference,
+            reference,
             **kwargs
         ):
-            """Get By Id  # noqa: E501
+            """Get  # noqa: E501
 
-            Get document as JSON string.  - **id_reference**: <data_source>/<document_uuid> - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
+            Get document as JSON string.  - **reference**:   - By id: PROTOCOL://DATA SOURCE/$ID.Attribute   - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute   - By query: PROTOCOL://DATA SOURCE/$ID.list(key=value)    The PROTOCOL is optional, and the default is dmss.  - **depth**: Maximum depth for resolving nested documents.  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
-            >>> thread = api.document_get_by_id(id_reference, async_req=True)
+            >>> thread = api.document_get(reference, async_req=True)
             >>> result = thread.get()
 
             Args:
-                id_reference (str):
+                reference (str):
 
             Keyword Args:
                 depth (int): [optional] if omitted the server will use the default value of 999
@@ -1547,29 +1547,29 @@ class DefaultApi(object):
                 '_check_return_type', True
             )
             kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['id_reference'] = \
-                id_reference
+            kwargs['reference'] = \
+                reference
             return self.call_with_http_info(**kwargs)
 
-        self.document_get_by_id = _Endpoint(
+        self.document_get = _Endpoint(
             settings={
                 'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
                 'auth': [
                     'APIKeyHeader',
                     'OAuth2AuthorizationCodeBearer'
                 ],
-                'endpoint_path': '/api/documents/{id_reference}',
-                'operation_id': 'document_get_by_id',
+                'endpoint_path': '/api/documents/{reference}',
+                'operation_id': 'document_get',
                 'http_method': 'GET',
                 'servers': None,
             },
             params_map={
                 'all': [
-                    'id_reference',
+                    'reference',
                     'depth',
                 ],
                 'required': [
-                    'id_reference',
+                    'reference',
                 ],
                 'nullable': [
                 ],
@@ -1584,17 +1584,17 @@ class DefaultApi(object):
                 'allowed_values': {
                 },
                 'openapi_types': {
-                    'id_reference':
+                    'reference':
                         (str,),
                     'depth':
                         (int,),
                 },
                 'attribute_map': {
-                    'id_reference': 'id_reference',
+                    'reference': 'reference',
                     'depth': 'depth',
                 },
                 'location_map': {
-                    'id_reference': 'path',
+                    'reference': 'path',
                     'depth': 'query',
                 },
                 'collection_format_map': {
@@ -1608,128 +1608,7 @@ class DefaultApi(object):
                 'content_type': [],
             },
             api_client=api_client,
-            callable=__document_get_by_id
-        )
-
-        def __document_get_by_path(
-            self,
-            absolute_path,
-            **kwargs
-        ):
-            """Get By Path  # noqa: E501
-
-            Get a document by its absolute path.  - **absolute_path**: <protocol>://<data_source>/<path>.<attribute>  # noqa: E501
-            This method makes a synchronous HTTP request by default. To make an
-            asynchronous HTTP request, please pass async_req=True
-
-            >>> thread = api.document_get_by_path(absolute_path, async_req=True)
-            >>> result = thread.get()
-
-            Args:
-                absolute_path (str):
-
-            Keyword Args:
-                _return_http_data_only (bool): response data without head status
-                    code and headers. Default is True.
-                _preload_content (bool): if False, the urllib3.HTTPResponse object
-                    will be returned without reading/decoding response data.
-                    Default is True.
-                _request_timeout (int/float/tuple): timeout setting for this request. If
-                    one number provided, it will be total request timeout. It can also
-                    be a pair (tuple) of (connection, read) timeouts.
-                    Default is None.
-                _check_input_type (bool): specifies if type checking
-                    should be done one the data sent to the server.
-                    Default is True.
-                _check_return_type (bool): specifies if type checking
-                    should be done one the data received from the server.
-                    Default is True.
-                _host_index (int/None): specifies the index of the server
-                    that we want to use.
-                    Default is read from the configuration.
-                async_req (bool): execute request asynchronously
-
-            Returns:
-                {str: (bool, date, datetime, dict, float, int, list, str, none_type)}
-                    If the method is called asynchronously, returns the request
-                    thread.
-            """
-            kwargs['async_req'] = kwargs.get(
-                'async_req', False
-            )
-            kwargs['_return_http_data_only'] = kwargs.get(
-                '_return_http_data_only', True
-            )
-            kwargs['_preload_content'] = kwargs.get(
-                '_preload_content', True
-            )
-            kwargs['_request_timeout'] = kwargs.get(
-                '_request_timeout', None
-            )
-            kwargs['_check_input_type'] = kwargs.get(
-                '_check_input_type', True
-            )
-            kwargs['_check_return_type'] = kwargs.get(
-                '_check_return_type', True
-            )
-            kwargs['_host_index'] = kwargs.get('_host_index')
-            kwargs['absolute_path'] = \
-                absolute_path
-            return self.call_with_http_info(**kwargs)
-
-        self.document_get_by_path = _Endpoint(
-            settings={
-                'response_type': ({str: (bool, date, datetime, dict, float, int, list, str, none_type)},),
-                'auth': [
-                    'APIKeyHeader',
-                    'OAuth2AuthorizationCodeBearer'
-                ],
-                'endpoint_path': '/api/documents-by-path/{absolute_path}',
-                'operation_id': 'document_get_by_path',
-                'http_method': 'GET',
-                'servers': None,
-            },
-            params_map={
-                'all': [
-                    'absolute_path',
-                ],
-                'required': [
-                    'absolute_path',
-                ],
-                'nullable': [
-                ],
-                'enum': [
-                ],
-                'validation': [
-                ]
-            },
-            root_map={
-                'validations': {
-                },
-                'allowed_values': {
-                },
-                'openapi_types': {
-                    'absolute_path':
-                        (str,),
-                },
-                'attribute_map': {
-                    'absolute_path': 'absolute_path',
-                },
-                'location_map': {
-                    'absolute_path': 'path',
-                },
-                'collection_format_map': {
-                }
-            },
-            headers_map={
-                'accept': [
-                    'application/json',
-                    'text/plain'
-                ],
-                'content_type': [],
-            },
-            api_client=api_client,
-            callable=__document_get_by_path
+            callable=__document_get
         )
 
         def __document_remove(

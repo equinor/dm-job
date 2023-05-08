@@ -18,7 +18,7 @@ import tempfile
 
 from dateutil.parser import parse
 
-from dmss_api.exceptions import (
+from dm_cli.dmss_api.exceptions import (
     ApiKeyError,
     ApiAttributeError,
     ApiTypeError,

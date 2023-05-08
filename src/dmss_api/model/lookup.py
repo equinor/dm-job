@@ -11,7 +11,7 @@
 import re  # noqa: F401
 import sys  # noqa: F401
 
-from dmss_api.model_utils import (  # noqa: F401
+from dm_cli.dmss_api.model_utils import (  # noqa: F401
     ApiTypeError,
     ModelComposed,
     ModelNormal,
@@ -26,12 +26,12 @@ from dmss_api.model_utils import (  # noqa: F401
     validate_get_composed_info,
 )
 from ..model_utils import OpenApiModel
-from dmss_api.exceptions import ApiAttributeError
+from dm_cli.dmss_api.exceptions import ApiAttributeError
 
 
 def lazy_import():
-    from dmss_api.model.recipe import Recipe
-    from dmss_api.model.storage_recipe import StorageRecipe
+    from dm_cli.dmss_api.model.recipe import Recipe
+    from dm_cli.dmss_api.model.storage_recipe import StorageRecipe
     globals()['Recipe'] = Recipe
     globals()['StorageRecipe'] = StorageRecipe
 

@@ -29,7 +29,7 @@ def get_document(fully_qualified_path: str) -> dict:
     """
     # TODO: Update dmss endpoint to only return the raw document, not the blueprint(?)
     dmss_api.api_client.configuration.access_token = get_access_token()
-    return dmss_api.document_get_by_path(fully_qualified_path)["document"]  # type: ignore
+    return dmss_api.document_get(fully_qualified_path)["document"]  # type: ignore
 
 
 def get_document_by_uid(id_reference: str, depth: int = 999, ui_recipe="", attribute="", token: str = None) -> dict:

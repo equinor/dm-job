@@ -15,7 +15,7 @@ import sys
 import urllib3
 
 from http import client as http_client
-from dmss_api.exceptions import ApiValueError
+from dm_cli.dmss_api.exceptions import ApiValueError
 
 
 JSON_SCHEMA_VALIDATION_KEYWORDS = {

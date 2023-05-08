@@ -32,7 +32,7 @@ class TestReverseDescription:
         job_document_dmss_id = dmss_api.document_add_to_path(
             "WorkflowDS/TestEntities", json.dumps(test_job), update_uncontained=True
         )
-        start_job_response = test_client.post(f"WorkflowDS/{job_document_dmss_id['uid']}")
+        start_job_response = test_client.post(f"WorkflowDS/${job_document_dmss_id['uid']}")
         start_job_response.raise_for_status()
         get_results_response = test_client.get(f"/{start_job_response.json()['uid']}/result")
         get_results_response.raise_for_status()
