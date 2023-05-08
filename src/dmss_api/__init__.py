@@ -13,15 +13,15 @@
 __version__ = "1.0.0"
 
 # import ApiClient
-from dmss_api.api_client import ApiClient
+from dm_cli.dmss_api.api_client import ApiClient
 
 # import Configuration
-from dmss_api.configuration import Configuration
+from dm_cli.dmss_api.configuration import Configuration
 
 # import exceptions
-from dmss_api.exceptions import OpenApiException
-from dmss_api.exceptions import ApiAttributeError
-from dmss_api.exceptions import ApiTypeError
-from dmss_api.exceptions import ApiValueError
-from dmss_api.exceptions import ApiKeyError
-from dmss_api.exceptions import ApiException
+from dm_cli.dmss_api.exceptions import OpenApiException
+from dm_cli.dmss_api.exceptions import ApiAttributeError
+from dm_cli.dmss_api.exceptions import ApiTypeError
+from dm_cli.dmss_api.exceptions import ApiValueError
+from dm_cli.dmss_api.exceptions import ApiKeyError
+from dm_cli.dmss_api.exceptions import ApiException

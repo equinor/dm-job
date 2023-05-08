@@ -11,7 +11,7 @@
 import re  # noqa: F401
 import sys  # noqa: F401
 
-from dmss_api.model_utils import (  # noqa: F401
+from dm_cli.dmss_api.model_utils import (  # noqa: F401
     ApiTypeError,
     ModelComposed,
     ModelNormal,
@@ -26,11 +26,11 @@ from dmss_api.model_utils import (  # noqa: F401
     validate_get_composed_info,
 )
 from ..model_utils import OpenApiModel
-from dmss_api.exceptions import ApiAttributeError
+from dm_cli.dmss_api.exceptions import ApiAttributeError
 
 
 def lazy_import():
-    from dmss_api.model.access_level import AccessLevel
+    from dm_cli.dmss_api.model.access_level import AccessLevel
     globals()['AccessLevel'] = AccessLevel
 
 
@@ -156,7 +156,7 @@ class PATData(ModelNormal):
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
             pat_hash (str): [optional]  # noqa: E501
-            uuid (str): [optional] if omitted the server will use the default value of "89a5ff81-037d-4118-8277-3919cb41476f"  # noqa: E501
+            uuid (str): [optional] if omitted the server will use the default value of "e298aba4-84af-4270-bf81-6f11f48680b0"  # noqa: E501
             roles ([str]): [optional] if omitted the server will use the default value of []  # noqa: E501
         """
 
@@ -248,7 +248,7 @@ class PATData(ModelNormal):
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
             pat_hash (str): [optional]  # noqa: E501
-            uuid (str): [optional] if omitted the server will use the default value of "89a5ff81-037d-4118-8277-3919cb41476f"  # noqa: E501
+            uuid (str): [optional] if omitted the server will use the default value of "e298aba4-84af-4270-bf81-6f11f48680b0"  # noqa: E501
             roles ([str]): [optional] if omitted the server will use the default value of []  # noqa: E501
         """
 

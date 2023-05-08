@@ -11,8 +11,8 @@
 import re  # noqa: F401
 import sys  # noqa: F401
 
-from dmss_api.api_client import ApiClient, Endpoint as _Endpoint
-from dmss_api.model_utils import (  # noqa: F401
+from dm_cli.dmss_api.api_client import ApiClient, Endpoint as _Endpoint
+from dm_cli.dmss_api.model_utils import (  # noqa: F401
     check_allowed_values,
     check_validations,
     date,
@@ -21,8 +21,8 @@ from dmss_api.model_utils import (  # noqa: F401
     none_type,
     validate_and_convert_types
 )
-from dmss_api.model.error_response import ErrorResponse
-from dmss_api.model.get_blueprint_response import GetBlueprintResponse
+from dm_cli.dmss_api.model.error_response import ErrorResponse
+from dm_cli.dmss_api.model.get_blueprint_response import GetBlueprintResponse
 
 
 class BlueprintApi(object):
