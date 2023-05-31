@@ -583,7 +583,7 @@ class DefaultApi(object):
         ):
             """Create Lookup  # noqa: E501
 
-            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application  # noqa: E501
+            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application - **recipe_package**: List with one or more paths to package(s) that contain recipe links. (Example: 'system/SIMOS/recipe_links')  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -592,7 +592,7 @@ class DefaultApi(object):
 
             Args:
                 application (str):
-                recipe_package (str):
+                recipe_package ([str]):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -682,7 +682,7 @@ class DefaultApi(object):
                     'application':
                         (str,),
                     'recipe_package':
-                        (str,),
+                        ([str],),
                 },
                 'attribute_map': {
                     'application': 'application',
@@ -693,6 +693,7 @@ class DefaultApi(object):
                     'recipe_package': 'query',
                 },
                 'collection_format_map': {
+                    'recipe_package': 'multi',
                 }
             },
             headers_map={
@@ -1502,7 +1503,8 @@ class DefaultApi(object):
                 reference (str):
 
             Keyword Args:
-                depth (int): [optional] if omitted the server will use the default value of 999
+                depth (int): [optional] if omitted the server will use the default value of 0
+                resolve_links (bool): [optional] if omitted the server will use the default value of False
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
                 _preload_content (bool): if False, the urllib3.HTTPResponse object
@@ -1567,6 +1569,7 @@ class DefaultApi(object):
                 'all': [
                     'reference',
                     'depth',
+                    'resolve_links',
                 ],
                 'required': [
                     'reference',
@@ -1588,14 +1591,18 @@ class DefaultApi(object):
                         (str,),
                     'depth':
                         (int,),
+                    'resolve_links':
+                        (bool,),
                 },
                 'attribute_map': {
                     'reference': 'reference',
                     'depth': 'depth',
+                    'resolve_links': 'resolve_links',
                 },
                 'location_map': {
                     'reference': 'path',
                     'depth': 'query',
+                    'resolve_links': 'query',
                 },
                 'collection_format_map': {
                 }

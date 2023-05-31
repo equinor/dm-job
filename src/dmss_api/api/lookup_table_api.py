@@ -45,7 +45,7 @@ class LookupTableApi(object):
         ):
             """Create Lookup  # noqa: E501
 
-            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application  # noqa: E501
+            Create a recipe lookup table from a package containing RecipeLinks. Associate it with an application. This can be used for setting Ui- and StorageRecipes for specific applications.  - **application**: name of application - **recipe_package**: List with one or more paths to package(s) that contain recipe links. (Example: 'system/SIMOS/recipe_links')  # noqa: E501
             This method makes a synchronous HTTP request by default. To make an
             asynchronous HTTP request, please pass async_req=True
 
@@ -54,7 +54,7 @@ class LookupTableApi(object):
 
             Args:
                 application (str):
-                recipe_package (str):
+                recipe_package ([str]):
 
             Keyword Args:
                 _return_http_data_only (bool): response data without head status
@@ -144,7 +144,7 @@ class LookupTableApi(object):
                     'application':
                         (str,),
                     'recipe_package':
-                        (str,),
+                        ([str],),
                 },
                 'attribute_map': {
                     'application': 'application',
@@ -155,6 +155,7 @@ class LookupTableApi(object):
                     'recipe_package': 'query',
                 },
                 'collection_format_map': {
+                    'recipe_package': 'multi',
                 }
             },
             headers_map={
