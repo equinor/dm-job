@@ -32,31 +32,31 @@ def get_document(fully_qualified_path: str) -> dict:
     return dmss_api.document_get(fully_qualified_path)["document"]  # type: ignore
 
 
-def get_document_by_uid(id_reference: str, depth: int = 999, ui_recipe="", attribute="", token: str = None) -> dict:
+def get_document_by_uid(reference: str, depth: int = 999, ui_recipe="", attribute="", token: str = None) -> dict:
     """
     The uid based DMSS document getter.
     Used by DocumentService.
-    Inject a mock 'get_document_by_uid' in unit unit.
+    Inject a mock 'get_document_by_uid' in unit.
 
-    id_reference is on the format: <data_source>/<document_uuid>.<attribute>
+    reference is on the format: <data_source>/$<document_uuid>.<attribute>
     """
 
     # The generated API package was transforming data types. i.e. parsing datetime from strings...
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
-    params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute}
-    req = requests.get(f"{Config.DMSS_API}/api/documents/{id_reference}", params=params, headers=headers)
+    params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute, "resolve_links": True}
+    req = requests.get(f"{Config.DMSS_API}/api/documents/{reference}", params=params, headers=headers)
     req.raise_for_status()
 
     return req.json()  # type: ignore
 
 
-def update_document_by_uid(document_id: str, document: dict, token: str = None) -> dict:
+def update_document_by_uid(reference: str, document: dict, token: str = None) -> dict:
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.put(
-        f"{Config.DMSS_API}/api/documents/{document_id}",
+        f"{Config.DMSS_API}/api/documents/{reference}",
         data=form_data,
         headers=headers,
         params={"update_uncontained": "False"},

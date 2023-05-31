@@ -470,7 +470,8 @@ class DocumentApi(object):
                 reference (str):
 
             Keyword Args:
-                depth (int): [optional] if omitted the server will use the default value of 999
+                depth (int): [optional] if omitted the server will use the default value of 0
+                resolve_links (bool): [optional] if omitted the server will use the default value of False
                 _return_http_data_only (bool): response data without head status
                     code and headers. Default is True.
                 _preload_content (bool): if False, the urllib3.HTTPResponse object
@@ -535,6 +536,7 @@ class DocumentApi(object):
                 'all': [
                     'reference',
                     'depth',
+                    'resolve_links',
                 ],
                 'required': [
                     'reference',
@@ -556,14 +558,18 @@ class DocumentApi(object):
                         (str,),
                     'depth':
                         (int,),
+                    'resolve_links':
+                        (bool,),
                 },
                 'attribute_map': {
                     'reference': 'reference',
                     'depth': 'depth',
+                    'resolve_links': 'resolve_links',
                 },
                 'location_map': {
                     'reference': 'path',
                     'depth': 'query',
+                    'resolve_links': 'query',
                 },
                 'collection_format_map': {
                 }
