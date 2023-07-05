@@ -32,7 +32,9 @@ def get_document(fully_qualified_path: str) -> dict:
     return dmss_api.document_get(fully_qualified_path)["document"]  # type: ignore
 
 
-def get_document_by_uid(reference: str, depth: int = 999, ui_recipe="", attribute="", token: str = None) -> dict:
+def get_document_by_uid(
+    reference: str, depth: int = 999, resolve_links=False, ui_recipe="", attribute="", token: str = None
+) -> dict:
     """
     The uid based DMSS document getter.
     Used by DocumentService.
@@ -44,7 +46,7 @@ def get_document_by_uid(reference: str, depth: int = 999, ui_recipe="", attribut
     # The generated API package was transforming data types. i.e. parsing datetime from strings...
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
-    params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute, "resolve_links": True}
+    params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute, "resolve_links": resolve_links}
     req = requests.get(f"{Config.DMSS_API}/api/documents/{reference}", params=params, headers=headers)
     req.raise_for_status()
 
