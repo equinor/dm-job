@@ -30,7 +30,7 @@ test_client = TestClient(create_app())
 class TestReverseDescription:
     def test_starting_and_get_result(self):
         job_document_dmss_id = dmss_api.document_add(
-            "/WorkflowDS/TestEntities", json.dumps(test_job), update_uncontained=True
+            "dmss://WorkflowDS/TestEntities", json.dumps(test_job), update_uncontained=True
         )
         start_job_response = test_client.post(f"WorkflowDS/${job_document_dmss_id['uid']}")
         start_job_response.raise_for_status()
