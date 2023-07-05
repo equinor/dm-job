@@ -16,6 +16,6 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture(scope="session", autouse=True)
 def create_test_root_package():
-    test_package = {"type": "dmss://system/SIMOS/Package", "name": "TestEntities", "isRoot": True}
+    test_package = {"type": "dmss://system/SIMOS/Package", "name": "TestEntities", "isRoot": True, "content": []}
     yield dmss_api.document_add("WorkflowDS", json.dumps(test_package))
     dmss_api.document_remove("WorkflowDS/TestEntities")
