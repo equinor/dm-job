@@ -220,8 +220,9 @@ class JobService:
                 message="The job handler does not support the operation",
                 debug="The job handler does not implement the 'progress' method",
             )
-        if status is JobStatus.COMPLETED:
-            result_reference = self._get_job_entity(job.dmss_id, job.token)["result"]
+        job_entity = self._get_job_entity(job.dmss_id, job.token)
+        if status is JobStatus.COMPLETED and job_entity.get("results", None):
+            result_reference = job_entity["result"]
             job.entity["result"] = result_reference
         job.status = status
         job.log = log
