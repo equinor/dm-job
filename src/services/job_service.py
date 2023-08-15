@@ -38,6 +38,14 @@ from utils.string_helpers import split_absolute_ref
 
 
 def schedule_cron_job(scheduler: BackgroundScheduler, function: Callable, job: Job) -> str:
+    """Schedule a cron job.
+
+    A cron job is a job that is run on a schedule. For example at 16:00 every Thursday.
+    The cron syntax from unix is used to define when the job should run.
+    For example: "30 12 * * 3" means that the job should run at 12:30 on Wednesday.
+
+    It is assumed that the 'job' parameter contains an entity with a 'cron' string attibute that follows the cron syntax.
+    """
     if not job.entity.get("cron"):
         raise ValueError("CronJob entity is missing required attribute 'cron'")
     try:
@@ -62,7 +70,14 @@ def schedule_cron_job(scheduler: BackgroundScheduler, function: Callable, job: J
 
 
 class JobService:
+    """
+    Service for working with jobs.
+    The job service is responsible for job operations like registering jobs, starting jobs, removing jobs, etc.
+    """
+
     def __init__(self):
+        """Set up Redis database for storing jobs."""
+        # TODO should move the job store out of the job service to separate responsibilities
         self.job_store = redis.Redis(
             host=config.SCHEDULER_REDIS_HOST,
             port=config.SCHEDULER_REDIS_PORT,
@@ -84,6 +99,7 @@ class JobService:
         return self.job_store.set(str(job.job_uid), json.dumps(job.to_dict()))
 
     def _get_job(self, job_uid: UUID) -> Union[Job, None]:
+        """Get a job from the job storage."""
         try:
             if raw_job := self.job_store.get(str(job_uid)):
                 return Job.from_dict(json.loads(raw_job.decode()))
@@ -96,6 +112,12 @@ class JobService:
 
     @staticmethod
     def _get_job_entity(dmss_id: str, token: str = None):
+        """Get a document from DMSS.
+
+        The dmss_id can be on the formats:
+          - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
+          - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
+        """
         data_source_id, job_entity_id, attribute = split_absolute_ref(dmss_id)
         return get_document_by_uid(
             reference=f"{data_source_id}/{job_entity_id}.{attribute}", token=token, depth=50, resolve_links=False
@@ -103,7 +125,16 @@ class JobService:
 
     @staticmethod
     def _insert_reference(document_id: str, reference: dict, token: str = ""):  # nosec
+        """Insert a reference into an existing entity stored in dmss.
+
+        - **document_id**: the address to the entity we want to update. Can be on the formats:
+          - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
+          - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
+
+        - **reference**: an entity of type 'dmss://system/SIMOS/Reference' to be inserted.
+        """
         headers = {"Access-Key": token}
+        # TODO use document update instead, the reference insert endpoint has been removed from DMSS
         req = requests.put(f"{config.DMSS_API}/api/reference/{document_id}", json=reference, headers=headers)
         req.raise_for_status()
 
@@ -111,10 +142,28 @@ class JobService:
 
     @staticmethod
     def _update_job_entity(dmss_id: str, job_entity: dict, token: str):
+        """Update a job entity in dmss.
+
+        - **dmss_id**: the address to the job entity we want to update. Can be on the formats:
+          - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
+          - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
+
+        - **job_entity**: the new job entity.
+        """
         return update_document_by_uid(dmss_id, {"data": job_entity}, token=token)
 
     def _get_job_handler(self, job: Job) -> JobHandlerInterface:
-        data_source_id = job.dmss_id.split("/", 1)[0]
+        """Get the job handler for a job.
+
+        Job handlers must be placed in the folders "default_job_handlers" and "job_handler_plugins" in the
+        repository root folder.
+        Each job handler have a folder with at least one file: __init__.py
+        This __init__ file must implement a class called "JobHandler" that inherits from the JobHandlerInterface class.
+
+        The runner type in the job entity (job.entity["runner"]["type"]) decides what job handler to fetch.
+        Also, the runner type must be equal to the '_SUPPORTED_TYPE' inside the job handler's __init__ file.
+        """
+        data_source_id = job.dmss_id.split("/", 1)[0]  # TODO use split_absolute_ref() to do this splitting.
 
         job_handler_directories = []
         for handler_location in ("default_job_handlers", "job_handler_plugins"):
@@ -139,6 +188,7 @@ class JobService:
         raise NotImplementedError(f"No handler for a job of type '{job.entity['runner']['type']}' is configured")
 
     def _run_job(self, job_uid: UUID) -> str:
+        """Start a job, by calling the start() function for the job's job handler."""
         job: Job = self._get_job(job_uid)
         if not job:
             raise NotFoundException(
@@ -174,6 +224,14 @@ class JobService:
             return job.log  # type: ignore
 
     def register_job(self, dmss_id: str) -> Tuple[str, str]:
+        """Register and start a job.
+
+        Create an instance of the Job class from a job entity stored in DMSS, and start running the job.
+
+        - **dmss_id**: address to the job entity to register. Can be on the formats:
+          - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
+          - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
+        """
         # A token must be created when there still is a request object.
         token = get_personal_access_token()
         job_entity = self._get_job_entity(dmss_id, token)
@@ -209,6 +267,10 @@ class JobService:
         return result
 
     def status_job(self, job_uid: UUID) -> Tuple[JobStatus, str, str]:
+        """Get the status for an existing job.
+
+        The result of the job is fetched by using the progress() function in the job handler for the given job.
+        """
         job = self._get_job(job_uid)
         if not job:
             raise NotFoundException(f"No job with uid '{job_uid}' is registered")
@@ -235,6 +297,11 @@ class JobService:
         return status, job.log, f"Started: {job.started.isoformat()}"
 
     def remove_job(self, job_uid: UUID) -> str:
+        """Remove an existing job.
+
+        The remove() function in the job's job handler is used.
+        Also, the job is removed from the job store.
+        """
         job = self._get_job(job_uid)
         if not job:
             raise NotFoundException(f"No job with id '{job_uid}' is registered")
@@ -250,6 +317,10 @@ class JobService:
         return remove_message  # type: ignore
 
     def get_job_result(self, job_uid: UUID) -> Tuple[str, bytes]:
+        """Get result from an existing job.
+
+        The result() function in the job's job handler is used.
+        """
         job = self._get_job(job_uid)
         if not job:
             raise NotFoundException(f"No job with id '{job_uid}' is registered")
