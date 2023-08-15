@@ -5,6 +5,7 @@ services:
     image: datamodelingtool.azurecr.io/dmss:latest
     restart: unless-stopped
     environment:
+      AUTH_ENABLED: 0
       ENVIRONMENT: local
       MONGO_INITDB_ROOT_USERNAME: maf
       MONGO_INITDB_ROOT_PASSWORD: maf
@@ -35,6 +36,8 @@ services:
       DMSS_API: http://dmss:5000
     depends_on:
       - job-store
+    volumes:
+      - ../dm-core-packages/example/job_handlers:/code/src/job_handler_plugins
     ports:
       - "5001:5000"
 

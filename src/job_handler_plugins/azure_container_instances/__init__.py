@@ -4,6 +4,7 @@ from collections import namedtuple
 from time import sleep
 from typing import Tuple
 
+from azure.mgmt.web import WebSiteManagementClient
 from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import ClientSecretCredential
 from azure.mgmt.containerinstance import ContainerInstanceManagementClient
@@ -34,6 +35,67 @@ class JobHandler(JobHandlerInterface):
     Support both executable jobs and job services
     """
 
+    def __init__(self, job, data_source: str):
+        super().__init__(job, data_source)
+        # logger.setLevel(logging.WARNING)  # I could not find the correctly named logger for this...
+        azure_credentials = ClientSecretCredential(
+            client_id=config.AZURE_JOB_SP_CLIENT_ID,
+            client_secret=config.AZURE_JOB_SP_SECRET,
+            tenant_id=config.AZURE_JOB_SP_TENANT_ID,
+        )
+        self.azure_valid_container_name = (self.job.entity["runner"]["name"] + str(job.job_uid)).lower().replace(".",
+                                                                                                                 "-")
+        self.aci_client = ContainerInstanceManagementClient(
+            azure_credentials, subscription_id=config.AZURE_JOB_SUBSCRIPTION
+        )
+
+        WEB_APP_NAME = os.environ.get("WEB_APP_NAME", f"PythonAzureExample-WebApp-{random.randint(1, 100000):05}")
+        SERVICE_PLAN_NAME = "WEB_APP_SERVICE_PLAN"
+        web_app_client = WebSiteManagementClient(azure_credentials, config.AZURE_JOB_SUBSCRIPTION)
+        # Provision the plan; Linux is the default
+        poller = web_app_client.app_service_plans.begin_create_or_update(config.AZURE_JOB_RESOURCE_GROUP,
+                                                                         SERVICE_PLAN_NAME,
+                                                                         {
+                                                                             "location": "norwayeast",
+                                                                             "reserved": True,
+                                                                             "sku": {"name": "B1"}
+                                                                         }
+                                                                         )
+
+        plan_result = poller.result()
+
+        print(f"Provisioned App Service plan {plan_result.name}")
+
+        ####
+        poller = web_app_client.web_apps.begin_create_or_update(config.AZURE_JOB_RESOURCE_GROUP,
+                                                                WEB_APP_NAME,
+                                                                {
+                                                                    "location": "norwayeast",
+                                                                    "server_farm_id": plan_result.id,
+                                                                    "site_config": {
+                                                                        "linux_fx_version": "python|3.8"
+                                                                    }
+                                                                }
+                                                                )
+
+        web_app_result = poller.result()
+        print(f"Provisioned web app {web_app_result.name} at {web_app_result.default_host_name}")
+
+        ####
+        REPO_URL = os.environ["REPO_URL"]
+
+        poller = web_app_client.web_apps.begin_create_or_update_source_control(config.AZURE_JOB_RESOURCE_GROUP,
+                                                                               WEB_APP_NAME,
+                                                                               {
+                                                                                   "location": "GitHub",
+                                                                                   "repo_url": REPO_URL,
+                                                                                   "branch": "master"
+                                                                               }
+                                                                               )
+
+    sc_result = poller.result()
+
+    print(f"Set source control on web app to {sc_result.branch} branch of {sc_result.repo_url}")
     def __init__(self, job, data_source: str):
         super().__init__(job, data_source)
         logger.setLevel(logging.WARNING)  # I could not find the correctly named logger for this...

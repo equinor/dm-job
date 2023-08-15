@@ -17,6 +17,10 @@ azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
 azure-identity = "^1.11.0"
 dm-cli = "^1.0.10"
+azure-mgmt-web = "7.1.0"
+azure-cli-core = "^2.51.0"
+azure-cli-command-modules-nspkg = "^2.0.3"
+
 
 
 

@@ -5,9 +5,12 @@ ENTRYPOINT ["/code/src/init.sh"]
 CMD ["api"]
 EXPOSE 5000
 
-RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y curl
+RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y curl && apt install build-essential -y
+RUN apt-get install azure-cli -y
 
 ENV PATH="/code/.venv/bin:$PATH"
+
+RUN useradd --system --uid 1000 nonrootuser
 
 RUN pip install --upgrade pip && \
     pip install poetry && \
@@ -21,6 +24,8 @@ WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
 COPY .flake8 .bandit ./
+RUN chown -R nonrootuser /home
+USER nonrootuser
 CMD ["api"]
 
 
@@ -29,5 +34,6 @@ RUN poetry install --no-dev
 WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
-USER 1000
+RUN chown -R nonrootuser /home
+USER nonrootuser
 CMD ["api"]
