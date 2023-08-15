@@ -18,7 +18,15 @@ router = APIRouter()
 def start(job_dmss_id: str):
     """Start a job.
 
-    job_dmss_id should be on the format: {data_source_id}/{id}.{attribute}
+    To start the job, a job handler needs to be implemented for the job entity referenced with 'job_dmss_id'.
+    After the job is started, the internal job uid is included in the response. This uid can be used to
+    get status, remove the job or get the result.
+
+    - **job_dmss_id**: an address to a job entity stored in DMSS:
+       - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
+       - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
+
+    The PROTOCOL is optional, and the default is dmss.
     """
     return start_job_use_case(job_dmss_id=job_dmss_id).dict()
 
@@ -26,16 +34,29 @@ def start(job_dmss_id: str):
 @router.get("/{job_uid}", operation_id="job_status", response_model=StatusJobResponse)
 @create_response(JSONResponse)
 def status(job_uid: str):
+    """Get the status for an existing job.
+
+    - **job_uid**: the job API's internal uid for the job.
+    """
     return status_job_use_case(job_id=job_uid).dict()
 
 
 @router.delete("/{job_uid}", operation_id="remove_job")
 @create_response(PlainTextResponse)
 def remove(job_uid: str):
+    """Remove an existing job by calling the remove() function in the job handler for a given job.
+    The job will then be deleted from the redis database used for storing jobs.
+
+    - **job_uid**: the job API's internal uid for the job.
+    """
     return delete_job_use_case(job_id=job_uid)
 
 
 @router.get("/{job_uid}/result", operation_id="job_result", response_model=GetJobResultResponse)
 @create_response(JSONResponse)
 def result(job_uid: str):
+    """Get the results from a completed job, by calling the result() function in the job handler for a given job.
+
+    - **job_uid**: the job API's internal uid for the job.
+    """
     return get_job_result_use_case(job_uid=job_uid).dict()
