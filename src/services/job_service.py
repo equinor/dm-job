@@ -155,8 +155,8 @@ class JobService:
     def _get_job_handler(self, job: Job) -> JobHandlerInterface:
         """Get the job handler for a job.
 
-        Job handlers must be placed in the folders "default_job_handlers" and "job_handler_plugins" in the
-        repository root folder.
+        Job handlers must be placed in the "default_job_handlers" or the "job_handler_plugins" folder in the
+        repository src folder.
         Each job handler have a folder with at least one file: __init__.py
         This __init__ file must implement a class called "JobHandler" that inherits from the JobHandlerInterface class.
 
