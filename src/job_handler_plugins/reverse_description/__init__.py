@@ -38,8 +38,8 @@ class JobHandler(JobHandlerInterface):
 
     def start(self) -> str:
         logger.info("Starting ReverseDescription job.")
-        input_entity = self._get_by_id(f"{self.data_source}/{self.job.entity['applicationInput']['address']}")
-        result = input_entity.get("description", "Backup")[::-1]
+        application_input_entity = self.job.entity["applicationInput"]
+        result = application_input_entity.get("description", "Backup")[::-1]
         with open(f"{self.results_directory}/{self.job.job_uid}", "w") as result_file:
             result_file.write(result)
         logger.info("ReverseDescription job completed")
