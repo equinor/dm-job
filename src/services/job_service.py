@@ -28,7 +28,7 @@ from services.dmss import (
 from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from services.job_scheduler import scheduler
 from utils.logging import logger
-from utils.string_helpers import split_absolute_ref
+from utils.string_helpers import split_address
 
 # TODO: Support cron jobs
 # def is_cron_job(blueprint_ref: str) -> bool:
@@ -118,7 +118,7 @@ class JobService:
           - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
           - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
         """
-        data_source_id, job_entity_id, attribute = split_absolute_ref(dmss_id)
+        protocol, data_source_id, job_entity_id, attribute = split_address(dmss_id)
         return get_document_by_uid(
             reference=f"{data_source_id}/{job_entity_id}.{attribute}", token=token, depth=50, resolve_links=False
         )
