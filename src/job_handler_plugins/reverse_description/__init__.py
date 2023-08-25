@@ -26,13 +26,16 @@ class JobHandler(JobHandlerInterface):
         data_source: str,
     ):
         super().__init__(job, data_source)
-        self.headers = {"Access-Key": job.token}
+        self.headers = {"Access-Key": job.token or ""}
 
     def _get_by_id(self, reference: str, depth: int = 1, attribute: str = ""):
         params = {"depth": depth, "attribute": attribute}
         req = requests.get(
-            f"{config.DMSS_API}/api/documents/{reference}?resolve_links=true&depth=100", params=params, headers=self.headers  # type: ignore
-        )  # type: ignore
+            f"{config.DMSS_API}/api/documents/{reference}?resolve_links=true&depth=100",
+            params=params,
+            headers=self.headers,
+            timeout=10,
+        )
         req.raise_for_status()
         return req.json()
 
