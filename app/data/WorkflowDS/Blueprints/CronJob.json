@@ -1,24 +1,26 @@
 {
-  "type": "CORE:Blueprint",
   "name": "CronJob",
+  "type": "CORE:Blueprint",
   "description": "Blueprint for a job triggered by a time schedule",
-  "extends": ["CORE:NamedEntity"],
+  "extends": [
+    "CORE:NamedEntity"
+  ],
   "attributes": [
     {
-      "attributeType": "string",
+      "name": "cron",
       "type": "CORE:BlueprintAttribute",
-      "name": "cron"
+      "attributeType": "string"
     },
     {
-      "attributeType": "string",
-      "type": "CORE:BlueprintAttribute",
       "name": "startDate",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
       "optional": true
     },
     {
-      "attributeType": "string",
-      "type": "CORE:BlueprintAttribute",
       "name": "endDate",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
       "optional": true
     }
   ]

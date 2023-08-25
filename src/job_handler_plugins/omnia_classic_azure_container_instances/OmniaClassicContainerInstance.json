@@ -96,9 +96,9 @@
       }
     },
     {
+      "name": "[parameters('name')]",
       "type": "Microsoft.ContainerInstance/containerGroups",
       "apiVersion": "2019-12-01",
-      "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "properties": {
         "containers": [
@@ -131,7 +131,9 @@
           "Id": "[resourceId('Microsoft.Network/networkProfiles', 'myNetworkProfile')]"
         }
       },
-      "dependsOn": ["[resourceId('Microsoft.Network/networkProfiles', 'myNetworkProfile')]"]
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkProfiles', 'myNetworkProfile')]"
+      ]
     }
   ]
 }

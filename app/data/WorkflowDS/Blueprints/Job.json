@@ -1,7 +1,7 @@
 {
   "name": "Job",
-  "abstract": true,
   "type": "CORE:Blueprint",
+  "abstract": true,
   "attributes": [
     {
       "name": "type",
@@ -34,11 +34,11 @@
       "default": "Not registered"
     },
     {
-      "attributeType": "object",
-      "type": "CORE:BlueprintAttribute",
       "name": "applicationInput",
-      "label": "Input",
+      "type": "CORE:BlueprintAttribute",
       "description": "Input entity to a job",
+      "attributeType": "object",
+      "label": "Input",
       "contained": false,
       "optional": true
     },
@@ -48,7 +48,7 @@
       "attributeType": "string",
       "optional": true
     },
-        {
+    {
       "name": "stopped",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
@@ -74,19 +74,19 @@
       "optional": true
     },
     {
-      "attributeType": "JobHandler",
-      "type": "CORE:BlueprintAttribute",
       "name": "runner",
-      "label": "Runner",
+      "type": "CORE:BlueprintAttribute",
       "description": "JobRunner that will handle this job",
+      "attributeType": "JobHandler",
+      "label": "Runner",
       "optional": true
     },
     {
-      "attributeType": "string",
-      "type": "CORE:BlueprintAttribute",
       "name": "referenceTarget",
-      "label": "Reference target",
+      "type": "CORE:BlueprintAttribute",
       "description": "Dotted id to an analysis entity's job result. Should be on the format: entityId.jobs.*index*.result. Must be generated at run time since the index can vary.",
+      "attributeType": "string",
+      "label": "Reference target",
       "optional": true
     }
   ]

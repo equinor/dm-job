@@ -1,6 +1,8 @@
 {
-  "type": "CORE:Blueprint",
   "name": "ReverseDescription",
-  "extends": ["JobHandler"],
-  "description": "A job that takes an input of any type, and outputs a copy with the description reversed"
+  "type": "CORE:Blueprint",
+  "description": "A job that takes an input of any type, and outputs a copy with the description reversed",
+  "extends": [
+    "JobHandler"
+  ]
 }

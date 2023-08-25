@@ -1,7 +1,10 @@
 {
-  "type": "CORE:Blueprint",
   "name": "AzureContainer",
+  "type": "CORE:Blueprint",
   "description": "Description of a executable job running as an Azure Container Instance",
-  "extends": ["Container", "JobHandler"],
+  "extends": [
+    "Container",
+    "JobHandler"
+  ],
   "attributes": []
 }
