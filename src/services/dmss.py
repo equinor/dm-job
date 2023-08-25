@@ -33,7 +33,7 @@ def get_document(fully_qualified_path: str) -> dict:
 
 
 def get_document_by_uid(
-    reference: str, depth: int = 999, resolve_links=False, ui_recipe="", attribute="", token: str = None
+    reference: str, depth: int = 999, resolve_links=False, ui_recipe="", attribute="", token: str | None = None
 ) -> dict:
     """
     The uid based DMSS document getter.
@@ -53,7 +53,7 @@ def get_document_by_uid(
     return req.json()  # type: ignore
 
 
-def update_document_by_uid(reference: str, document: dict, token: str = None) -> dict:
+def update_document_by_uid(reference: str, document: dict, token: str | None = None) -> dict:
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.put(
@@ -65,18 +65,6 @@ def update_document_by_uid(reference: str, document: dict, token: str = None) ->
     )
     req.raise_for_status()
     return req.json()  # type: ignore
-
-
-def add_document_simple(data_source: str, document: dict, token: str = None) -> str:
-    headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
-    req = requests.post(
-        f"{Config.DMSS_API}/api/documents/{data_source}/add-raw",
-        json=document,
-        headers=headers,
-        timeout=10,
-    )
-    req.raise_for_status()
-    return req.text
 
 
 def get_blueprint(type_ref: str) -> dict:

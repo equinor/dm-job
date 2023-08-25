@@ -11,7 +11,7 @@ class Deployer:
 
         self.client = ResourceManagementClient(self.credentials, self.subscription_id)
 
-    def deploy(self, template: dict, deployment_name: str, parameters: dict = None):
+    def deploy(self, template: dict, deployment_name: str, parameters: dict):
         deployment_properties = {
             "mode": DeploymentMode.incremental,
             "template": template,

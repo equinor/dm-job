@@ -29,10 +29,8 @@ class JobHandler(JobHandlerInterface):
         self.headers = {"Access-Key": job.token or ""}
 
     def _get_by_id(self, reference: str, depth: int = 1, attribute: str = ""):
-        params = {"depth": depth, "attribute": attribute}
         req = requests.get(
             f"{config.DMSS_API}/api/documents/{reference}?resolve_links=true&depth=100",
-            params=params,
             headers=self.headers,
             timeout=10,
         )
