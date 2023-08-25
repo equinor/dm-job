@@ -111,7 +111,7 @@ class JobService:
         return None
 
     @staticmethod
-    def _get_job_entity(dmss_id: str, token: str = None):
+    def _get_job_entity(dmss_id: str, token: str | None = None):
         """Get a document from DMSS.
 
         The dmss_id can be on the formats:
@@ -146,7 +146,7 @@ class JobService:
         return req.json()
 
     @staticmethod
-    def _update_job_entity(dmss_id: str, job_entity: dict, token: str):
+    def _update_job_entity(dmss_id: str, job_entity: dict, token: str | None):
         """Update a job entity in dmss.
 
         - **dmss_id**: the address to the job entity we want to update. Can be on the formats:

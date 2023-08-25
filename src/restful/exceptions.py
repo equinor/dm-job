@@ -23,7 +23,7 @@ class ApplicationException(Exception):
         self,
         message: str = "The requested operation failed",
         debug: str = "An unknown and unhandled exception occurred in the API",
-        data: dict = None,
+        data: dict | None = None,
         status: int = 500,
     ):
         self.status = status
@@ -47,7 +47,7 @@ class MissingPrivilegeException(ApplicationException):
         self,
         message: str = "You do not have the required permissions",
         debug: str = "Action denied because of insufficient permissions",
-        data: dict = None,
+        data: dict | None = None,
     ):
         self.type = self.__class__.__name__
         self.message = message
@@ -61,7 +61,7 @@ class NotFoundException(ApplicationException):
         self,
         message: str = "The requested resource could not be found",
         debug: str = "The requested resource could not be found",
-        data: dict = None,
+        data: dict | None = None,
     ):
         self.type = self.__class__.__name__
         self.message = message
@@ -75,7 +75,7 @@ class BadRequestException(ApplicationException):
         self,
         message: str = "Invalid data for the operation",
         debug: str = "Unable to complete the requested operation with the given input values.",
-        data: dict = None,
+        data: dict | None = None,
     ):
         super().__init__(message, debug, data)
         self.type = self.__class__.__name__
@@ -87,7 +87,7 @@ class ValidationException(ApplicationException):
         self,
         message: str = "The received data is invalid",
         debug: str = "Values are invalid for requested operation.",
-        data: dict = None,
+        data: dict | None = None,
     ):
         super().__init__(message, debug, data)
         self.type = self.__class__.__name__
@@ -99,7 +99,7 @@ class NotImplementedException(ApplicationException):
         self,
         message: str = "The job handler does not implement that method",
         debug: str = "The job handler does not implement that method",
-        data: dict = None,
+        data: dict | None = None,
     ):
         super().__init__(message, debug, data)
         self.type = self.__class__.__name__
