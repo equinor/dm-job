@@ -54,7 +54,6 @@ def get_document_by_uid(
 
 
 def update_document_by_uid(reference: str, document: dict, token: str = None) -> dict:
-
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.put(
@@ -68,7 +67,6 @@ def update_document_by_uid(reference: str, document: dict, token: str = None) ->
 
 
 def add_document_simple(data_source: str, document: dict, token: str = None) -> str:
-
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     req = requests.post(
         f"{Config.DMSS_API}/api/documents/{data_source}/add-raw",
