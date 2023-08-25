@@ -135,7 +135,12 @@ class JobService:
         """
         headers = {"Access-Key": token}
         # TODO use document update instead, the reference insert endpoint has been removed from DMSS
-        req = requests.put(f"{config.DMSS_API}/api/reference/{document_id}", json=reference, headers=headers)
+        req = requests.put(
+            f"{config.DMSS_API}/api/reference/{document_id}",
+            json=reference,
+            headers=headers,
+            timeout=10,
+        )
         req.raise_for_status()
 
         return req.json()

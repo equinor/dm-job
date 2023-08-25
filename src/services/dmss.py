@@ -47,7 +47,7 @@ def get_document_by_uid(
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute, "resolve_links": resolve_links}
-    req = requests.get(f"{Config.DMSS_API}/api/documents/{reference}", params=params, headers=headers)
+    req = requests.get(f"{Config.DMSS_API}/api/documents/{reference}", params=params, headers=headers, timeout=10)
     req.raise_for_status()
 
     return req.json()  # type: ignore
@@ -61,6 +61,7 @@ def update_document_by_uid(reference: str, document: dict, token: str = None) ->
         data=form_data,
         headers=headers,
         params={"update_uncontained": "False"},
+        timeout=10,
     )
     req.raise_for_status()
     return req.json()  # type: ignore
@@ -72,6 +73,7 @@ def add_document_simple(data_source: str, document: dict, token: str = None) -> 
         f"{Config.DMSS_API}/api/documents/{data_source}/add-raw",
         json=document,
         headers=headers,
+        timeout=10,
     )
     req.raise_for_status()
     return req.text
