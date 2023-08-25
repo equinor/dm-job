@@ -3,26 +3,26 @@
   "type": "CORE:Blueprint",
   "description": "Container image used as job runner for a task. Full container image name is name/subName",
   "attributes": [
-      {
+    {
       "name": "type",
-      "attributeType": "string",
       "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
       "label": "Type",
       "default": "",
       "optional": false
     },
     {
       "name": "description",
-      "attributeType": "string",
       "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
       "default": "",
       "optional": true,
       "label": "Description"
     },
     {
-      "attributeType": "string",
-      "type": "CORE:BlueprintAttribute",
       "name": "imageName",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
       "optional": true
     },
     {
