@@ -33,7 +33,7 @@ jobs:
 
 
       - name: "Pull Docker image"
-        run: docker pull $DOCKER_IMAGE.
+        run: docker pull $DOCKER_IMAGE
 
       - name: "Build Docker image"
         run: docker build --cache-from $DOCKER_IMAGE --target prod --tag $DOCKER_IMAGE .
