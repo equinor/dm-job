@@ -23,6 +23,7 @@ repos:
           [--autofix, --no-sort-keys, "--top-keys=_id,name,type,description"]
       - id: no-commit-to-branch
         args: [--branch, main]
+        stages: [commit-msg]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v2.4.0
