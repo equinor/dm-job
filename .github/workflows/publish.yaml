@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   workflow_call:  # Workflow is meant to be called from another workflow, with the image tag as input
     inputs:
-      image-tag:
+      image-tags:
         description: 'Which tag to set for the produced docker images'
         default: 'latest'
         required: true
@@ -11,25 +11,43 @@ on:
       ACR_SECRET:
         required: false
 
-
 env:
   IMAGE_REGISTRY: datamodelingtool.azurecr.io
   REGISTRY_USER: datamodelingtool
-  API_IMAGE: datamodelingtool.azurecr.io/dm-job
+  DOCKER_IMAGE: datamodelingtool.azurecr.io/dm-job
 
 
 jobs:
-  build-and-publish-api-main:
-    runs-on: ubuntu-20.04
+  build-and-push:
+    name: Build and push
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@main
 
-      - name: "Build and Publish API"
+      - name: "Write version file"
+        run: echo $(git log -n 1 --format=format:'%h% %>(12) %cs %>(12,mtrunc)%aN%  %s %D') > ./src/version.txt
+
+      - name: "Docker Login"
+        run: docker login -u $REGISTRY_USER -p ${{ secrets.ACR_SECRET }} $IMAGE_REGISTRY
+
+
+      - name: "Pull Docker image"
+        run: docker pull $DOCKER_IMAGE.
+
+      - name: "Build Docker image"
+        run: docker build --cache-from $DOCKER_IMAGE --target prod --tag $DOCKER_IMAGE .
+
+      - name: "Tag and push"
         run: |
-          echo "Tagging with ${{ inputs.image-tag }}"
-          docker login -u $REGISTRY_USER -p ${{ secrets.ACR_SECRET }} $IMAGE_REGISTRY
-          docker pull $API_IMAGE
-          echo $(git log -n 1 --format=format:'%h% %>(12) %cs %>(12,mtrunc)%aN%  %s %D') > ./src/version.txt
-          docker build --cache-from $API_IMAGE --target prod --tag $API_IMAGE .
-          docker tag $API_IMAGE $API_IMAGE:${{ inputs.image-tag }}
-          docker push $API_IMAGE:${{ inputs.image-tag }}
+          echo "Tagging with ${{ inputs.image-tags }}"
+          IFS=','
+          for IMAGE_TAG in $(echo ${{ inputs.image-tags }})
+          do
+            echo "Tagging with $IMAGE_TAG"
+            docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$IMAGE_TAG
+            docker push $DOCKER_IMAGE:$IMAGE_TAG
+          done
+
+      - name: "Docker Logout"
+        run: docker logout

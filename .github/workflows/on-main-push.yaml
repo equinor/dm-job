@@ -14,6 +14,19 @@ jobs:
     needs: tests
     uses: ./.github/workflows/publish.yaml
     with:
-      image-tag: latest
+      image-tags: latest
+    secrets:
+      ACR_SECRET: ${{ secrets.ACR_SECRET }}
+
+  release-please:
+    needs: [tests]
+    uses: ./.github/workflows/create-release-pr.yaml
+
+  publish-tagged-docker-image:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    uses: ./.github/workflows/publish.yaml
+    with:
+      image-tags: production,${{ needs.release-please.outputs.tag_name }}
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
