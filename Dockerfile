@@ -1,8 +1,7 @@
 FROM python:3.10-slim as base
 ENV PYTHONUNBUFFERED=1 PYTHONPATH=/code/src
 WORKDIR /code
-ENTRYPOINT ["/code/src/init.sh"]
-CMD ["api"]
+CMD ["/code/src/init.sh", "api"]
 EXPOSE 5000
 
 RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y curl
@@ -21,7 +20,6 @@ WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
 COPY .flake8 .bandit ./
-CMD ["api"]
 
 
 FROM base as prod
@@ -30,4 +28,3 @@ WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
 USER 1000
-CMD ["api"]
