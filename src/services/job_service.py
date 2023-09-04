@@ -120,7 +120,7 @@ class JobService:
         """
         protocol, data_source_id, job_entity_id, attribute = split_address(dmss_id)
         return get_document_by_uid(
-            reference=f"{data_source_id}/{job_entity_id}.{attribute}", token=token, depth=50, resolve_links=False
+            reference=f"{data_source_id}/{job_entity_id}.{attribute}", token=token, depth=1, resolve_links=False
         )
 
     @staticmethod
