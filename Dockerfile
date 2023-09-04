@@ -1,16 +1,15 @@
 FROM python:3.10-slim as base
-ENV PYTHONUNBUFFERED=1 PYTHONPATH=/code/src
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/code/src
 WORKDIR /code
 CMD ["/code/src/init.sh", "api"]
 EXPOSE 5000
 
 RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y curl
 
-ENV PATH="/code/.venv/bin:$PATH"
-
 RUN pip install --upgrade pip && \
     pip install poetry && \
-    poetry config virtualenvs.in-project true
+    poetry config virtualenvs.create false
 
 COPY pyproject.toml poetry.lock ./
 
