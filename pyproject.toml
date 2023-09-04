@@ -46,7 +46,7 @@ all=true
 
 [tool.black]
 line-length = 119
-target-version = ['py10']
+target-version = ['py11']
 exclude = '''
 /(
     \.eggs

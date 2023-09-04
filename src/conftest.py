@@ -3,7 +3,6 @@ import json
 import pytest
 
 from services.dmss import dmss_api
-from src.restful.exceptions import NotFoundException
 
 
 def pytest_addoption(parser):
@@ -20,6 +19,6 @@ def create_test_root_package():
     test_package = {"type": "dmss://system/SIMOS/Package", "name": "TestEntities", "isRoot": True, "content": []}
     try:
         dmss_api.document_remove("WorkflowDS/TestEntities")
-    except Exception:
+    except Exception:  # nosec
         pass
     yield dmss_api.document_add("WorkflowDS", json.dumps(test_package))
