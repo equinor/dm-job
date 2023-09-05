@@ -28,9 +28,9 @@ class JobHandler(JobHandlerInterface):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token or ""}
 
-    def _get_by_id(self, reference: str, depth: int = 1, attribute: str = ""):
+    def _get_by_id(self, address: str):
         req = requests.get(
-            f"{config.DMSS_API}/api/documents/{reference}?resolve_links=true&depth=100",
+            f"{config.DMSS_API}/api/documents/{address}?depth=1",
             headers=self.headers,
             timeout=10,
         )
@@ -39,7 +39,8 @@ class JobHandler(JobHandlerInterface):
 
     def start(self) -> str:
         logger.info("Starting ReverseDescription job.")
-        application_input_entity = self.job.entity["applicationInput"]
+        application_reference = self.job.entity["applicationInput"]
+        application_input_entity = self._get_by_id(address=application_reference["address"])
         result = application_input_entity.get("description", "Backup")[::-1]
         with open(f"{self.results_directory}/{self.job.job_uid}", "w") as result_file:
             result_file.write(result)
