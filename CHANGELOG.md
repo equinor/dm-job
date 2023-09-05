@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.7](https://github.com/equinor/dm-job/compare/v1.0.6...v1.0.7) (2023-09-05)
+
+
+### Bug Fixes
+
+* adjust depth parameter ([61b8fc7](https://github.com/equinor/dm-job/commit/61b8fc7c9e024e875d2be6a30fc153db649023e8))
+
+
+### Build System
+
+* stop using venv inside docker ([135c91c](https://github.com/equinor/dm-job/commit/135c91c44ce87704202e53fe19d3140dfeea2f58))
+
+
+### Continuous Integration
+
+* lock dmss version ([752e3a0](https://github.com/equinor/dm-job/commit/752e3a0a4499f6c9a11cbc3da45d4c3a1e6f5a9e))
+
 ## [1.0.6](https://github.com/equinor/dm-job/compare/v1.0.5...v1.0.6) (2023-08-29)
 
 
