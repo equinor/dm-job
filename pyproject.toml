@@ -6,7 +6,7 @@ authors = [""]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10.4"
+python = "^3.11.1"
 redis = "^4.3.4"
 APScheduler = "^3.9.1"
 docker = "^5.0.3"
@@ -46,7 +46,7 @@ all=true
 
 [tool.black]
 line-length = 119
-target-version = ['py10']
+target-version = ['py11']
 exclude = '''
 /(
     \.eggs
