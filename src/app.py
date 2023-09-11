@@ -34,6 +34,13 @@ def create_app():
         description="REST API used with the Data Modelling framework to schedule jobs",
         exception_handlers={RequestValidationError: validation_exception_handler},
         middleware=[Middleware(StoreHeadersMiddleware)],
+        swagger_ui_init_oauth={
+            "clientId": config.OAUTH_CLIENT_ID,
+            "appName": "DM JOB",
+            "usePkceWithAuthorizationCodeGrant": True,
+            "scopes": config.OAUTH_AUTH_SCOPE,
+            "useBasicAuthenticationWithAccessCodeGrant": True,
+        },
     )
 
     if config.ENVIRONMENT == "local":

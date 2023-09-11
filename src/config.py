@@ -27,5 +27,9 @@ class Config:
     SCHEDULER_REDIS_PORT = int(os.getenv("SCHEDULER_REDIS_PORT", 6379))
     SCHEDULER_REDIS_SSL = os.getenv("SCHEDULER_REDIS_SSL", "False").lower() == "true"
 
+    # Swagger auth
+    OAUTH_CLIENT_ID: str | None = os.getenv("OAUTH_CLIENT_ID")
+    OAUTH_AUTH_SCOPE: str | None = os.getenv("OAUTH_AUTH_SCOPE")
+
 
 config = Config()
