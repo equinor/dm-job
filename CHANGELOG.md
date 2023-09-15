@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.1.0](https://github.com/equinor/dm-job/compare/v1.0.7...v1.1.0) (2023-09-15)
+
+
+### Features
+
+* add radix job handler ([c72fec7](https://github.com/equinor/dm-job/commit/c72fec78bc9edcd461b22be2bcb24e4f4d0844c6))
+
+
+### Code Refactoring
+
+* add oauth scope to swagger ([92ef6b0](https://github.com/equinor/dm-job/commit/92ef6b0d7258f611ed261abf0dd32366c45a3dd6))
+
+
+### Build System
+
+* correct command to start application ([5875e2b](https://github.com/equinor/dm-job/commit/5875e2bac8f364beab7d69030008965f0d31df2d))
+
 ## [1.0.7](https://github.com/equinor/dm-job/compare/v1.0.6...v1.0.7) (2023-09-05)
 
 
