@@ -39,7 +39,11 @@ fi
 
 if [ "$1" = 'api' ]; then
   service_is_ready
-    if [ "$ENVIRON" != "local" ]; then
+  if [ "${DATA_SOURCE_FILES:-""}" != "" ]; then
+    echo "$DATA_SOURCE_FILES" > /code/app/data_sources/WorkflowDS.json
+  fi
+
+  if [ "$ENVIRON" != "local" ]; then
     cat version.txt || true
     gunicorn app:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5000
   else
