@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/equinor/dm-job/compare/v1.1.0...v1.2.0) (2023-09-25)
+
+
+### Features
+
+* add data source from environment ([8ef5ded](https://github.com/equinor/dm-job/commit/8ef5dedfeaedaa9362cad6367dcc394b0bedc213))
+
 ## [1.1.0](https://github.com/equinor/dm-job/compare/v1.0.7...v1.1.0) (2023-09-15)
 
 
