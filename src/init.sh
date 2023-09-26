@@ -38,7 +38,6 @@ if [ "$ENVIRON" = 'local' ] && [ "$API_ENV" = 'development' ]; then
 fi
 
 if [ "${DATA_SOURCE_FILES:-""}" != "" ]; then
-  cat /code/app/data_sources/WorkflowDS.json
   echo "$DATA_SOURCE_FILES" > /code/app/data_sources/WorkflowDS.json
 fi
 
