@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/equinor/dm-job/compare/v1.2.0...v1.2.1) (2023-09-26)
+
+
+### Bug Fixes
+
+* set data source from environment variable ([08fe04f](https://github.com/equinor/dm-job/commit/08fe04f72b3318b28275012b197c90590ed7f64a))
+
 ## [1.2.0](https://github.com/equinor/dm-job/compare/v1.1.0...v1.2.0) (2023-09-25)
 
 
