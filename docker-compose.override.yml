@@ -4,6 +4,7 @@ services:
   job-api:
     build:
       target: development
+    image: datamodelingtool.azurecr.io/dm-job:dev
     volumes:
       - ./src/:/code/src
       - ./pyproject.toml:/code/pyproject.toml

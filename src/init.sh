@@ -37,11 +37,13 @@ if [ "$ENVIRON" = 'local' ] && [ "$API_ENV" = 'development' ]; then
   install_dmss_package
 fi
 
+if [ "${DATA_SOURCE_FILES:-""}" != "" ]; then
+  cat /code/app/data_sources/WorkflowDS.json
+  echo "$DATA_SOURCE_FILES" > /code/app/data_sources/WorkflowDS.json
+fi
+
 if [ "$1" = 'api' ]; then
   service_is_ready
-  if [ "${DATA_SOURCE_FILES:-""}" != "" ]; then
-    echo "$DATA_SOURCE_FILES" > /code/app/data_sources/WorkflowDS.json
-  fi
 
   if [ "$ENVIRON" != "local" ]; then
     cat version.txt || true
