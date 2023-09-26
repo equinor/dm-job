@@ -2,6 +2,7 @@ FROM python:3.10-slim as base
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/code/src
 WORKDIR /code
+ENTRYPOINT ["/code/src/init.sh"]
 CMD ["/code/src/init.sh", "api"]
 EXPOSE 5000
 
