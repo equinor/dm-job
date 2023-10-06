@@ -24,7 +24,7 @@ class JobHandler(JobHandlerInterface):
     def start(self) -> str:
         logger.info("Starting Radix job...")
         # Add token and URL to payload, so that jobs are able to connect to the DMSS instance.
-        payload = {"DMSS_TOKEN": self.job.token, "DMSS_URL": config.DMSS_API}
+        payload = {"DMSS_TOKEN": self.job.token, "DMSS_URL": config.DMSS_API, "DMSS_ID": self.job.dmss_id}
         result = requests.post(
             _get_job_url(self.job),
             json={"payload": json.dumps(payload)},

@@ -29,6 +29,7 @@ class Job:
         cron_job: bool = False,
         token: str | None = None,
         state: dict | None = None,
+        application_input: dict | None = None,
     ):
         self.dmss_id: str = dmss_id
         self.job_uid: UUID = job_uid
@@ -40,6 +41,7 @@ class Job:
         self.cron_job: bool = cron_job
         self.token: str | None = token
         self.state = state
+        self.application_input = application_input
 
     def update_entity_attributes(self):
         # These attributes are common amongst all Job entities
@@ -60,6 +62,7 @@ class Job:
             "cron_job": self.cron_job,
             "token": self.token,
             "state": self.state,
+            "applicationInput": self.application_input,
         }
 
     @classmethod
@@ -75,6 +78,7 @@ class Job:
             cron_job=a_dict.get("cron_job", False),
             token=a_dict.get("token"),
             state=a_dict.get("state", None),
+            application_input=a_dict.get("applicationInput", None),
         )
 
 
