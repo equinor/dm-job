@@ -128,6 +128,9 @@ typings/
 .env
 scripts/reset-db.env
 
+# asdf
+.tool-versions
+
 # next.js build output
 .next
 
