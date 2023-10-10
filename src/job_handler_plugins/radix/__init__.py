@@ -35,7 +35,8 @@ class JobHandler(JobHandlerInterface):
         # so that we can call the job scheduler
         # to get the progress or to remove the job.
         self.job.state = {"job_name": result.json()["name"]}
-        return result.status()  # type: ignore
+        logger.info(f"result:  {result}")
+        return result.status_code  # type: ignore
 
     def remove(self) -> Tuple[str, str]:
         result = requests.delete(
