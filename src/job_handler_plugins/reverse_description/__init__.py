@@ -17,9 +17,6 @@ class JobHandler(JobHandlerInterface):
     A silly test jobHandler that creates a NamedEntity of the input with it's description reversed
     """
 
-    results_directory = f"{Path(__file__).parent}/results"
-    os.makedirs(results_directory, exist_ok=True)
-
     def __init__(
         self,
         job: Job,
@@ -27,6 +24,8 @@ class JobHandler(JobHandlerInterface):
     ):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token or ""}
+        self.results_directory = f"{Path(__file__).parent}/results"
+        os.makedirs(self.results_directory, exist_ok=True)
 
     def _get_by_id(self, address: str):
         req = requests.get(
