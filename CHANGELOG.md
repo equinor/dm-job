@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.2](https://github.com/equinor/dm-job/compare/v1.2.1...v1.2.2) (2023-10-11)
+
+
+### Bug Fixes
+
+* include job dmss_id in in job payload ([36a430f](https://github.com/equinor/dm-job/commit/36a430f0a63cac71809c3c103639427bdf918f03))
+* make radix job handler return status code instead of calling status ([48b9ae2](https://github.com/equinor/dm-job/commit/48b9ae22e50b06377047fdd29f68f658aead4162))
+* permission deined results folder ([706b959](https://github.com/equinor/dm-job/commit/706b959d66646a8da5325f16b45f5a89924089bb))
+
+
+### Code Refactoring
+
+* remove print data source ([b7b813e](https://github.com/equinor/dm-job/commit/b7b813e24e57004faf90f5755ccfadbe0de46b11))
+
 ## [1.2.1](https://github.com/equinor/dm-job/compare/v1.2.0...v1.2.1) (2023-09-26)
 
 
