@@ -21,7 +21,8 @@
       "name": "customCommand",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
-      "optional": true
+      "optional": true,
+      "dimensions": "*"
     },
     {
       "name": "name",

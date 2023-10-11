@@ -21,6 +21,7 @@ COPY src /code/src/
 COPY app /code/app/
 COPY .flake8 .bandit ./
 RUN chown -R 1000:1000 /code/app/data_sources/WorkflowDS.json
+USER 0
 
 FROM base as prod
 RUN poetry install --no-dev
