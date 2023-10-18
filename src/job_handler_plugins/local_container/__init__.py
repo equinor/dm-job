@@ -1,4 +1,6 @@
 import os
+import random
+import string
 from typing import Tuple
 
 import docker
@@ -11,6 +13,12 @@ from utils.logging import logger
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/Container"
 
 
+def autogenerate_container_name(length: int) -> str:
+    return "local-job_" + "".join(
+        random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length)
+    )
+
+
 class JobHandler(JobHandlerInterface):
     """
     A job handler to run local docker container. This is similar to the local_containers job handler in DMT, but uses
@@ -21,6 +29,7 @@ class JobHandler(JobHandlerInterface):
     def __init__(self, job: Job, data_source: str):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token}
+        self.local_container_name = job.entity.get("name", autogenerate_container_name(10))
         try:
             self.client = docker.from_env()
         except DockerException:
@@ -48,7 +57,7 @@ class JobHandler(JobHandlerInterface):
         self.client.containers.run(
             image=full_image_name,
             command=custom_command,
-            name=self.job.entity["name"],
+            name=self.local_container_name,
             environment=envs,
             network="application_default",
             detach=True,
@@ -58,7 +67,7 @@ class JobHandler(JobHandlerInterface):
 
     def remove(self) -> Tuple[str, str]:
         try:
-            container = self.client.containers.get(self.job.entity["name"])
+            container = self.client.containers.get(self.local_container_name)
             container.remove()
         except docker.errors.NotFound:
             pass
@@ -70,7 +79,7 @@ class JobHandler(JobHandlerInterface):
             # If setup fails, the container is not started
             return self.job.status, self.job.log
         try:
-            container = self.client.containers.get(self.job.entity["name"])
+            container = self.client.containers.get(self.local_container_name)
             status = self.job.status
             if container.status == "running":
                 status = JobStatus.RUNNING
