@@ -43,7 +43,7 @@ def schedule_cron_job(scheduler: BackgroundScheduler, function: Callable, job: J
     if not job.entity.get("schedule"):
         raise ValueError("CronJob entity is missing required attribute 'schedule'")
     try:
-        minute, hour, day, month, day_of_week = job.entity["cron"].split(" ")
+        minute, hour, day, month, day_of_week = job.entity["schedule"]["cron"].split(" ")
         scheduled_job = scheduler.add_job(
             function,
             "cron",
