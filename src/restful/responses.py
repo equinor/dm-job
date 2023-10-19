@@ -64,11 +64,13 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 result = func(*args, **kwargs)
                 return response_class(result, status_code=status.HTTP_200_OK)
             except HTTPError as http_error:
-                error_response = ErrorResponse(
-                    status=http_error.response.status_code,
-                    message=http_error.response.text,
-                    debug=f"The HTTP call to '{http_error.response.url}' failed",
-                )
+                error_response = ErrorResponse()
+                if http_error.response:
+                    error_response = ErrorResponse(
+                        status=http_error.response.status_code,
+                        message=http_error.response.text,
+                        debug=f"The HTTP call to '{http_error.response.url}' failed",
+                    )
                 logger.error(error_response)
                 return JSONResponse(error_response.dict(), status_code=error_response.status)
             except ServiceException as dmss_exception:
