@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.3](https://github.com/equinor/dm-job/compare/v1.2.2...v1.2.3) (2023-10-19)
+
+
+### Bug Fixes
+
+* allow local container jobs to run local images ([0319946](https://github.com/equinor/dm-job/commit/0319946004d479546afda7a25c403c2c7a746d13))
+* **mypy:** failing CI from mypy error ([4df66f8](https://github.com/equinor/dm-job/commit/4df66f81091dc1be5445daa91fdea61e7abd1d7d))
+
 ## [1.2.2](https://github.com/equinor/dm-job/compare/v1.2.1...v1.2.2) (2023-10-11)
 
 
