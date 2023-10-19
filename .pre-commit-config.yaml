@@ -5,7 +5,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: check-ast
-        language_version: python3.10
+        language_version: python3.11
       - id: check-merge-conflict
       - id: check-case-conflict
       - id: check-json
@@ -35,8 +35,8 @@ repos:
     rev: 23.7.0
     hooks:
       - id: black
-        language_version: python3.10
-        args: [--target-version, py310]
+        language_version: python3.11
+        args: [--target-version, py311]
         files: ^src/.*\.py$
         exclude: ^src/dmss_api/
 
