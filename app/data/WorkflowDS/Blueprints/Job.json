@@ -94,6 +94,14 @@
       "attributeType": "string",
       "label": "Reference target",
       "optional": true
+    },
+    {
+      "name": "schedule",
+      "type": "CORE:BlueprintAttribute",
+      "description": "Schedule for a cronjob",
+      "attributeType": "CronJob",
+      "label": "Schedule",
+      "optional": true
     }
   ]
 }

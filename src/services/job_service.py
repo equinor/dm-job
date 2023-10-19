@@ -30,12 +30,6 @@ from services.job_scheduler import scheduler
 from utils.logging import logger
 from utils.string_helpers import split_address
 
-# TODO: Support cron jobs
-# def is_cron_job(blueprint_ref: str) -> bool:
-#     """Checks if the type SIMOS.CRONJOB is in the list of types the blueprint extends from"""
-#     all_extends = get_extends_from(blueprint_ref)
-#     return SIMOS.CRON_JOB.value in all_extends
-
 
 def schedule_cron_job(scheduler: BackgroundScheduler, function: Callable, job: Job) -> str:
     """Schedule a cron job.
@@ -46,8 +40,8 @@ def schedule_cron_job(scheduler: BackgroundScheduler, function: Callable, job: J
 
     It is assumed that the 'job' parameter contains an entity with a 'cron' string attibute that follows the cron syntax.
     """
-    if not job.entity.get("cron"):
-        raise ValueError("CronJob entity is missing required attribute 'cron'")
+    if not job.entity.get("schedule"):
+        raise ValueError("CronJob entity is missing required attribute 'schedule'")
     try:
         minute, hour, day, month, day_of_week = job.entity["cron"].split(" ")
         scheduled_job = scheduler.add_job(
@@ -241,9 +235,10 @@ class JobService:
         token = get_personal_access_token()
         job_entity = self._get_job_entity(dmss_id, token)
 
-        if False:  # TODO: Reimplement cron-job support
-            # if is_cron_job(job_entity["type"]):
+        # if False:  # TODO: Reimplement cron-job support
+        if job_entity.get("schedule"):
             job = Job(
+                job_uid=uuid4(),
                 dmss_id=dmss_id,
                 started=datetime.now(),
                 status=JobStatus.REGISTERED,
@@ -252,7 +247,7 @@ class JobService:
                 token=token,
             )
             self._get_job_handler(job)  # Test for available handler before registering
-            result = schedule_cron_job(scheduler, lambda: self._run_job(dmss_id), job)
+            result = str(job.job_uid), schedule_cron_job(scheduler, lambda: self._run_job(job.job_uid), job)
         else:
             job = Job(
                 job_uid=uuid4(),
