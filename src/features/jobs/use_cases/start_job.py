@@ -2,7 +2,7 @@ from typing import Tuple
 
 from pydantic.main import BaseModel
 
-from services.job_service import JobService
+from services.job_service import register_job
 
 
 class StartJobResponse(BaseModel):
@@ -11,6 +11,5 @@ class StartJobResponse(BaseModel):
 
 
 def start_job_use_case(job_dmss_id: str) -> StartJobResponse:
-    job_service = JobService()
-    result: Tuple[str, str] = job_service.register_job(job_dmss_id)
+    result: Tuple[str, str] = register_job(job_dmss_id)
     return StartJobResponse(**{"message": result[1], "uid": result[0]})

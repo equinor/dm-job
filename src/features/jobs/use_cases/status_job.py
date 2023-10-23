@@ -3,7 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from services.job_handler_interface import JobStatus
-from services.job_service import JobService
+from services.job_service import status_job
 
 
 class StatusJobResponse(BaseModel):
@@ -16,6 +16,5 @@ class StatusJobResponse(BaseModel):
 
 
 def status_job_use_case(job_id: str) -> StatusJobResponse:
-    job_service = JobService()
-    status, log, message = job_service.status_job(UUID(job_id))
+    status, log, message = status_job(UUID(job_id))
     return StatusJobResponse(**{"status": status.value, "log": log, "message": message})
