@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.4](https://github.com/equinor/dm-job/compare/v1.2.3...v1.2.4) (2023-10-24)
+
+
+### Bug Fixes
+
+* cron job support ([1ac7d1a](https://github.com/equinor/dm-job/commit/1ac7d1a6b9eac66852ff1db5d74f98b927c7bc54))
+* default name for job docker container ([b4d1cbd](https://github.com/equinor/dm-job/commit/b4d1cbde3e5e3747a4ad1661e8fb30dc2c33927b))
+* deterministic default name for local container ([11ef33f](https://github.com/equinor/dm-job/commit/11ef33f6b48eee27ada46d9269ae6e0026d69476))
+* remove singleton ([edaecc5](https://github.com/equinor/dm-job/commit/edaecc5bb9d2fc6e659d96da71005dc4bb85f6cb))
+* small fix ([4e00d41](https://github.com/equinor/dm-job/commit/4e00d413dd54e6afe2a689114f90cfd7bfc75544))
+* turn job service into singleton ([b50f42d](https://github.com/equinor/dm-job/commit/b50f42d0845e5662249e0083d763e1b79979cad1))
+
 ## [1.2.3](https://github.com/equinor/dm-job/compare/v1.2.2...v1.2.3) (2023-10-19)
 
 
