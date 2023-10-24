@@ -5,7 +5,7 @@ import json
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Dict, Tuple, Union
+from typing import Callable, Tuple, Union
 from uuid import UUID, uuid4
 
 import redis
@@ -33,17 +33,8 @@ from utils.logging import logger
 from utils.string_helpers import split_address
 
 
-class Singleton(type):
-    _instances: Dict[Singleton, Singleton] = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class JobStore(metaclass=Singleton):
-    job_store = redis.Redis(
+def get_job_store():
+    return redis.Redis(
         host=config.SCHEDULER_REDIS_HOST,
         port=config.SCHEDULER_REDIS_PORT,
         db=0,
@@ -52,10 +43,6 @@ class JobStore(metaclass=Singleton):
         socket_timeout=5,
         socket_connect_timeout=5,
     )
-
-
-def get_job_store():
-    return JobStore().job_store
 
 
 def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, job: Job) -> str:
@@ -251,8 +238,6 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     token = get_personal_access_token()
     job_entity = _get_job_entity(dmss_id, token)
 
-    # if False:  # TODO: Reimplement cron-job support
-    print("Job has schedule: ", job_entity.get("schedule"))
     if job_entity.get("schedule"):
         job = Job(
             job_uid=uuid4(),
