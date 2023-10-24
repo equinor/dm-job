@@ -94,7 +94,6 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
 
 def _get_job(job_uid: UUID) -> Union[Job, None]:
     """Get a job from the job storage."""
-    print("getting job: ", str(job_uid))
     try:
         if raw_job := get_job_store().get(str(job_uid)):
             return Job.from_dict(json.loads(raw_job.decode()))
@@ -235,7 +234,6 @@ def _run_job(job_uid: UUID) -> str:
         job.update_entity_attributes()
         _update_job_entity(job.dmss_id, job.entity, job.token)  # Update in DMSS with status etc.
 
-        print("runnig job: ", str(job.job_uid))
         _set_job(job)
         return job.log  # type: ignore
 
@@ -254,6 +252,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     job_entity = _get_job_entity(dmss_id, token)
 
     # if False:  # TODO: Reimplement cron-job support
+    print("Job has schedule: ", job_entity.get("schedule"))
     if job_entity.get("schedule"):
         job = Job(
             job_uid=uuid4(),
@@ -280,10 +279,9 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
             token=token,
         )
         _get_job_handler(job)
-        scheduler.add_job(func=_run_job, trigger="cron", args=[job.job_uid], jobstore="redis_job_store")
+        scheduler.add_job(func=_run_job, args=[job.job_uid], jobstore="redis_job_store")
         result = str(job.job_uid), "Job successfully started"
 
-    print("registering job: ", str(job.job_uid))
     _set_job(job)
     job.update_entity_attributes()
     _update_job_entity(job.dmss_id, job.entity, job.token)
@@ -313,7 +311,6 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
     job.status = status
     job.log = log
 
-    print("updating job status: ", str(job.job_uid))
     _set_job(job)
     job.update_entity_attributes()
     _update_job_entity(job.dmss_id, job.entity, job.token)
