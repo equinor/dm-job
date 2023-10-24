@@ -1,7 +1,6 @@
 import os
-import random
-import string
 from typing import Tuple
+from uuid import UUID
 
 import docker
 from docker.errors import DockerException
@@ -13,10 +12,8 @@ from utils.logging import logger
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/Container"
 
 
-def autogenerate_container_name(length: int) -> str:
-    return "local-job_" + "".join(
-        random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length)
-    )
+def autogenerate_container_name(job_uid: UUID) -> str:
+    return "local-job_" + str(job_uid).split("-")[0]
 
 
 class JobHandler(JobHandlerInterface):
@@ -29,7 +26,7 @@ class JobHandler(JobHandlerInterface):
     def __init__(self, job: Job, data_source: str):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token}
-        self.local_container_name = job.entity.get("name", autogenerate_container_name(10))
+        self.local_container_name = job.entity.get("name", autogenerate_container_name(job.job_uid))
         try:
             self.client = docker.from_env()
         except DockerException:
