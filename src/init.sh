@@ -1,7 +1,6 @@
 #!/bin/bash
 set -eu
 ENVIRON=${ENVIRONMENT:="production"}
-API_ENV=${API_ENV:="production"}
 
 # Wait until the storage services is ready before continuing.
 # This is to ensure that the services is initialized before the API tries to connect.
@@ -21,21 +20,6 @@ service_is_ready() {
   done
   echo "DMSS is ready!"
 }
-
-install_dmss_package() {
-  if [ ! -e /dmss_api/setup.py ]; then
-    echo "WARNING: Tried to install local version of the DMSS-API, but it could not be found. Continuing with version from Pypi..."
-  else
-    echo "Installing DMSS-API from local..."
-    pip uninstall dmss-api -y -q
-    pip install -e /dmss_api/ -q
-  fi
-}
-
-# Try to install the local version of the DMSS-API pypi package. Soft fail.
-if [ "$ENVIRON" = 'local' ] && [ "$API_ENV" = 'development' ]; then
-  install_dmss_package
-fi
 
 if [ "${DATA_SOURCE_FILES:-""}" != "" ]; then
   echo "$DATA_SOURCE_FILES" > /code/app/data_sources/WorkflowDS.json

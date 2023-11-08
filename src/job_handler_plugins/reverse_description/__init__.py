@@ -1,10 +1,9 @@
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Tuple
 
-import requests
-
-from config import config
+from services.dmss import get_document
 from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from utils.logging import logger
 
@@ -27,23 +26,16 @@ class JobHandler(JobHandlerInterface):
         self.results_directory = f"{Path(__file__).parent}/results"
         os.makedirs(self.results_directory, exist_ok=True)
 
-    def _get_by_id(self, address: str):
-        req = requests.get(
-            f"{config.DMSS_API}/api/documents/{address}?depth=1",
-            headers=self.headers,
-            timeout=10,
-        )
-        req.raise_for_status()
-        return req.json()
-
     def start(self) -> str:
         logger.info("Starting ReverseDescription job.")
         application_reference = self.job.entity["applicationInput"]
-        application_input_entity = self._get_by_id(address=application_reference["address"])
+        application_input_entity = get_document(application_reference["address"], token=self.job.token)
         result = application_input_entity.get("description", "Backup")[::-1]
         with open(f"{self.results_directory}/{self.job.job_uid}", "w") as result_file:
             result_file.write(result)
         logger.info("ReverseDescription job completed")
+        self.job.status = JobStatus.COMPLETED
+        self.job.stopped = datetime.now()
         return "OK"
 
     def result(self) -> Tuple[str, bytes]:

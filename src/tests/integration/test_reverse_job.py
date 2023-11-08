@@ -1,16 +1,16 @@
 # type: ignore
-import json
 import unittest
+from time import sleep
 
 from starlette.testclient import TestClient
 
 from app import create_app
-from services.dmss import dmss_api
+from services.dmss import add_document
 
 application_input = {
-    "_id": "1",
-    "name": "whatever",
-    "description": "raksO gitS",
+    "_id": "2",
+    "name": "SomethingElseByTheKinks",
+    "description": "sdrawkcaBsIsihT",
     "type": "dmss://system/SIMOS/NamedEntity",
 }
 
@@ -20,7 +20,7 @@ test_job = {
     "status": "not started",
     "triggeredBy": "me",
     "applicationInput": {
-        "address": "dmss://WorkflowDS/$1",
+        "address": "dmss://WorkflowDS/$2",
         "type": "dmss://system/SIMOS/Reference",
         "referenceType": "link",
     },
@@ -32,14 +32,11 @@ test_client = TestClient(create_app())
 
 class TestReverseDescription(unittest.TestCase):
     def test_starting_and_get_result(self):
-        dmss_api.document_add(
-            "dmss://WorkflowDS/TestEntities", json.dumps(application_input), update_uncontained=False
-        )
-        job_document_dmss_id = dmss_api.document_add(
-            "dmss://WorkflowDS/TestEntities", json.dumps(test_job), update_uncontained=False
-        )
+        add_document("dmss://WorkflowDS/TestEntities", application_input)
+        job_document_dmss_id = add_document("dmss://WorkflowDS/TestEntities", test_job)
         start_job_response = test_client.post(f"WorkflowDS/${job_document_dmss_id['uid']}")
         start_job_response.raise_for_status()
+        sleep(8)  # Let the job run...
         get_results_response = test_client.get(f"/{start_job_response.json()['uid']}/result")
         get_results_response.raise_for_status()
-        assert get_results_response.json()["result"] == "Stig Oskar"
+        assert get_results_response.json()["result"] == "ThisIsBackwards"

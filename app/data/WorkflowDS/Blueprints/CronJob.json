@@ -24,6 +24,13 @@
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
       "optional": true
+    },
+    {
+      "name": "runs",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "./Job",
+      "optional": true,
+      "dimensions": "*"
     }
   ]
 }

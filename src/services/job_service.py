@@ -3,13 +3,12 @@ from __future__ import annotations
 import importlib
 import json
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable, Tuple, Union
 from uuid import UUID, uuid4
 
 import redis
-import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from redis import AuthenticationError
 
@@ -19,18 +18,13 @@ from restful.exceptions import (
     NotFoundException,
     NotImplementedException,
 )
-from services.dmss import (
-    get_document_by_uid,
-    get_personal_access_token,
-    update_document_by_uid,
-)
+from services.dmss import get_document, get_personal_access_token, update_document
 
 # TODO: Authorization. The only level of authorization at this point is to allow all that
 #  can view the job entity to also run and delete the job.
 from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from services.job_scheduler import scheduler
 from utils.logging import logger
-from utils.string_helpers import split_address
 
 
 def get_job_store():
@@ -104,53 +98,6 @@ def load_cron_jobs():
             logger.info(f"Loaded and registered job '{job.job_uid}' from {config.SCHEDULER_REDIS_HOST}")
 
 
-def _get_job_entity(dmss_id: str, token: str | None = None):
-    """Get a document from DMSS.
-
-    The dmss_id can be on the formats:
-      - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
-      - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
-    """
-    protocol, data_source_id, job_entity_id, attribute = split_address(dmss_id)
-    return get_document_by_uid(
-        reference=f"{data_source_id}/{job_entity_id}.{attribute}", token=token, depth=1, resolve_links=False
-    )
-
-
-def _insert_reference(document_id: str, reference: dict, token: str = ""):  # nosec
-    """Insert a reference into an existing entity stored in dmss.
-
-    - **document_id**: the address to the entity we want to update. Can be on the formats:
-      - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
-      - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
-
-    - **reference**: an entity of type 'dmss://system/SIMOS/Reference' to be inserted.
-    """
-    headers = {"Access-Key": token}
-    # TODO use document update instead, the reference insert endpoint has been removed from DMSS
-    req = requests.put(
-        f"{config.DMSS_API}/api/reference/{document_id}",
-        json=reference,
-        headers=headers,
-        timeout=10,
-    )
-    req.raise_for_status()
-
-    return req.json()
-
-
-def _update_job_entity(dmss_id: str, job_entity: dict, token: str | None):
-    """Update a job entity in dmss.
-
-    - **dmss_id**: the address to the job entity we want to update. Can be on the formats:
-      - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
-      - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
-
-    - **job_entity**: the new job entity.
-    """
-    return update_document_by_uid(dmss_id, {"data": job_entity}, token=token)
-
-
 def _get_job_handler(job: Job) -> JobHandlerInterface:
     """Get the job handler for a job.
 
@@ -218,8 +165,12 @@ def _run_job(job_uid: UUID) -> str:
     except Exception as error:
         job.log = f"{job.log}\n\n{error}"
     finally:
+        if job.entity["type"] == config.RECURRING_JOB:
+            # The recurring job has been updated within the JobHandler
+            # Fetch the updated entity before merging data
+            job.entity = get_document(job.dmss_id)
         job.update_entity_attributes()
-        _update_job_entity(job.dmss_id, job.entity, job.token)  # Update in DMSS with status etc.
+        update_document(job.dmss_id, job.entity, job.token)  # Update in DMSS with status etc.
 
         _set_job(job)
         return job.log  # type: ignore
@@ -236,7 +187,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     """
     # A token must be created when there still is a request object.
     token = get_personal_access_token()
-    job_entity = _get_job_entity(dmss_id, token)
+    job_entity = get_document(dmss_id, 0, token)
 
     if job_entity.get("schedule"):
         job = Job(
@@ -264,12 +215,16 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
             token=token,
         )
         _get_job_handler(job)
-        scheduler.add_job(func=_run_job, args=[job.job_uid], jobstore="redis_job_store")
+        # Add a 5second delay on every job we run.
+        # This is so that the JobService can update job state in
+        # DMSS, before we get a race with the job itself trying to update it's state.
+        in_5_seconds = datetime.now() + timedelta(seconds=5)
+        scheduler.add_job(func=_run_job, next_run_time=in_5_seconds, args=[job.job_uid], jobstore="redis_job_store")
         result = str(job.job_uid), "Job successfully started"
 
     _set_job(job)
     job.update_entity_attributes()
-    _update_job_entity(job.dmss_id, job.entity, job.token)
+    update_document(job.dmss_id, job_entity, token=job.token)
     return result
 
 
@@ -289,7 +244,7 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'progress' method",
         )
-    job_entity = _get_job_entity(job.dmss_id, job.token)
+    job_entity = get_document(job.dmss_id, 0, job.token)
     if status is JobStatus.COMPLETED and job_entity.get("results", None):
         result_reference = job_entity["result"]
         job.entity["result"] = result_reference
@@ -298,7 +253,7 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
 
     _set_job(job)
     job.update_entity_attributes()
-    _update_job_entity(job.dmss_id, job.entity, job.token)
+    update_document(job.dmss_id, job.entity, job.token)
     if job.cron_job:
         cron_job = scheduler.get_job(str(job_uid), jobstore="redis_job_store")
         return status, job.log, f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}"
