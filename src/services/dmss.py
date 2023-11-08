@@ -21,46 +21,36 @@ def get_access_token() -> str:
         return ""
 
 
-def get_document(fully_qualified_path: str) -> dict:
-    """
-    The default DMSS document getter.
-    Used by DocumentService.
-    Inject a mock 'get_document' in unit.
-    """
-    # TODO: Update dmss endpoint to only return the raw document, not the blueprint(?)
-    dmss_api.api_client.configuration.access_token = get_access_token()
-    return dmss_api.document_get(fully_qualified_path)["document"]  # type: ignore
-
-
-def get_document_by_uid(
-    reference: str, depth: int = 999, resolve_links=False, ui_recipe="", attribute="", token: str | None = None
-) -> dict:
-    """
-    The uid based DMSS document getter.
-    Used by DocumentService.
-    Inject a mock 'get_document_by_uid' in unit.
-
-    reference is on the format: <data_source>/$<document_uuid>.<attribute>
-    """
-
+def get_document(reference: str, depth: int = 0, token: str | None = None) -> dict:
     # The generated API package was transforming data types. i.e. parsing datetime from strings...
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
-    params = {"depth": depth, "ui_recipe": ui_recipe, "attribute": attribute, "resolve_links": resolve_links}
+    params = {"depth": depth}
     req = requests.get(f"{Config.DMSS_API}/api/documents/{reference}", params=params, headers=headers, timeout=10)
     req.raise_for_status()
 
     return req.json()  # type: ignore
 
 
-def update_document_by_uid(reference: str, document: dict, token: str | None = None) -> dict:
+def update_document(reference: str, document: dict, token: str | None = None) -> dict:
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
-    form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.put(
         f"{Config.DMSS_API}/api/documents/{reference}",
-        data=form_data,
+        data={"data": json.dumps(document)},
         headers=headers,
-        params={"update_uncontained": "False"},
+        timeout=10,
+    )
+    req.raise_for_status()
+    return req.json()  # type: ignore
+
+
+def add_document(reference: str, document: dict, token: str | None = None) -> dict:
+    headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
+    # form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
+    req = requests.post(
+        f"{Config.DMSS_API}/api/documents/{reference}",
+        data={"document": json.dumps(document)},
+        headers=headers,
         timeout=10,
     )
     req.raise_for_status()

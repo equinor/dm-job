@@ -62,6 +62,5 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
           sleep 50  # Wait for database to be ready
-          docker-compose -f docker-compose.yml -f docker-compose.ci.yml run dmss reset-app
           docker-compose -f docker-compose.yml -f docker-compose.ci.yml run job-api dm --url http://dmss:5000 reset ../app
-          docker-compose -f docker-compose.yml -f docker-compose.ci.yml run --rm job-api pytest -c ../pyproject.toml --integration
+          docker-compose -f docker-compose.yml -f docker-compose.ci.yml run --rm job-api pytest -c ../pyproject.toml --integration --capture=tee-sys
