@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/equinor/dm-job/compare/v1.2.4...v1.3.0) (2023-11-09)
+
+
+### Features
+
+* RecurringJobHandler ([39da290](https://github.com/equinor/dm-job/commit/39da2905aa864c64268182d38fbee24a8a96dc91))
+
 ## [1.2.4](https://github.com/equinor/dm-job/compare/v1.2.3...v1.2.4) (2023-10-24)
 
 
