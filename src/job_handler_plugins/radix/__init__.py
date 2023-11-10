@@ -17,9 +17,7 @@ def _get_job_url(job: Job) -> str:
 
 
 def list_of_env_to_dict(env_vars) -> dict:
-    keys = [s.split("=")[0] for s in env_vars]
-    values = [s.split("=")[1] for s in env_vars]
-    return dict(zip(keys, values))
+    return {s.split("=")[0]: s.split("=")[1] for s in env_vars}
 
 
 class JobHandler(JobHandlerInterface):
