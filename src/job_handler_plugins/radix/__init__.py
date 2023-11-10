@@ -16,6 +16,12 @@ def _get_job_url(job: Job) -> str:
     return f"http://{job_name}:{scheduler_port}/api/v1/jobs"
 
 
+def list_of_env_to_dict(env_vars) -> dict:
+    keys = [s.split("=")[0] for s in env_vars]
+    values = [s.split("=")[1] for s in env_vars]
+    return dict(zip(keys, values))
+
+
 class JobHandler(JobHandlerInterface):
     def __init__(self, job: Job, data_source: str):
         super().__init__(job, data_source)
@@ -24,7 +30,15 @@ class JobHandler(JobHandlerInterface):
     def start(self) -> str:
         logger.info("Starting Radix job...")
         # Add token and URL to payload, so that jobs are able to connect to the DMSS instance.
-        payload = {"DMSS_TOKEN": self.job.token, "DMSS_URL": config.DMSS_API, "DMSS_ID": self.job.dmss_id}
+        try:
+            payload = list_of_env_to_dict(self.job.entity["runner"]["environmentVariables"])
+        except IndexError:
+            raise ValueError(
+                f"Malformed environment variable received by job handler of type {_SUPPORTED_TYPE}. Should be on the format <key>=<value> (location: {self.job.dmss_id})"
+            )
+        payload["DMSS_TOKEN"] = self.job.token
+        payload["DMSS_URL"] = config.DMSS_API
+        payload["DMSS_ID"] = self.job.dmss_id
         result = requests.post(
             _get_job_url(self.job),
             json={"payload": json.dumps(payload)},
