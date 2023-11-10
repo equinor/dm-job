@@ -1,6 +1,5 @@
 import os
 from typing import Tuple
-from uuid import UUID
 
 import docker
 from docker.errors import DockerException
@@ -10,10 +9,6 @@ from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from utils.logging import logger
 
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/Container"
-
-
-def autogenerate_container_name(job_uid: UUID) -> str:
-    return "local-job_" + str(job_uid).split("-")[0]
 
 
 class JobHandler(JobHandlerInterface):
@@ -26,7 +21,8 @@ class JobHandler(JobHandlerInterface):
     def __init__(self, job: Job, data_source: str):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token}
-        self.local_container_name = job.entity.get("name", autogenerate_container_name(job.job_uid))
+
+        self.local_container_name = f"{job.entity['runner']['name']}_{str(job.job_uid).split('-')[0]}"
         try:
             self.client = docker.from_env()
         except DockerException:
