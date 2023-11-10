@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Tuple
 from uuid import UUID
@@ -92,5 +93,13 @@ class JobHandler(JobHandlerInterface):
             logger.error(f"Failed to poll progress of local container: {error}")
             return JobStatus.UNKNOWN, self.job.log
 
-    def result(self) -> Tuple[str, bytes]:
-        return "test 123", b"lkjgfdakljhfdgsllkjhldafgoiu8y03q987hgbloizdjhfpg980"
+    def result(self) -> str:
+        if self.job.status != JobStatus.COMPLETED:
+            return f"Job has not completed. Status: {self.job.status}"
+        elif result := self.job.entity.get("result"):
+            return json.dumps(result)
+        elif address := self.job.entity.get("outputTarget"):
+            # TODO: resolve the local address
+            return str(address)
+        else:
+            return f"No result are available for job with runner: {self.job.entity['runner']['name']}"
