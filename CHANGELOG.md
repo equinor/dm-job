@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.1](https://github.com/equinor/dm-job/compare/v1.3.0...v1.3.1) (2023-11-10)
+
+
+### Bug Fixes
+
+* implement environmentVariables from job runner entity in rtadix job handler ([e21c814](https://github.com/equinor/dm-job/commit/e21c8142bf28fdec72bbea1aeaa7b3794837d94c))
+* move dmss variables into environment variables in runner entity ([2086db0](https://github.com/equinor/dm-job/commit/2086db09f99f61b3b90312b7f470f698addab981))
+
+
+### Code Refactoring
+
+* simplify list_of_env_to_dict function ([6ba4de9](https://github.com/equinor/dm-job/commit/6ba4de976b9dcefb99836f29d68d74cab924572e))
+
 ## [1.3.0](https://github.com/equinor/dm-job/compare/v1.2.4...v1.3.0) (2023-11-09)
 
 
