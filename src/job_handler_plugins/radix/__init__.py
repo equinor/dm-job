@@ -11,8 +11,8 @@ _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/Radix"
 
 
 def _get_job_url(job: Job) -> str:
-    job_name: str = job.entity["runner"]["jobName"]
-    scheduler_port: str = job.entity["runner"]["schedulerPort"]
+    job_name: str = job.runner["jobName"]
+    scheduler_port: str = job.runner["schedulerPort"]
     return f"http://{job_name}:{scheduler_port}/api/v1/jobs"
 
 
@@ -29,7 +29,7 @@ class JobHandler(JobHandlerInterface):
         logger.info("Starting Radix job...")
         # Add token and URL to payload, so that jobs are able to connect to the DMSS instance.
         try:
-            payload = list_of_env_to_dict(self.job.entity["runner"]["environmentVariables"])
+            payload = list_of_env_to_dict(self.job.runner["environmentVariables"])
         except IndexError:
             raise ValueError(
                 f"Malformed environment variable received by job handler of type {_SUPPORTED_TYPE}. Should be on the format <key>=<value> (location: {self.job.dmss_id})"

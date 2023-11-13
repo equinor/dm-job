@@ -16,7 +16,7 @@ uvicorn = {extras = ["standard"], version = "^0.18.2"}
 azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
 azure-identity = "^1.11.0"
-dm-cli = "^1.0.10"
+dm-cli = "^1.2.0"
 
 
 
@@ -40,6 +40,9 @@ ignore_missing_imports = true
 warn_return_any = true
 warn_unused_configs = true
 namespace_packages = true
+plugins = [
+    "pydantic.mypy"
+]
 
 [tool.pycln]
 all=true

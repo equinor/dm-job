@@ -32,11 +32,11 @@ def get_document(reference: str, depth: int = 0, token: str | None = None) -> di
     return req.json()  # type: ignore
 
 
-def update_document(reference: str, document: dict, token: str | None = None) -> dict:
+def update_document(reference: str, document_json: str, token: str | None = None) -> dict:
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or get_access_token()}
     req = requests.put(
         f"{Config.DMSS_API}/api/documents/{reference}",
-        data={"data": json.dumps(document)},
+        data={"data": document_json},
         headers=headers,
         timeout=10,
     )

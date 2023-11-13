@@ -1,8 +1,13 @@
+import json
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
 from typing import Tuple
-from uuid import UUID, uuid4
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+from services.dmss import get_document
 
 
 class JobStatus(str, Enum):
@@ -16,70 +21,46 @@ class JobStatus(str, Enum):
     UNKNOWN = "unknown"
 
 
-class Job:
-    def __init__(
-        self,
-        dmss_id: str,
-        started: datetime,
-        status: JobStatus,
-        entity: dict,
-        job_uid: UUID = uuid4(),
-        stopped: datetime = datetime(1, 1, 1),
-        log: str | None = None,
-        cron_job: bool = False,
-        token: str | None = None,
-        state: dict | None = None,
-        application_input: dict | None = None,
-    ):
-        self.dmss_id: str = dmss_id
-        self.job_uid: UUID = job_uid
-        self.started: datetime = started
-        self.status: JobStatus = status
-        self.entity: dict = entity
-        self.stopped: datetime = stopped
-        self.log: str | None = log
-        self.cron_job: bool = cron_job
-        self.token: str | None = token
-        self.state = state
-        self.application_input = application_input
+class Job(BaseModel):
+    class Config:
+        json_encoders = {UUID: lambda uuid: str(uuid)}
+        allow_population_by_field_name = True
 
-    def update_entity_attributes(self):
-        # These attributes are common amongst all Job entities
-        self.entity["started"] = self.started.isoformat() + "Z"
-        self.entity["stopped"] = self.stopped.isoformat() + "Z"
-        self.entity["status"] = self.status.value
-        self.entity["uid"] = str(self.job_uid)
+    type: str
+    dmss_id: str
+    job_uid: UUID = Field(alias="uid")
+    name: str | None
+    label: str | None
+    triggeredBy: str | None
+    status: JobStatus
+    application_input: dict | None = Field(alias="applicationInput")
+    started: datetime | None
+    stopped: datetime | None
+    ended: datetime | None
+    outputTarget: str | None
+    result: dict | None
+    runner: dict | None
+    referenceTarget: str | None
+    schedule: dict | None
 
-    def to_dict(self):
-        return {
-            "job_uid": str(self.job_uid),
-            "dmss_id": self.dmss_id,
-            "started": self.started.isoformat(),
-            "status": self.status.value,
-            "entity": self.entity,
-            "stopped": self.stopped.isoformat(),
-            "log": self.log,
-            "cron_job": self.cron_job,
-            "token": self.token,
-            "state": self.state,
-            "applicationInput": self.application_input,
+    log: str | None
+    token: str | None
+    state: dict | None
+
+    # Fields that are not sendt to DMSS
+    exclude_keys: dict = {"dmss_id": True, "log": True, "token": True, "state": True, "exclude_keys": True}
+
+    def dmss_sync(self):
+        fetched = get_document(self.dmss_id)
+        job_dict = json.loads(self.json())
+        merged_kwargs = {
+            **fetched,
+            "status": job_dict["status"],
+            "started": job_dict["started"],
+            "stopped": job_dict["stopped"],
         }
-
-    @classmethod
-    def from_dict(cls, a_dict: dict):
-        return Job(
-            dmss_id=a_dict["dmss_id"],
-            job_uid=UUID(a_dict["job_uid"]),
-            started=datetime.fromisoformat(a_dict["started"]),
-            status=JobStatus(a_dict["status"]),
-            entity=a_dict["entity"],
-            stopped=datetime.fromisoformat(a_dict["stopped"]),
-            log=a_dict.get("log"),
-            cron_job=a_dict.get("cron_job", False),
-            token=a_dict.get("token"),
-            state=a_dict.get("state", None),
-            application_input=a_dict.get("applicationInput", None),
-        )
+        for field, value in merged_kwargs.items():
+            setattr(self, field, value)
 
 
 class JobHandlerInterface(ABC):

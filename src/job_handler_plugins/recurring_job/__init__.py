@@ -28,7 +28,7 @@ class JobHandler(JobHandlerInterface):
         logger.info(msg)
         self.job.log = f"{self.job.log}\n{msg}"
 
-        job_template = self.job.entity["applicationInput"]
+        job_template = self.job.application_input
         new_job_address = add_document(f"{self.job.dmss_id}.schedule.runs", job_template, self.job.token)
         # TODO: Update DMSS to return complete address, and avoid this ugly stuff
         complete_new_job_address = self.job.dmss_id.split("$", 1)[0] + "$" + new_job_address["uid"]
@@ -49,4 +49,4 @@ class JobHandler(JobHandlerInterface):
         raise NotImplementedError
 
     def progress(self) -> Tuple[JobStatus, str]:
-        return self.job.status, self.job.entity.get("logs")
+        return self.job.status, self.job.log

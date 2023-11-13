@@ -16,7 +16,7 @@ from job_handler_plugins.omnia_classic_azure_container_instances.ARM_deployer im
     Deployer,
 )
 from restful.exceptions import NotFoundException
-from services.job_handler_interface import JobHandlerInterface, JobStatus
+from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from utils.logging import logger
 
 AccessToken = namedtuple("AccessToken", ["token", "expires_on"])
@@ -40,7 +40,8 @@ class JobHandler(JobHandlerInterface):
     """
 
     def __init__(self, data_source: str, job_entity: dict, token: str):
-        super().__init__(data_source, job_entity, token)
+        new_job = Job(**job_entity)
+        super().__init__(new_job, data_source)
         logger.setLevel(logging.WARNING)  # I could not find the correctly named logger for this...
         azure_credentials = ClientSecretCredential(
             client_id=config.AZURE_JOB_SP_CLIENT_ID,
@@ -48,7 +49,7 @@ class JobHandler(JobHandlerInterface):
             tenant_id=config.AZURE_JOB_SP_TENANT_ID,
         )
         self.arm_deployer = Deployer(config.AZURE_JOB_SUBSCRIPTION, config.AZURE_JOB_RESOURCE_GROUP, azure_credentials)
-        self.azure_valid_container_name = self.job_entity["name"].lower()
+        self.azure_valid_container_name = self.job.runner["name"].lower()
         self.aci_client = ContainerInstanceManagementClient(
             azure_credentials, subscription_id=config.AZURE_JOB_SUBSCRIPTION
         )
@@ -62,7 +63,7 @@ class JobHandler(JobHandlerInterface):
 
     def start(self) -> str:
         logger.info(
-            f"JobName: '{self.job_entity.get('_id', self.job_entity.get('name'))}'."
+            f"JobName: '{self.job.runner.get('_id', self.job.runner.get('name'))}'."
             + " Starting Azure Container job..."
         )
 
@@ -72,28 +73,28 @@ class JobHandler(JobHandlerInterface):
         ]
 
         # Parse env-vars from job entity
-        for env_string in self.job_entity.get("environmentVariables", []):
+        for env_string in self.job.runner.get("environmentVariables", []):
             key, value = env_string.split("=", 1)
             env_vars.append(EnvironmentVariable(name=key, value=value))
 
         logger.info(
             f"Creating Azure container '{self.azure_valid_container_name}':\n\t"
-            + f"Image: '{self.job_entity.get('image', 'None')}'\n\t"
-            + f"Command: {self.job_entity.get('command', 'None')}\n\t"
-            + f"RegistryUsername: '{self.job_entity.get('cr-username', 'None')}'\n\t"
+            + f"Image: '{self.job.runner.get('image', 'None')}'\n\t"
+            + f"Command: {self.job.runner.get('command', 'None')}\n\t"
+            + f"RegistryUsername: '{self.job.runner.get('cr-username', 'None')}'\n\t"
             + f"EnvironmentVariables: {[e.name for e in env_vars]}",
         )
 
         parameters = {
             "name": self.azure_valid_container_name,
-            "image": self.job_entity["image"],
-            "command": self.job_entity.get("command") + [f"--token={self.token}"],
+            "image": self.job.runner["image"],
+            "command": self.job.runner.get("command") + [f"--token={self.job.token}"],
             "cpuCores": 1,
             "memoryInGb": 2,
             "restartPolicy": "Never",
             "location": "norwayeast",
-            "subnetId": self.job_entity.get("subnetId"),
-            "logAnalyticsWorkspaceResourceId": self.job_entity.get("logAnalyticsWorkspaceResourceId"),
+            "subnetId": self.job.runner.get("subnetId"),
+            "logAnalyticsWorkspaceResourceId": self.job.runner.get("logAnalyticsWorkspaceResourceId"),
         }
         with open(f"{Path(__file__).parent}/OmniaClassicContainerInstance.json", "r") as template_file:
             template = json.load(template_file)

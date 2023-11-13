@@ -5,7 +5,7 @@ import json
 import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Callable, Tuple, Union
+from typing import Callable, Tuple
 from uuid import UUID, uuid4
 
 import redis
@@ -48,10 +48,10 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
 
     It is assumed that the 'job' parameter contains an entity with a 'cron' string attribute that follows the cron syntax.
     """
-    if not job.entity.get("schedule"):
+    if not job.schedule:
         raise ValueError("CronJob entity is missing required attribute 'schedule'")
     try:
-        minute, hour, day, month, day_of_week = job.entity["schedule"]["cron"].split(" ")
+        minute, hour, day, month, day_of_week = job.schedule["cron"].split(" ")
         scheduled_job = job_scheduler.add_job(
             trigger="cron",
             func=function,
@@ -73,27 +73,28 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
         raise ValueError(f"Failed to schedule cron job '{job.job_uid}'. {e}'")
 
 
-def _get_job(job_uid: UUID) -> Union[Job, None]:
+def _get_job(job_uid: UUID) -> Job:
     """Get a job from the job storage."""
     try:
         if raw_job := get_job_store().get(str(job_uid)):
-            return Job.from_dict(json.loads(raw_job.decode()))
+            return Job(**json.loads(raw_job.decode()))
+        else:
+            raise NotFoundException(f"No job with id '{job_uid}' is registered")
     except AuthenticationError:
         raise ValueError(
             "Tried to fetch a job from Redis but no password"
             + " was supplied. Make sure SCHEDULER_REDIS_PASSWORD is set."
         )
-    return None
 
 
 def _set_job(job: Job):
-    return get_job_store().set(str(job.job_uid), json.dumps(job.to_dict()))
+    return get_job_store().set(str(job.job_uid), job.json())
 
 
 def load_cron_jobs():
     for key in get_job_store().scan_iter():
         job = _get_job(UUID(key.decode()))
-        if job.cron_job:
+        if job.schedule:
             schedule_cron_job(scheduler, _run_job, job)
             logger.info(f"Loaded and registered job '{job.job_uid}' from {config.SCHEDULER_REDIS_HOST}")
 
@@ -106,7 +107,7 @@ def _get_job_handler(job: Job) -> JobHandlerInterface:
     Each job handler have a folder with at least one file: __init__.py
     This __init__ file must implement a class called "JobHandler" that inherits from the JobHandlerInterface class.
 
-    The runner type in the job entity (job.entity["runner"]["type"]) decides what job handler to fetch.
+    The runner type in the job entity (job.runner["type"]) decides what job handler to fetch.
     Also, the runner type must be equal to the '_SUPPORTED_TYPE' inside the job handler's __init__ file.
     """
     data_source_id = job.dmss_id.split("/", 1)[0]  # TODO use split_absolute_ref() to do this splitting.
@@ -120,7 +121,7 @@ def _get_job_handler(job: Job) -> JobHandlerInterface:
     try:
         modules = [importlib.import_module(module) for module in job_handler_directories]
         for job_handler_module in modules:
-            if job.entity["runner"]["type"] == job_handler_module._SUPPORTED_TYPE:
+            if job.runner["type"] == job_handler_module._SUPPORTED_TYPE:
                 return job_handler_module.JobHandler(job, data_source_id)
     except ImportError as error:
         traceback.print_exc()
@@ -131,17 +132,12 @@ def _get_job_handler(job: Job) -> JobHandlerInterface:
             + "with the string, tuple, or list value of the job type(s)."
         )
 
-    raise NotImplementedError(f"No handler for a job of type '{job.entity['runner']['type']}' is configured")
+    raise NotImplementedError(f"No handler for a job of type '{job.runner['type']}' is configured")
 
 
 def _run_job(job_uid: UUID) -> str:
     """Start a job, by calling the start() function for the job's job handler."""
     job: Job = _get_job(job_uid)
-    if not job:
-        raise NotFoundException(
-            message=f"The job with uid '{job_uid}' was not found",
-            debug=f"The job with uid '{job_uid}' was not found",
-        )
     try:
         job_handler = _get_job_handler(job)
         job.started = datetime.now()
@@ -165,12 +161,14 @@ def _run_job(job_uid: UUID) -> str:
     except Exception as error:
         job.log = f"{job.log}\n\n{error}"
     finally:
-        if job.entity["type"] == config.RECURRING_JOB:
+        if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler
             # Fetch the updated entity before merging data
-            job.entity = get_document(job.dmss_id)
-        job.update_entity_attributes()
-        update_document(job.dmss_id, job.entity, job.token)  # Update in DMSS with status etc.
+            job.dmss_sync()
+
+        update_document(
+            job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token
+        )  # Update in DMSS with status etc.
 
         _set_job(job)
         return job.log  # type: ignore
@@ -188,33 +186,23 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     # A token must be created when there still is a request object.
     token = get_personal_access_token()
     job_entity = get_document(dmss_id, 0, token)
-
+    kwargs = {
+        "dmss_id": dmss_id,
+        "job_uid": uuid4(),
+        "started": datetime.now(),
+        "token": token,
+        **job_entity,
+    }
+    job = Job(**kwargs)
+    job.status = JobStatus.REGISTERED
+    _get_job_handler(job)  # Test for available handler before registering
     if job_entity.get("schedule"):
-        job = Job(
-            job_uid=uuid4(),
-            dmss_id=dmss_id,
-            started=datetime.now(),
-            status=JobStatus.REGISTERED,
-            entity=job_entity,
-            cron_job=True,
-            token=token,
-        )
-        _get_job_handler(job)  # Test for available handler before registering
         result = str(job.job_uid), schedule_cron_job(
             scheduler,
             _run_job,
             job,
         )
     else:
-        job = Job(
-            job_uid=uuid4(),
-            dmss_id=dmss_id,
-            started=datetime.now(),
-            status=JobStatus.REGISTERED,
-            entity=job_entity,
-            token=token,
-        )
-        _get_job_handler(job)
         # Add a 5second delay on every job we run.
         # This is so that the JobService can update job state in
         # DMSS, before we get a race with the job itself trying to update it's state.
@@ -223,8 +211,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
         result = str(job.job_uid), "Job successfully started"
 
     _set_job(job)
-    job.update_entity_attributes()
-    update_document(job.dmss_id, job_entity, token=job.token)
+    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), token=job.token)
     return result
 
 
@@ -234,8 +221,6 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
     The result of the job is fetched by using the progress() function in the job handler for the given job.
     """
     job = _get_job(job_uid)
-    if not job:
-        raise NotFoundException(f"No job with uid '{job_uid}' is registered")
     job_handler = _get_job_handler(job)
     try:
         status, log = job_handler.progress()
@@ -244,17 +229,12 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'progress' method",
         )
-    job_entity = get_document(job.dmss_id, 0, job.token)
-    if status is JobStatus.COMPLETED and job_entity.get("results", None):
-        result_reference = job_entity["result"]
-        job.entity["result"] = result_reference
     job.status = status
     job.log = log
 
     _set_job(job)
-    job.update_entity_attributes()
-    update_document(job.dmss_id, job.entity, job.token)
-    if job.cron_job:
+    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
+    if job.schedule:
         cron_job = scheduler.get_job(str(job_uid), jobstore="redis_job_store")
         return status, job.log, f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}"
     return status, job.log, f"Started: {job.started.isoformat()}"
@@ -267,8 +247,6 @@ def remove_job(job_uid: UUID) -> str:
     Also, the job is removed from the job store.
     """
     job = _get_job(job_uid)
-    if not job:
-        raise NotFoundException(f"No job with id '{job_uid}' is registered")
     job_handler = _get_job_handler(job)
     try:
         remove_message = job_handler.remove()
@@ -287,8 +265,6 @@ def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
     The result() function in the job's job handler is used.
     """
     job = _get_job(job_uid)
-    if not job:
-        raise NotFoundException(f"No job with id '{job_uid}' is registered")
     if not job.status.COMPLETED:
         raise BadRequestException("The job has not yet completed")
     job_handler = _get_job_handler(job)

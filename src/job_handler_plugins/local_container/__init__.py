@@ -21,8 +21,7 @@ class JobHandler(JobHandlerInterface):
     def __init__(self, job: Job, data_source: str):
         super().__init__(job, data_source)
         self.headers = {"Access-Key": job.token}
-
-        self.local_container_name = f"{job.entity['runner']['name']}_{str(job.job_uid).split('-')[0]}"
+        self.local_container_name = f"{job.runner['name']}_{str(job.job_uid).split('-')[0]}"
         try:
             self.client = docker.from_env()
         except DockerException:
@@ -35,7 +34,7 @@ class JobHandler(JobHandlerInterface):
             )
 
     def start(self) -> str:
-        runner_entity: dict = self.job.entity["runner"]
+        runner_entity: dict = self.job.runner
         full_image_name: str = (
             f"{runner_entity['image']['registryName']}/{runner_entity['image']['imageName']}"
             + f":{runner_entity['image']['version']}"
@@ -44,7 +43,7 @@ class JobHandler(JobHandlerInterface):
         logger.info("Creating container\n\t" + f"Image: '{full_image_name}'\n\t")
         envs = [f"{e}={os.getenv(e)}" for e in config.SCHEDULER_ENVS_TO_EXPORT if os.getenv(e)]
 
-        custom_command = self.job.entity["runner"].get("customCommands")
+        custom_command = self.job.runner.get("customCommands")
         envs = envs + runner_entity["environmentVariables"]
         envs.append(f"DMSS_TOKEN={self.job.token}")
         envs.append(f"DMSS_ID={self.job.dmss_id}")
