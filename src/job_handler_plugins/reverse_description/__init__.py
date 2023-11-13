@@ -28,7 +28,7 @@ class JobHandler(JobHandlerInterface):
 
     def start(self) -> str:
         logger.info("Starting ReverseDescription job.")
-        application_reference = self.job.entity["applicationInput"]
+        application_reference = self.job.application_input
         application_input_entity = get_document(application_reference["address"], token=self.job.token)
         result = application_input_entity.get("description", "Backup")[::-1]
         with open(f"{self.results_directory}/{self.job.job_uid}", "w") as result_file:

@@ -31,10 +31,8 @@ test_job = {
             "referenceType": "link",
         },
         "runner": {"type": "dmss://WorkflowDS/Blueprints/ReverseDescription"},
-        "started": "Not started",
     },
     "runner": {"type": "dmss://WorkflowDS/Blueprints/RecurringJobHandler"},
-    "started": "Not started",
     "schedule": {"type": "dmss://WorkflowDS/Blueprints/CronJob", "cron": "1/1 * * * *", "runs": []},
 }
 test_client = TestClient(create_app())

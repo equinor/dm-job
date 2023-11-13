@@ -25,7 +25,6 @@ test_job = {
         "referenceType": "link",
     },
     "runner": {"type": "dmss://WorkflowDS/Blueprints/ReverseDescription"},
-    "started": "Not started",
 }
 test_client = TestClient(create_app())
 

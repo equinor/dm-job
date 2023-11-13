@@ -42,7 +42,7 @@ class JobHandler(JobHandlerInterface):
             client_secret=config.AZURE_JOB_SP_SECRET,
             tenant_id=config.AZURE_JOB_SP_TENANT_ID,
         )
-        self.azure_valid_container_name = self.job.entity["name"].lower().replace(".", "-")
+        self.azure_valid_container_name = self.job.runner["name"].lower().replace(".", "-")
         self.aci_client = ContainerInstanceManagementClient(
             azure_credentials, subscription_id=config.AZURE_JOB_SUBSCRIPTION
         )
@@ -55,7 +55,7 @@ class JobHandler(JobHandlerInterface):
         raise NotImplementedError
 
     def start(self) -> str:
-        logger.info(f"JobName: '{self.job.job_id}'. Starting Azure Container job...")
+        logger.info(f"JobName: '{self.job.job_uid}'. Starting Azure Container job...")
 
         # Add env-vars from deployment first
         env_vars: list[EnvironmentVariable] = [
@@ -65,11 +65,11 @@ class JobHandler(JobHandlerInterface):
         env_vars.append(EnvironmentVariable(name="DMSS_TOKEN", value=self.job.token))
 
         # Parse env-vars from job entity
-        for env_string in self.job.entity.get("environmentVariables", []):
+        for env_string in self.job.runner.get("environmentVariables", []):
             key, value = env_string.split("=", 1)
             env_vars.append(EnvironmentVariable(name=key, value=value))
-        reference_target: str = self.job.entity.get("referenceTarget", None)
-        runner_entity: dict = self.job.entity["runner"]
+        reference_target: str = self.job.referenceTarget
+        runner_entity: dict = self.job.runner
         if not runner_entity["image"]["registryName"]:
             raise ValueError("Container image in job runner")
         full_image_name: str = (
@@ -83,7 +83,7 @@ class JobHandler(JobHandlerInterface):
         )
         command_list = [
             "/code/init.sh",
-            f"--input-id={self.data_source}/{self.job.entity['applicationInput']['_id']}",
+            f"--input-id={self.data_source}/{self.job.application_input['_id']}",
         ]
         if reference_target:
             command_list.append(f"--reference-target={reference_target}")
