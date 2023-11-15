@@ -44,7 +44,7 @@ class JobHandler(JobHandlerInterface):
         envs = [f"{e}={os.getenv(e)}" for e in config.SCHEDULER_ENVS_TO_EXPORT if os.getenv(e)]
 
         custom_command = self.job.runner.get("customCommands")
-        envs = envs + runner_entity["environmentVariables"]
+        envs = envs + runner_entity.get("environmentVariables", [])
         envs.append(f"DMSS_TOKEN={self.job.token}")
         envs.append(f"DMSS_ID={self.job.dmss_id}")
         envs.append(f"DMSS_URL={config.DMSS_API}")
