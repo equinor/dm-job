@@ -53,7 +53,7 @@ class JobHandler(JobHandlerInterface):
             command=custom_command,
             name=self.local_container_name,
             environment=envs,
-            network="application_default",
+            network=self.job.runner["network"],
             detach=True,
         )
         logger.info("*** Local container job started successfully ***")
