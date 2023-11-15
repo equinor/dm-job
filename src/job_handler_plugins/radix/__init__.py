@@ -29,7 +29,7 @@ class JobHandler(JobHandlerInterface):
         logger.info("Starting Radix job...")
         # Add token and URL to payload, so that jobs are able to connect to the DMSS instance.
         try:
-            payload = list_of_env_to_dict(self.job.runner["environmentVariables"])
+            payload = list_of_env_to_dict(self.job.runner.get("environmentVariables", []))
         except IndexError:
             raise ValueError(
                 f"Malformed environment variable received by job handler of type {_SUPPORTED_TYPE}. Should be on the format <key>=<value> (location: {self.job.dmss_id})"
@@ -59,6 +59,8 @@ class JobHandler(JobHandlerInterface):
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, str]:
+        if not self.job.state:
+            return self.job.status, self.job.log
         result = requests.get(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
             timeout=10,
