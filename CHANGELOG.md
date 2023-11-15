@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.2](https://github.com/equinor/dm-job/compare/v1.3.1...v1.3.2) (2023-11-15)
+
+
+### Bug Fixes
+
+* check to handle if job_status is called before start has completed ([b6d436e](https://github.com/equinor/dm-job/commit/b6d436ee49cbb002723d5e707a924e7645584b5a))
+
+
+### Code Refactoring
+
+* make Local containers use runner name ([efbbe99](https://github.com/equinor/dm-job/commit/efbbe9926499a365d379c6fddd664e001348e9a6))
+* use pydantic model for job class ([2752aa5](https://github.com/equinor/dm-job/commit/2752aa558872a200562b6eb0f9b472722a7ca574))
+
 ## [1.3.1](https://github.com/equinor/dm-job/compare/v1.3.0...v1.3.1) (2023-11-10)
 
 
