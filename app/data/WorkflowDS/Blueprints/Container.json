@@ -28,6 +28,11 @@
       "name": "name",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string"
+    },
+    {
+      "name": "network",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string"
     }
   ]
 }
