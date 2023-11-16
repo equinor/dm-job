@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.4](https://github.com/equinor/dm-job/compare/v1.3.3...v1.3.4) (2023-11-16)
+
+
+### Bug Fixes
+
+* add local docker network name to container runner ([bd3b645](https://github.com/equinor/dm-job/commit/bd3b645a497037d9148fc7048949dd1e66500274))
+* make environment varaibles optional for local container runner ([432288b](https://github.com/equinor/dm-job/commit/432288ba68d32b950713eb5534551f346238f90d))
+
 ## [1.3.3](https://github.com/equinor/dm-job/compare/v1.3.2...v1.3.3) (2023-11-16)
 
 
