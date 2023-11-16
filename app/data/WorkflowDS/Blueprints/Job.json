@@ -1,7 +1,6 @@
 {
   "name": "Job",
   "type": "CORE:Blueprint",
-  "abstract": true,
   "attributes": [
     {
       "name": "type",
