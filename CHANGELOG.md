@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/equinor/dm-job/compare/v1.3.2...v1.3.3) (2023-11-16)
+
+
+### Bug Fixes
+
+* remove abstract from job blueprint ([e3fef28](https://github.com/equinor/dm-job/commit/e3fef280259b74af46c6859903680125c2e31cbc))
+
 ## [1.3.2](https://github.com/equinor/dm-job/compare/v1.3.1...v1.3.2) (2023-11-15)
 
 
