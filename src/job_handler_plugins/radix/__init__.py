@@ -68,11 +68,15 @@ class JobHandler(JobHandlerInterface):
         result.raise_for_status()
         response_json = result.json()
         job_status = JobStatus.UNKNOWN
+        job_log = "No logs available yet!"
         match (response_json["status"]):  # noqa
             case "Running":  # noqa
                 job_status = JobStatus.RUNNING
+                job_log = json.dumps(response_json)
             case "Failed":  # noqa
                 job_status = JobStatus.FAILED
+                job_log = json.dumps(response_json)
             case "Succeeded":  # noqa
                 job_status = JobStatus.COMPLETED
-        return job_status, response_json["message"]
+                job_log = json.dumps(response_json)
+        return job_status, job_log
