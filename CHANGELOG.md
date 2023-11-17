@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.5](https://github.com/equinor/dm-job/compare/v1.3.4...v1.3.5) (2023-11-17)
+
+
+### Bug Fixes
+
+* add separate blueprint for local container runner ([1288afb](https://github.com/equinor/dm-job/commit/1288afba23573e58a027b4eaa992fbe4e2a54c0c))
+
 ## [1.3.4](https://github.com/equinor/dm-job/compare/v1.3.3...v1.3.4) (2023-11-16)
 
 
