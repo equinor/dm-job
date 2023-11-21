@@ -46,7 +46,7 @@ class JobHandler(JobHandlerInterface):
         # Need to store the unique job name in the state,
         # so that we can call the job scheduler
         # to get the progress or to remove the job.
-        self.job.state = {"job_name": result.json()["name"]}
+        self.job.state = {"job_name": result.json()["name"], "prev_status": self.job.status}
         logger.info(f"result:  {result}")
         return result.status_code  # type: ignore
 
@@ -79,4 +79,7 @@ class JobHandler(JobHandlerInterface):
             case "Succeeded":  # noqa
                 job_status = JobStatus.COMPLETED
                 job_log = json.dumps(response_json)
+        if self.job.state["prev_status"] != job_status:
+            job_log = f"{self.job.log}\n{job_log}"
+            self.job.state["prev_status"] = job_status
         return job_status, job_log
