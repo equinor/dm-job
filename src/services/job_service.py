@@ -142,23 +142,25 @@ def _run_job(job_uid: UUID) -> str:
         job_handler = _get_job_handler(job)
         job.started = datetime.now()
         try:
-            job.log = job_handler.start()
+            result = job_handler.start()
+            job.append_log(result)
+
         except Exception as error:
             print(traceback.format_exc())
             logger.warning(f"Failed to run job; {job_uid}")
             job.status = JobStatus.FAILED
             raise error
     except NotImplementedError as error:
-        job.log = (
+        job.append_log(
             f"{job.log}\n\nThe jobHandler '{type(job_handler).__name__}' is missing some implementations: {error}"
         )
     except KeyError as error:
-        job.log = (
+        job.append_log(
             f"{job.log}\n\nThe jobHandler '{type(job_handler).__name__}' "
             f"tried to access a missing attribute: {error}"
         )
     except Exception as error:
-        job.log = f"{job.log}\n\n{error}"
+        job.append_log(error)
     finally:
         if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler
@@ -229,8 +231,9 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'progress' method",
         )
-    job.status = status
-    job.log = log
+    if job.status != status:
+        job.status = status
+        job.append_log(log)
 
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)

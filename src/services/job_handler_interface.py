@@ -62,6 +62,9 @@ class Job(BaseModel):
         for field, value in merged_kwargs.items():
             setattr(self, field, value)
 
+    def append_log(self, log):
+        self.log = f"{self.log}\n{log}"
+
 
 class JobHandlerInterface(ABC):
     def __init__(self, job: Job, data_source: str):
