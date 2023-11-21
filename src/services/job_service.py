@@ -141,7 +141,6 @@ def _run_job(job_uid: UUID) -> str:
     try:
         job_handler = _get_job_handler(job)
         job.started = datetime.now()
-        job.status = JobStatus.STARTING
         try:
             job.log = job_handler.start()
         except Exception as error:
@@ -194,9 +193,9 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
         **job_entity,
     }
     job = Job(**kwargs)
-    job.status = JobStatus.REGISTERED
     _get_job_handler(job)  # Test for available handler before registering
     if job_entity.get("schedule"):
+        job.status = JobStatus.REGISTERED
         result = str(job.job_uid), schedule_cron_job(
             scheduler,
             _run_job,
@@ -207,6 +206,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
         # This is so that the JobService can update job state in
         # DMSS, before we get a race with the job itself trying to update it's state.
         in_5_seconds = datetime.now() + timedelta(seconds=5)
+        job.status = JobStatus.STARTING
         scheduler.add_job(func=_run_job, next_run_time=in_5_seconds, args=[job.job_uid], jobstore="redis_job_store")
         result = str(job.job_uid), "Job successfully started"
 
@@ -249,12 +249,14 @@ def remove_job(job_uid: UUID) -> str:
     job = _get_job(job_uid)
     job_handler = _get_job_handler(job)
     try:
-        remove_message = job_handler.remove()
+        job_status, remove_message = job_handler.remove()
+        job.status = job_status
     except NotImplementedError:
         raise NotImplementedException(
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'remove' method",
         )
+    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     get_job_store().delete(str(job_uid))
     return remove_message  # type: ignore
 
