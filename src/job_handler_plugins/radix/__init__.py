@@ -17,7 +17,7 @@ def _get_job_url(job: Job) -> str:
 
 
 def list_of_env_to_dict(env_vars) -> dict:
-    return {s.split("=")[0]: s.split("=")[1] for s in env_vars}
+    return {s.lsplit("=", 1)[0]: s.lsplit("=", 1)[1] for s in env_vars}
 
 
 class JobHandler(JobHandlerInterface):
@@ -46,7 +46,7 @@ class JobHandler(JobHandlerInterface):
         # Need to store the unique job name in the state,
         # so that we can call the job scheduler
         # to get the progress or to remove the job.
-        self.job.state = {"job_name": result.json()["name"], "prev_status": self.job.status}
+        self.job.state = {"job_name": result.json()["name"]}
         logger.info(f"result:  {result}")
         return result.status_code  # type: ignore
 
@@ -79,7 +79,4 @@ class JobHandler(JobHandlerInterface):
             case "Succeeded":  # noqa
                 job_status = JobStatus.COMPLETED
                 job_log = json.dumps(response_json)
-        if self.job.state["prev_status"] != job_status:
-            job_log = f"{self.job.log}\n{job_log}"
-            self.job.state["prev_status"] = job_status
         return job_status, job_log

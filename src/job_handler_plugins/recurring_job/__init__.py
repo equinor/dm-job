@@ -26,7 +26,7 @@ class JobHandler(JobHandlerInterface):
     def start(self) -> str:
         msg = f'{self.job.log}\nStarting scheduled job from "{self.job.dmss_id}"'
         logger.info(msg)
-        self.job.log = f"{self.job.log}\n{msg}"
+        self.job.append_log(msg)
 
         job_template = self.job.application_input
         new_job_address = add_document(f"{self.job.dmss_id}.schedule.runs", job_template, self.job.token)
@@ -37,7 +37,7 @@ class JobHandler(JobHandlerInterface):
 
         msg = f'{self.job.log}\nJob: "{new_uid}", Status: "{new_log}"'
         logger.info(msg)
-        self.job.log = f"{self.job.log}\n{msg}"
+        self.job.append_log(msg)
         self.job.status = JobStatus.RUNNING
         return "OK"
 
