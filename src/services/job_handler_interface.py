@@ -12,6 +12,7 @@ from services.dmss import get_document
 
 class JobStatus(str, Enum):
     REGISTERED = "registered"
+    NOT_STARTED = "not started"
     STARTING = "starting"
     RUNNING = "running"
     FAILED = "failed"
