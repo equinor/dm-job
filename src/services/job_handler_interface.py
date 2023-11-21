@@ -63,7 +63,8 @@ class Job(BaseModel):
             setattr(self, field, value)
 
     def append_log(self, log):
-        self.log = f"{self.log}\n{log}"
+        new = f"\n{log}" if (self.log and log) else log
+        self.log = self.log + new if self.log else new
 
 
 class JobHandlerInterface(ABC):
