@@ -43,12 +43,20 @@ class Job(BaseModel):
     referenceTarget: str | None
     schedule: dict | None
 
-    log: str | None
+    log: list | None = []
+    progress: float | None
     token: str | None
     state: dict | None
 
     # Fields that are not sendt to DMSS
-    exclude_keys: dict = {"dmss_id": True, "log": True, "token": True, "state": True, "exclude_keys": True}
+    exclude_keys: dict = {
+        "dmss_id": True,
+        "log": True,
+        "progress": True,
+        "token": True,
+        "state": True,
+        "exclude_keys": True,
+    }
 
     def dmss_sync(self):
         fetched = get_document(self.dmss_id)
@@ -64,7 +72,7 @@ class Job(BaseModel):
 
     def append_log(self, log):
         if log:
-            self.log = self.log + f"\n{log}" if self.log else log
+            self.log.append(log)
 
 
 class JobHandlerInterface(ABC):
@@ -80,7 +88,7 @@ class JobHandlerInterface(ABC):
         """Terminate and cleanup all job related resources"""
         raise NotImplementedError
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         """Poll progress from the job instance"""
         raise NotImplementedError
 

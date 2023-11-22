@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from starlette.responses import JSONResponse, PlainTextResponse
 
+from domain_classes.progress import Progress
 from features.jobs.use_cases.delete_job import delete_job_use_case
 from features.jobs.use_cases.get_result_job import (
     GetJobResultResponse,
@@ -8,6 +9,10 @@ from features.jobs.use_cases.get_result_job import (
 )
 from features.jobs.use_cases.start_job import StartJobResponse, start_job_use_case
 from features.jobs.use_cases.status_job import StatusJobResponse, status_job_use_case
+from features.jobs.use_cases.update_job_progress import (
+    UpdateJobProgressResponse,
+    update_job_progress_use_case,
+)
 from restful.responses import create_response
 
 router = APIRouter()
@@ -60,3 +65,14 @@ def result(job_uid: str):
     - **job_uid**: the job API's internal uid for the job.
     """
     return get_job_result_use_case(job_uid=job_uid).dict()
+
+
+@router.put("/{job_uid}", operation_id="update_job_progress", response_model=UpdateJobProgressResponse)
+@create_response(JSONResponse)
+def progress(job_uid: str, job_progress: Progress):
+    """Update the progress of the job.
+
+    - **job_uid**: the job API's internal uid for the job.
+    - **progress**: progress object with percentage and logs
+    """
+    return update_job_progress_use_case(job_uid=job_uid, progress=job_progress).dict()

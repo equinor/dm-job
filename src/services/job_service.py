@@ -13,6 +13,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from redis import AuthenticationError
 
 from config import config
+from domain_classes.progress import Progress
 from restful.exceptions import (
     BadRequestException,
     NotFoundException,
@@ -211,7 +212,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     return result
 
 
-def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
+def status_job(job_uid: UUID) -> Tuple[JobStatus, list, str]:
     """Get the status for an existing job.
 
     The result of the job is fetched by using the progress() function in the job handler for the given job.
@@ -272,3 +273,13 @@ def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'result' method",
         )
+
+
+def update_progress(job_uid: UUID, progress: Progress):
+    job = _get_job(job_uid)
+    job.log = progress.logs or job.log
+    job.progress = progress.percentage or job.progress
+    job.status = progress.status or job.status
+    _set_job(job)
+    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
+    return "OK"
