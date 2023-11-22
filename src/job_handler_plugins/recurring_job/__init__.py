@@ -24,7 +24,7 @@ class JobHandler(JobHandlerInterface):
         self.headers = {"Access-Key": job.token or ""}
 
     def start(self) -> str:
-        msg = f'{self.job.log}\nStarting scheduled job from "{self.job.dmss_id}"'
+        msg = f'Starting scheduled job from "{self.job.dmss_id}"'
         logger.info(msg)
         self.job.append_log(msg)
 
@@ -35,7 +35,7 @@ class JobHandler(JobHandlerInterface):
 
         new_uid, new_log = register_job(complete_new_job_address)
 
-        msg = f'{self.job.log}\nJob: "{new_uid}", Status: "{new_log}"'
+        msg = f'Job: "{new_uid}", Status: "{new_log}"'
         logger.info(msg)
         self.job.append_log(msg)
         self.job.status = JobStatus.RUNNING

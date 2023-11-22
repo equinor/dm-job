@@ -142,8 +142,7 @@ def _run_job(job_uid: UUID) -> str:
         job_handler = _get_job_handler(job)
         job.started = datetime.now()
         try:
-            result = job_handler.start()
-            job.append_log(result)
+            message = job_handler.start()
 
         except Exception as error:
             print(traceback.format_exc())
@@ -151,16 +150,11 @@ def _run_job(job_uid: UUID) -> str:
             job.status = JobStatus.FAILED
             raise error
     except NotImplementedError as error:
-        job.append_log(
-            f"{job.log}\n\nThe jobHandler '{type(job_handler).__name__}' is missing some implementations: {error}"
-        )
+        message = f"The jobHandler '{type(job_handler).__name__}' is missing some implementations: {error}"
     except KeyError as error:
-        job.append_log(
-            f"{job.log}\n\nThe jobHandler '{type(job_handler).__name__}' "
-            f"tried to access a missing attribute: {error}"
-        )
+        message = f"The jobHandler '{type(job_handler).__name__}' " f"tried to access a missing attribute: {error}"
     except Exception as error:
-        job.append_log(error)
+        message = error
     finally:
         if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler
@@ -172,7 +166,7 @@ def _run_job(job_uid: UUID) -> str:
         )  # Update in DMSS with status etc.
 
         _set_job(job)
-        return job.log  # type: ignore
+        return message  # type: ignore
 
 
 def register_job(dmss_id: str) -> Tuple[str, str]:
@@ -210,7 +204,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
         in_5_seconds = datetime.now() + timedelta(seconds=5)
         job.status = JobStatus.STARTING
         scheduler.add_job(func=_run_job, next_run_time=in_5_seconds, args=[job.job_uid], jobstore="redis_job_store")
-        result = str(job.job_uid), "Job successfully started"
+        result = str(job.job_uid), "Job starting in 5 seconds..."
 
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), token=job.token)
@@ -225,22 +219,22 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, str, str]:
     job = _get_job(job_uid)
     job_handler = _get_job_handler(job)
     try:
-        status, log = job_handler.progress()
+        status, log, message = job_handler.progress()
     except NotImplementedError:
         raise NotImplementedException(
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'progress' method",
         )
-    if job.status != status:
-        job.status = status
-        job.append_log(log)
+    job.status = status
+    if log:
+        job.log = log
 
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     if job.schedule:
         cron_job = scheduler.get_job(str(job_uid), jobstore="redis_job_store")
         return status, job.log, f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}"
-    return status, job.log, f"Started: {job.started.isoformat()}"
+    return status, job.log, message
 
 
 def remove_job(job_uid: UUID) -> str:
