@@ -48,5 +48,5 @@ class JobHandler(JobHandlerInterface):
     def result(self) -> Tuple[str, bytes]:
         raise NotImplementedError
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         return self.job.status, self.job.log, None

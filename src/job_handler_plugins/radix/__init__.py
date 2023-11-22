@@ -58,7 +58,7 @@ class JobHandler(JobHandlerInterface):
         result.raise_for_status()
         return JobStatus.REMOVED, "Removed"
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         if not self.job.state:
             return self.job.status, None, "Job is not yet started"
         result = requests.get(

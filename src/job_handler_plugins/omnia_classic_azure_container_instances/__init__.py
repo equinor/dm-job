@@ -123,7 +123,7 @@ class JobHandler(JobHandlerInterface):
             job_status = JobStatus.COMPLETED
         return job_status, status
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         """Poll progress from the job instance"""
         try:
             logger.setLevel(logging.WARNING)

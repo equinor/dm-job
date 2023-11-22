@@ -67,11 +67,11 @@ class JobHandler(JobHandlerInterface):
             pass
         return JobStatus.REMOVED, "Removed"
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         """Poll progress from the job instance"""
         if self.job.status == JobStatus.FAILED:
             # If setup fails, the container is not started
-            return self.job.status, self.job.log, None
+            return self.job.status, None, "Local container job failed"
         try:
             container = self.client.containers.get(self.local_container_name)
             status = self.job.status
@@ -81,11 +81,10 @@ class JobHandler(JobHandlerInterface):
                 status = JobStatus.FAILED
             elif container.attrs["State"]["ExitCode"] == 0:
                 status = JobStatus.COMPLETED
-            logs = container.logs()
-            return status, logs.decode(), None
+            return status, None, "Nothing to report"
         except docker.errors.NotFound as error:
             logger.error(f"Failed to poll progress of local container: {error}")
-            return JobStatus.UNKNOWN, self.job.log, None
+            return JobStatus.UNKNOWN, None, f"Failed to poll progress of local container: {error}"
 
     def result(self) -> Tuple[str, bytes]:
         return "test 123", b"lkjgfdakljhfdgsllkjhldafgoiu8y03q987hgbloizdjhfpg980"

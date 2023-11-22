@@ -74,7 +74,7 @@ class JobHandler(JobHandlerInterface):
         """Terminate and cleanup all job related resources"""
         raise NotImplementedError
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         """Poll progress from the job instance"""
         raise NotImplementedError
 

@@ -8,8 +8,8 @@ from services.job_service import status_job
 
 class StatusJobResponse(BaseModel):
     status: JobStatus
-    log: str | None
-    message: str
+    log: list | None
+    message: str | None
 
     class Config:
         use_enum_values = True

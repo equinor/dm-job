@@ -46,5 +46,5 @@ class JobHandler(JobHandlerInterface):
         with open(result_file_path, "rb") as result_file:
             return "Done", result_file.read()
 
-    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
         return self.job.status, None, "Progress tracking not implemented"
