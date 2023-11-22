@@ -131,11 +131,11 @@ class JobHandler(JobHandlerInterface):
             job_status = JobStatus.COMPLETED
         return job_status, status
 
-    def progress(self) -> Tuple[JobStatus, str]:
+    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
         """Poll progress from the job instance"""
         if self.job.status == JobStatus.FAILED:
             # If setup fails, the container is not started
-            return self.job.status, self.job.log
+            return self.job.status, self.job.log, None
         try:
             logger.setLevel(logging.WARNING)
             logs = self.aci_client.containers.list_logs(
@@ -171,4 +171,4 @@ class JobHandler(JobHandlerInterface):
                 job_status = JobStatus.FAILED
             case ("Waiting", None):  # noqa
                 job_status = JobStatus.STARTING
-        return job_status, logs
+        return job_status, logs, None
