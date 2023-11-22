@@ -58,9 +58,9 @@ class JobHandler(JobHandlerInterface):
         result.raise_for_status()
         return JobStatus.REMOVED, "Removed"
 
-    def progress(self) -> Tuple[JobStatus, str]:
+    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
         if not self.job.state:
-            return self.job.status, self.job.log
+            return self.job.status, None, "Job is not yet started"
         result = requests.get(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
             timeout=10,
@@ -68,15 +68,15 @@ class JobHandler(JobHandlerInterface):
         result.raise_for_status()
         response_json = result.json()
         job_status = JobStatus.UNKNOWN
-        job_log = "No logs available yet!"
+        message = "No logs available yet!"
         match (response_json["status"]):  # noqa
             case "Running":  # noqa
                 job_status = JobStatus.RUNNING
-                job_log = json.dumps(response_json)
+                message = json.dumps(response_json)
             case "Failed":  # noqa
                 job_status = JobStatus.FAILED
-                job_log = json.dumps(response_json)
+                message = json.dumps(response_json)
             case "Succeeded":  # noqa
                 job_status = JobStatus.COMPLETED
-                job_log = json.dumps(response_json)
-        return job_status, job_log
+                message = json.dumps(response_json)
+        return job_status, None, message

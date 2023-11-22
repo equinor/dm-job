@@ -63,8 +63,8 @@ class Job(BaseModel):
             setattr(self, field, value)
 
     def append_log(self, log):
-        new = f"\n{log}" if (self.log and log) else log
-        self.log = self.log + new if self.log else new
+        if log:
+            self.log = self.log + f"\n{log}" if self.log else log
 
 
 class JobHandlerInterface(ABC):
@@ -80,7 +80,7 @@ class JobHandlerInterface(ABC):
         """Terminate and cleanup all job related resources"""
         raise NotImplementedError
 
-    def progress(self) -> Tuple[JobStatus, str]:
+    def progress(self) -> Tuple[JobStatus, None | str, None | str]:
         """Poll progress from the job instance"""
         raise NotImplementedError
 
