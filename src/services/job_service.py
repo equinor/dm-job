@@ -247,12 +247,10 @@ def remove_job(job_uid: UUID) -> str:
     job_handler = _get_job_handler(job)
     try:
         job_status, remove_message = job_handler.remove()
-        job.status = job_status
     except NotImplementedError:
-        raise NotImplementedException(
-            message="The job handler does not support the operation",
-            debug="The job handler does not implement the 'remove' method",
-        )
+        job_status = JobStatus.REMOVED
+        remove_message = "The job handler does not support the operation"
+    job.status = job_status
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     get_job_store().delete(str(job_uid))
     return remove_message  # type: ignore

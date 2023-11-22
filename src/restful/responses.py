@@ -1,4 +1,5 @@
 import functools
+import logging
 import traceback
 from typing import Callable, Type, TypeVar
 
@@ -76,9 +77,14 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
             except ServiceException as dmss_exception:
                 logger.error(dmss_exception)
                 return PlainTextResponse(str(dmss_exception), status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
-            except (ValidationError, ValidationException) as e:
+            except ValidationException as e:
                 logger.error(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            except ValidationError as e:
+                validation_exception = ValidationException(message=str(e))
+                if logger.level <= logging.DEBUG:
+                    traceback.print_exc()
+                return JSONResponse(validation_exception.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
             except NotFoundException as e:
                 logger.error(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_404_NOT_FOUND)
