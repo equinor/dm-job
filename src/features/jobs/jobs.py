@@ -69,10 +69,10 @@ def result(job_uid: str):
 
 @router.put("/{job_uid}", operation_id="update_job_progress", response_model=UpdateJobProgressResponse)
 @create_response(JSONResponse)
-def progress(job_uid: str, job_progress: Progress):
+def progress(job_uid: str, overwrite_log: bool, job_progress: Progress):
     """Update the progress of the job.
 
     - **job_uid**: the job API's internal uid for the job.
     - **progress**: progress object with percentage and logs
     """
-    return update_job_progress_use_case(job_uid=job_uid, progress=job_progress).dict()
+    return update_job_progress_use_case(job_uid=job_uid, overwrite_log=overwrite_log, progress=job_progress).dict()

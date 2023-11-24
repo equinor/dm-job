@@ -44,7 +44,7 @@ class Job(BaseModel):
     schedule: dict | None
 
     log: list | None = []
-    progress: float | None
+    percentage: float | None
     token: str | None
     state: dict | None
 
@@ -52,7 +52,7 @@ class Job(BaseModel):
     exclude_keys: dict = {
         "dmss_id": True,
         "log": True,
-        "progress": True,
+        "percentage": True,
         "token": True,
         "state": True,
         "exclude_keys": True,
@@ -70,9 +70,13 @@ class Job(BaseModel):
         for field, value in merged_kwargs.items():
             setattr(self, field, value)
 
-    def append_log(self, log):
-        if log:
-            self.log.append(log)
+    def append_log(self, log: list | str):
+        if not isinstance(log, list):
+            log = [f"JOBAPI: {log}"]
+        if self.log:
+            self.log.extend(log)
+        else:
+            self.log = log
 
 
 class JobHandlerInterface(ABC):
@@ -88,7 +92,7 @@ class JobHandlerInterface(ABC):
         """Terminate and cleanup all job related resources"""
         raise NotImplementedError
 
-    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""
         raise NotImplementedError
 

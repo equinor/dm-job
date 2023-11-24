@@ -47,6 +47,6 @@ class JobHandler(JobHandlerInterface):
             pass
         return "Local shell job removed"
 
-    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""
-        return JobStatus.UNKNOWN, None, "Shell jobs does not support progress polling"
+        return JobStatus.UNKNOWN, ["Shell jobs does not support progress polling"], self.job.percentage

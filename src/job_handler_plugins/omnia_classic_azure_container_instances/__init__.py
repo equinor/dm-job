@@ -123,7 +123,7 @@ class JobHandler(JobHandlerInterface):
             job_status = JobStatus.COMPLETED
         return job_status, status
 
-    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""
         try:
             logger.setLevel(logging.WARNING)
@@ -151,4 +151,4 @@ class JobHandler(JobHandlerInterface):
             job_status = JobStatus.COMPLETED
         if status == "Waiting":
             job_status = JobStatus.STARTING
-        return job_status, logs, None
+        return job_status, logs, self.job.percentage

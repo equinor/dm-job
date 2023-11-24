@@ -56,8 +56,9 @@ class JobHandler(JobHandlerInterface):
             network=self.job.runner["network"],
             detach=True,
         )
-        logger.info("*** Local container job started successfully ***")
-        return "Ok"
+        message = "*** Local container job started successfully ***"
+        logger.info(message)
+        return message
 
     def remove(self) -> Tuple[str, str]:
         try:
@@ -67,11 +68,11 @@ class JobHandler(JobHandlerInterface):
             pass
         return JobStatus.REMOVED, "Removed"
 
-    def progress(self) -> Tuple[JobStatus, None | list[str], None | str]:
+    def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""
         if self.job.status == JobStatus.FAILED:
             # If setup fails, the container is not started
-            return self.job.status, None, "Local container job failed"
+            return self.job.status, "Local container job failed", self.job.percentage
         try:
             container = self.client.containers.get(self.local_container_name)
             status = self.job.status
@@ -81,10 +82,10 @@ class JobHandler(JobHandlerInterface):
                 status = JobStatus.FAILED
             elif container.attrs["State"]["ExitCode"] == 0:
                 status = JobStatus.COMPLETED
-            return status, None, "Nothing to report"
+            return status, None, self.job.percentage
         except docker.errors.NotFound as error:
             logger.error(f"Failed to poll progress of local container: {error}")
-            return JobStatus.UNKNOWN, None, f"Failed to poll progress of local container: {error}"
+            return JobStatus.UNKNOWN, f"Failed to poll progress of local container: {error}", self.job.percentage
 
     def result(self) -> Tuple[str, bytes]:
         return "test 123", b"lkjgfdakljhfdgsllkjhldafgoiu8y03q987hgbloizdjhfpg980"
