@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.4.0](https://github.com/equinor/dm-job/compare/v1.3.5...v1.4.0) (2023-11-24)
+
+
+### Features
+
+* update job progress endpoint ([de05191](https://github.com/equinor/dm-job/commit/de051910dea8c99633813e79df150f014a80eeca))
+
+
+### Bug Fixes
+
+* add back not started ([51e7fe0](https://github.com/equinor/dm-job/commit/51e7fe02f84d5ac65bc7f05d0631600690d124a1))
+* adjust when job status is set and save status removed to dmss ([a075441](https://github.com/equinor/dm-job/commit/a07544105003364eeae2a0f9fab4f0a1923a73ce))
+* append log fromat ([da4a8a0](https://github.com/equinor/dm-job/commit/da4a8a01bfc0936b76976bc405aa7531c84d2355))
+* append log to existing job log if status changed ([891e1ff](https://github.com/equinor/dm-job/commit/891e1ff9c368fb3c287843d9c8c7921c8e7c2cd7))
+* force log flag in update progress ([09a692a](https://github.com/equinor/dm-job/commit/09a692a9aceb30f2911ce315dfbf5f47c439ccf3))
+* make job handler progress return additional message ([0c7bdb4](https://github.com/equinor/dm-job/commit/0c7bdb4bd96a7700af270c0bed2421d973e4b114))
+* Make the api return the entire radix response when radix job handler progress is invoked ([fe880ec](https://github.com/equinor/dm-job/commit/fe880ecb5669433a87c6081ba778b69defa47b07))
+* remove job even if handler not implement method ([fff568f](https://github.com/equinor/dm-job/commit/fff568f65fafd14a4a4f8e7ba0db79af82891331))
+* update all job hanlder progress methods to include message ([533e7c2](https://github.com/equinor/dm-job/commit/533e7c243d2e1cedbe111d6e8ed828d9abac4380))
+* use append logs if status has changed in job_progress endpoint ([3139cd6](https://github.com/equinor/dm-job/commit/3139cd61985a7dfd5e3e9a31877c2824453368b8))
+
 ## [1.3.5](https://github.com/equinor/dm-job/compare/v1.3.4...v1.3.5) (2023-11-17)
 
 
