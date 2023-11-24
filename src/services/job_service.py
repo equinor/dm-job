@@ -139,6 +139,7 @@ def _get_job_handler(job: Job) -> JobHandlerInterface:
 def _run_job(job_uid: UUID) -> str:
     """Start a job, by calling the start() function for the job's job handler."""
     job: Job = _get_job(job_uid)
+    message: list[str] | str = ""
     try:
         job_handler = _get_job_handler(job)
         job.started = datetime.now()
@@ -155,13 +156,13 @@ def _run_job(job_uid: UUID) -> str:
     except KeyError as error:
         message = f"The jobHandler '{type(job_handler).__name__}' " f"tried to access a missing attribute: {error}"
     except Exception as error:
-        message = error
+        message = str(error).split("\n")
     finally:
         if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler
             # Fetch the updated entity before merging data
             job.dmss_sync()
-
+        job.append_log(message)
         update_document(
             job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token
         )  # Update in DMSS with status etc.
@@ -183,11 +184,11 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     token = get_personal_access_token()
     job_entity = get_document(dmss_id, 0, token)
     kwargs = {
+        **job_entity,
         "dmss_id": dmss_id,
-        "job_uid": uuid4(),
         "started": datetime.now(),
         "token": token,
-        **job_entity,
+        "uid": uuid4(),
     }
     job = Job(**kwargs)
     _get_job_handler(job)  # Test for available handler before registering
@@ -205,14 +206,15 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
         in_5_seconds = datetime.now() + timedelta(seconds=5)
         job.status = JobStatus.STARTING
         scheduler.add_job(func=_run_job, next_run_time=in_5_seconds, args=[job.job_uid], jobstore="redis_job_store")
-        result = str(job.job_uid), "Job starting in 5 seconds..."
+        job.append_log("Job starting in 5 seconds...")
+        result = str(job.job_uid), job.log[0]
 
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), token=job.token)
     return result
 
 
-def status_job(job_uid: UUID) -> Tuple[JobStatus, list, str]:
+def status_job(job_uid: UUID) -> Tuple[JobStatus, list, float]:
     """Get the status for an existing job.
 
     The result of the job is fetched by using the progress() function in the job handler for the given job.
@@ -220,7 +222,7 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, list, str]:
     job = _get_job(job_uid)
     job_handler = _get_job_handler(job)
     try:
-        status, log, message = job_handler.progress()
+        status, log, percentage = job_handler.progress()
     except NotImplementedError:
         raise NotImplementedException(
             message="The job handler does not support the operation",
@@ -228,14 +230,14 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, list, str]:
         )
     job.status = status
     if log:
-        job.log = log
+        job.append_log(log)
 
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     if job.schedule:
         cron_job = scheduler.get_job(str(job_uid), jobstore="redis_job_store")
-        return status, job.log, f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}"
-    return status, job.log, message
+        job.log.append(f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}")
+    return status, job.log, percentage
 
 
 def remove_job(job_uid: UUID) -> str:
@@ -252,6 +254,7 @@ def remove_job(job_uid: UUID) -> str:
         job_status = JobStatus.REMOVED
         remove_message = "The job handler does not support the operation"
     job.status = job_status
+    job.append_log(remove_message)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     get_job_store().delete(str(job_uid))
     return remove_message  # type: ignore
@@ -267,7 +270,9 @@ def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
         raise BadRequestException("The job has not yet completed")
     job_handler = _get_job_handler(job)
     try:
-        return job_handler.result()  # type: ignore
+        result, result_bytes = job_handler.result()  # type: ignore
+        job.append_log(result)
+        return result, result_bytes
     except NotImplementedError:
         raise NotImplementedException(
             message="The job handler does not support the operation",
@@ -275,11 +280,17 @@ def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
         )
 
 
-def update_progress(job_uid: UUID, progress: Progress):
+def update_progress(job_uid: UUID, overwrite_log, progress: Progress):
     job = _get_job(job_uid)
-    job.log = progress.logs or job.log
-    job.progress = progress.percentage or job.progress
-    job.status = progress.status or job.status
+    if progress.percentage is not None:
+        job.percentage = progress.percentage
+    if progress.logs:
+        if overwrite_log:
+            job.log = progress.logs
+        else:
+            job.append_log(progress.logs)
+    if progress.status:
+        job.status = progress.status
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     return "OK"

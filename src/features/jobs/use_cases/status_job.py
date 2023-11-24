@@ -8,13 +8,13 @@ from services.job_service import status_job
 
 class StatusJobResponse(BaseModel):
     status: JobStatus
-    log: list | None
-    message: str | None
+    log: list[str] | None
+    percentage: float | None
 
     class Config:
         use_enum_values = True
 
 
 def status_job_use_case(job_id: str) -> StatusJobResponse:
-    status, log, message = status_job(UUID(job_id))
-    return StatusJobResponse(**{"status": status.value, "log": log, "message": message})
+    status, log, percentage = status_job(UUID(job_id))
+    return StatusJobResponse(**{"status": status.value, "log": log, "percentage": percentage})

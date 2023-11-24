@@ -10,6 +10,6 @@ class UpdateJobProgressResponse(BaseModel):
     result: str
 
 
-def update_job_progress_use_case(job_uid: str, progress: Progress) -> UpdateJobProgressResponse:
-    result = update_progress(UUID(job_uid), progress)
+def update_job_progress_use_case(job_uid: str, overwrite_log, progress: Progress) -> UpdateJobProgressResponse:
+    result = update_progress(UUID(job_uid), overwrite_log, progress)
     return UpdateJobProgressResponse(result=result)
