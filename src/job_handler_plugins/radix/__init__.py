@@ -16,8 +16,8 @@ def _get_job_url(job: Job) -> str:
     return f"http://{job_name}:{scheduler_port}/api/v1/jobs"
 
 
-def list_of_env_to_dict(env_vars) -> dict:
-    return {s.lsplit("=", 1)[0]: s.lsplit("=", 1)[1] for s in env_vars}
+def list_of_env_to_dict(env_vars: list[str]) -> dict:
+    return {s.split("=", 1)[0]: s.split("=", 1)[1] for s in env_vars}
 
 
 class JobHandler(JobHandlerInterface):
