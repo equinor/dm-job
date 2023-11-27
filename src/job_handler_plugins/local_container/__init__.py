@@ -48,6 +48,7 @@ class JobHandler(JobHandlerInterface):
         envs.append(f"DMSS_TOKEN={self.job.token}")
         envs.append(f"DMSS_ID={self.job.dmss_id}")
         envs.append(f"DMSS_URL={config.DMSS_API}")
+        envs.append(f"JOB_API_URL={config.JOB_API_URL}")
         self.client.containers.run(
             image=full_image_name,
             command=custom_command,

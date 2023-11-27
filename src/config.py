@@ -6,6 +6,7 @@ class Config:
     API_DEBUG = os.getenv("API_DEBUG", 0)
     ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
     DMSS_API = os.getenv("DMSS_API", "http://dmss:5000")
+    JOB_API_URL = os.getenv("JOB_API_URL", "http://job-api:5000")
 
     # Azure stuff
     # Where to run jobs in Azure
