@@ -15,6 +15,7 @@ from redis import AuthenticationError
 from config import config
 from domain_classes.progress import Progress
 from restful.exceptions import (
+    ApplicationException,
     BadRequestException,
     NotFoundException,
     NotImplementedException,
@@ -253,6 +254,8 @@ def remove_job(job_uid: UUID) -> str:
     except NotImplementedError:
         job_status = JobStatus.REMOVED
         remove_message = "The job handler does not support the operation"
+    except Exception as err:
+        raise ApplicationException(data={"error": str(err)})
     job.status = job_status
     job.append_log(remove_message)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
