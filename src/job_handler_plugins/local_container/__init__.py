@@ -62,11 +62,10 @@ class JobHandler(JobHandlerInterface):
         return message
 
     def remove(self) -> Tuple[str, str]:
-        try:
-            container = self.client.containers.get(self.local_container_name)
-            container.remove()
-        except docker.errors.NotFound:
-            pass
+        container = self.client.containers.get(self.local_container_name)
+        if container.status != "exited":
+            container.kill()
+        container.remove()
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
