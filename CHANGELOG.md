@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/equinor/dm-job/compare/v1.4.1...v1.4.2) (2023-11-27)
+
+
+### Bug Fixes
+
+* add job api url to config ([d144724](https://github.com/equinor/dm-job/commit/d14472403ab4974b13c374510675595646cba655))
+
 ## [1.4.1](https://github.com/equinor/dm-job/compare/v1.4.0...v1.4.1) (2023-11-27)
 
 
