@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/equinor/dm-job/compare/v1.4.0...v1.4.1) (2023-11-27)
+
+
+### Bug Fixes
+
+* typo in string split in radix handler ([f09d417](https://github.com/equinor/dm-job/commit/f09d417eabf55191f19cb6696f77c1b65ff40514))
+
 ## [1.4.0](https://github.com/equinor/dm-job/compare/v1.3.5...v1.4.0) (2023-11-24)
 
 
