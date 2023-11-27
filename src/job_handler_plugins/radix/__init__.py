@@ -36,6 +36,7 @@ class JobHandler(JobHandlerInterface):
             )
         payload["DMSS_TOKEN"] = self.job.token
         payload["DMSS_URL"] = config.DMSS_API
+        payload["JOB_API_URL"] = config.JOB_API_URL
         payload["DMSS_ID"] = self.job.dmss_id
         result = requests.post(
             _get_job_url(self.job),
