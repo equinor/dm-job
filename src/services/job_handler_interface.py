@@ -47,6 +47,7 @@ class Job(BaseModel):
     percentage: float | None
     token: str | None
     state: dict | None
+    external_progress: bool = False
 
     # Fields that are not sendt to DMSS
     exclude_keys: dict = {
@@ -55,12 +56,14 @@ class Job(BaseModel):
         "percentage": True,
         "token": True,
         "state": True,
+        "external_progress": True,
         "exclude_keys": True,
     }
 
     def append_log(self, log: list | str):
         if not isinstance(log, list):
-            log = [f"JOBAPI: {log}"]
+            logs = log.split("\n")
+            log = [f"JOBAPI: {log}" for log in logs]
         if self.log:
             self.log.extend(log)
         else:

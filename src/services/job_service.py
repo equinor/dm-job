@@ -9,6 +9,7 @@ from typing import Callable, Tuple
 from uuid import UUID, uuid4
 
 import redis
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
 from redis import AuthenticationError
 
@@ -162,7 +163,7 @@ def _run_job(job_uid: UUID) -> str:
     except KeyError as error:
         message = f"The jobHandler '{type(job_handler).__name__}' " f"tried to access a missing attribute: {error}"
     except Exception as error:
-        message = str(error).split("\n")
+        message = str(error)
     finally:
         if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler
@@ -177,7 +178,7 @@ def _run_job(job_uid: UUID) -> str:
         return message  # type: ignore
 
 
-def register_job(dmss_id: str) -> Tuple[str, str]:
+def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
     """Register and start a job.
 
     Create an instance of the Job class from a job entity stored in DMSS, and start running the job.
@@ -200,7 +201,7 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
     _get_job_handler(job)  # Test for available handler before registering
     if job_entity.get("schedule"):
         job.status = JobStatus.REGISTERED
-        result = str(job.job_uid), schedule_cron_job(
+        schedule_response = schedule_cron_job(
             scheduler,
             _run_job,
             job,
@@ -211,22 +212,36 @@ def register_job(dmss_id: str) -> Tuple[str, str]:
         # DMSS, before we get a race with the job itself trying to update it's state.
         in_5_seconds = datetime.now() + timedelta(seconds=5)
         job.status = JobStatus.STARTING
-        scheduler.add_job(func=_run_job, next_run_time=in_5_seconds, args=[job.job_uid], jobstore="redis_job_store")
-        job.append_log("Job starting in 5 seconds...")
-        result = str(job.job_uid), job.log[0]
+        scheduled_job = scheduler.add_job(
+            func=_run_job,
+            next_run_time=in_5_seconds,
+            args=[job.job_uid],
+            jobstore="redis_job_store",
+            id=str(job.job_uid),
+        )
+        schedule_response = (
+            f"Job starting in 5 seconds: {scheduled_job.next_run_time} {scheduled_job.next_run_time.tzinfo}"
+        )
+
+    job.append_log(schedule_response)
+    result = str(job.job_uid), schedule_response, job.status
 
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), token=job.token)
     return result
 
 
-def status_job(job_uid: UUID) -> Tuple[JobStatus, list, float]:
+def status_job(job_uid: UUID) -> Tuple[JobStatus, list[str], float]:
     """Get the status for an existing job.
 
     The result of the job is fetched by using the progress() function in the job handler for the given job.
+    Return the logs and status which the job pushed (external progress tracking), if the job implements 'update_job_progress'.
+    If the job does not implement progress tracking, the job handler tries to evaluate the status of the job.
     """
     job = _get_job(job_uid)
     job_handler = _get_job_handler(job)
+    if job.external_progress:
+        return job.status, job.log, job.percentage
     try:
         status, log, percentage = job_handler.progress()
     except NotImplementedError:
@@ -234,20 +249,15 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, list, float]:
             message="The job handler does not support the operation",
             debug="The job handler does not implement the 'progress' method",
         )
-    job.status = status
-    if log:
-        job.append_log(log)
-
-    _set_job(job)
     if job.schedule:
-        cron_job = scheduler.get_job(str(job_uid), jobstore="redis_job_store")
-        job.log.append(f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}")
         job = dmss_sync(job)  # New runs might have been added and/or updated since last sync
-    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
-    return status, job.log, percentage
+    updated_job = Job(
+        **update_progress(job, progress=Progress(status=status, logs=log, percentage=percentage), overwrite_log=True)
+    )
+    return updated_job.status, updated_job.log, updated_job.percentage
 
 
-def remove_job(job_uid: UUID) -> str:
+def remove_job(job_uid: UUID) -> Tuple[str, str]:
     """Remove an existing job.
 
     The remove() function in the job's job handler is used.
@@ -255,19 +265,21 @@ def remove_job(job_uid: UUID) -> str:
     """
     job = _get_job(job_uid)
     job_handler = _get_job_handler(job)
-    job_status = JobStatus.REMOVED
     try:
-        remove_message = job_handler.remove()
+        job_status, remove_message = job_handler.remove()
+        job.status = job_status
+        update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
+        get_job_store().delete(str(job_uid))
     except NotImplementedError:
         remove_message = "The job handler does not support the operation"
-        job_status = job.status
     except Exception as err:
         raise ApplicationException(data={"error": str(err)})
+    try:
+        scheduler.remove_job(str(job_uid))
+    except JobLookupError:
+        pass
     job.append_log(remove_message)
-    job.status = job_status
-    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
-    get_job_store().delete(str(job_uid))
-    return remove_message  # type: ignore
+    return job.status, remove_message  # type: ignore
 
 
 def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
@@ -290,19 +302,24 @@ def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
         )
 
 
-def update_progress(job_uid: UUID, overwrite_log, progress: Progress):
+def update_progress_from_uid(job_uid: UUID, progress: Progress, overwrite_log: bool, external: bool):
     job = _get_job(job_uid)
     if job.schedule:
-        job = dmss_sync(job)  # New runs might have been added and updated since last sync
+        job = dmss_sync(job)
+    return update_progress(job, progress, overwrite_log, external)
+
+
+def update_progress(job: Job, progress: Progress, overwrite_log: bool, external: bool = False) -> dict:
+    job.external_progress = external or job.external_progress
     if progress.percentage is not None:
         job.percentage = progress.percentage
     if progress.logs:
         if overwrite_log:
-            job.log = progress.logs
+            job.log = progress.logs if isinstance(progress.logs, list) else [progress.logs]
         else:
             job.append_log(progress.logs)
     if progress.status:
         job.status = progress.status
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
-    return "OK"
+    return dict(json.loads(job.json()))

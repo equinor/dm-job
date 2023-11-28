@@ -27,18 +27,17 @@ class JobHandler(JobHandlerInterface):
         msg = f'Starting scheduled job from "{self.job.dmss_id}"'
         logger.info(msg)
         self.job.append_log(msg)
-
         job_template = self.job.application_input
         new_job_address = add_document(f"{self.job.dmss_id}.schedule.runs", job_template, self.job.token)
         # TODO: Update DMSS to return complete address, and avoid this ugly stuff
         complete_new_job_address = self.job.dmss_id.split("$", 1)[0] + "$" + new_job_address["uid"]
 
-        new_uid, new_log = register_job(complete_new_job_address)
+        new_uid, new_log, status = register_job(complete_new_job_address)
 
-        msg = f'Job: "{new_uid}", Status: "{new_log}"'
+        msg = f'Job: "{new_uid}", Status: "{status}"'
         logger.info(msg)
         self.job.append_log(msg)
-        return "OK"
+        return msg
 
     def remove(self) -> str:
         """Terminate and cleanup all job related resources"""
@@ -48,4 +47,4 @@ class JobHandler(JobHandlerInterface):
         raise NotImplementedError
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
-        return self.job.status, self.job.log, None
+        return self.job.status, self.job.log, self.job.percentage

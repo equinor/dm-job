@@ -39,8 +39,6 @@ class JobHandler(JobHandlerInterface):
             f"{runner_entity['image']['registryName']}/{runner_entity['image']['imageName']}"
             + f":{runner_entity['image']['version']}"
         )
-        logger.info(f"Job path: '{self.job.dmss_id} ({self.job.job_uid})'." + " Starting Local Container job...")
-        logger.info("Creating container\n\t" + f"Image: '{full_image_name}'\n\t")
         envs = [f"{e}={os.getenv(e)}" for e in config.SCHEDULER_ENVS_TO_EXPORT if os.getenv(e)]
 
         custom_command = self.job.runner.get("customCommands")
@@ -49,6 +47,7 @@ class JobHandler(JobHandlerInterface):
         envs.append(f"DMSS_ID={self.job.dmss_id}")
         envs.append(f"DMSS_URL={config.DMSS_API}")
         envs.append(f"JOB_API_URL={config.JOB_API_URL}")
+
         self.client.containers.run(
             image=full_image_name,
             command=custom_command,
@@ -58,34 +57,34 @@ class JobHandler(JobHandlerInterface):
             detach=True,
         )
         message = "*** Local container job started successfully ***"
-        logger.info(message)
         return message
 
     def remove(self) -> Tuple[str, str]:
-        container = self.client.containers.get(self.local_container_name)
-        if container.status != "exited":
-            container.kill()
-        container.remove()
-        return JobStatus.REMOVED, "Removed"
+        try:
+            container = self.client.containers.get(self.local_container_name)
+            if container.status != "exited":
+                container.kill()
+            container.remove()
+        except docker.errors.NotFound:
+            logger.info(f"Docker container {self.local_container_name} was not found")
+        return JobStatus.REMOVED, f"Removed docker container {self.local_container_name}"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""
-        if self.job.status == JobStatus.FAILED:
-            # If setup fails, the container is not started
-            return self.job.status, "Local container job failed", self.job.percentage
         try:
             container = self.client.containers.get(self.local_container_name)
-            status = self.job.status
             if container.status == "running":
-                status = JobStatus.RUNNING
-            elif container.attrs["State"]["ExitCode"] >= 1:
-                status = JobStatus.FAILED
+                return JobStatus.RUNNING, "Job is running", 0
             elif container.attrs["State"]["ExitCode"] == 0:
-                status = JobStatus.COMPLETED
-            return status, None, self.job.percentage
+                return JobStatus.COMPLETED, "Local container completed successfully", 1
+            else:
+                return (
+                    JobStatus.FAILED,
+                    "Job failed for an unknown reason. Consider implementing job progress update for more details.",
+                    0,
+                )
         except docker.errors.NotFound as error:
-            logger.error(f"Failed to poll progress of local container: {error}")
-            return JobStatus.UNKNOWN, f"Failed to poll progress of local container: {error}", self.job.percentage
+            return JobStatus.UNKNOWN, f"Failed to poll progress of local container: {error}", None
 
     def result(self) -> Tuple[str, bytes]:
         return "test 123", b"lkjgfdakljhfdgsllkjhldafgoiu8y03q987hgbloizdjhfpg980"
