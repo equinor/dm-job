@@ -1,10 +1,10 @@
 from uuid import UUID
 
 from fastapi import APIRouter
-from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.responses import JSONResponse
 
 from domain_classes.progress import Progress
-from features.jobs.use_cases.delete_job import delete_job_use_case
+from features.jobs.use_cases.delete_job import DeleteJobResponse, delete_job_use_case
 from features.jobs.use_cases.get_result_job import (
     GetJobResultResponse,
     get_job_result_use_case,
@@ -48,15 +48,15 @@ def status(job_uid: UUID):
     return status_job_use_case(job_id=job_uid).dict()
 
 
-@router.delete("/{job_uid}", operation_id="remove_job")
-@create_response(PlainTextResponse)
+@router.delete("/{job_uid}", operation_id="remove_job", response_model=DeleteJobResponse)
+@create_response(JSONResponse)
 def remove(job_uid: UUID):
     """Remove an existing job by calling the remove() function in the job handler for a given job.
     The job will then be deleted from the redis database used for storing jobs.
 
     - **job_uid**: the job API's internal uid for the job.
     """
-    return delete_job_use_case(job_id=job_uid)
+    return delete_job_use_case(job_id=job_uid).dict()
 
 
 @router.get("/{job_uid}/result", operation_id="job_result", response_model=GetJobResultResponse)

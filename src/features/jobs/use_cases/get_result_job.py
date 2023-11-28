@@ -12,4 +12,4 @@ class GetJobResultResponse(BaseModel):
 
 def get_job_result_use_case(job_uid: UUID) -> GetJobResultResponse:
     message, bytesvalue = get_job_result(job_uid)
-    return GetJobResultResponse(**{"message": message, "result": bytesvalue.decode("UTF-8")})
+    return GetJobResultResponse(message=message, result=bytesvalue)

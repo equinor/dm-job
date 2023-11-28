@@ -48,7 +48,6 @@ class JobHandler(JobHandlerInterface):
         # so that we can call the job scheduler
         # to get the progress or to remove the job.
         self.job.state = {"job_name": result.json()["name"]}
-        logger.info(f"result:  {result}")
         return result.status_code  # type: ignore
 
     def remove(self) -> Tuple[str, str]:
@@ -60,20 +59,22 @@ class JobHandler(JobHandlerInterface):
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
-        if not self.job.state:
-            return self.job.status, self.job.log, self.job.percentage
         result = requests.get(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
             timeout=10,
         )
         result.raise_for_status()
         response_json = result.json()
-        job_status = JobStatus.UNKNOWN
-        match (response_json["status"]):  # noqa
+        match (response_json["status"]):
             case "Running":  # noqa
-                job_status = JobStatus.RUNNING
+                return JobStatus.RUNNING, "Job is running", None
             case "Failed":  # noqa
-                job_status = JobStatus.FAILED
+                return (
+                    JobStatus.FAILED,
+                    "Job failed for an unknown reason. Consider implementing job progress update for more details.",
+                    0,
+                )
             case "Succeeded":  # noqa
-                job_status = JobStatus.COMPLETED
-        return job_status, None, self.job.percentage
+                return JobStatus.COMPLETED, "Radix job completed successfully", 1
+            case _:
+                return JobStatus.UNKNOWN, "Radix returned an unknown status code", 0

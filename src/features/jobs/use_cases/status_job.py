@@ -17,4 +17,4 @@ class StatusJobResponse(BaseModel):
 
 def status_job_use_case(job_id: UUID) -> StatusJobResponse:
     status, log, percentage = status_job(job_id)
-    return StatusJobResponse(**{"status": status.value, "log": log, "percentage": percentage})
+    return StatusJobResponse(status=status, log=log, percentage=percentage)
