@@ -5,6 +5,7 @@ redis_data
 src/script.sh
 h5/
 /src/home/first-run-false
+.python-version
 
 ### macOS ###
 # General

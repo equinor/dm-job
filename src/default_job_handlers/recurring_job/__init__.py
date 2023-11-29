@@ -38,12 +38,11 @@ class JobHandler(JobHandlerInterface):
         msg = f'Job: "{new_uid}", Status: "{new_log}"'
         logger.info(msg)
         self.job.append_log(msg)
-        self.job.status = JobStatus.RUNNING
         return "OK"
 
     def remove(self) -> str:
         """Terminate and cleanup all job related resources"""
-        raise NotImplementedError
+        return "OK. Nothing to clean up"
 
     def result(self) -> Tuple[str, bytes]:
         raise NotImplementedError

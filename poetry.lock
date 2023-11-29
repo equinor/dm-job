@@ -50,6 +50,24 @@ twisted = ["twisted"]
 zookeeper = ["kazoo"]
 
 [[package]]
+name = "asttokens"
+version = "2.4.1"
+description = "Annotate AST trees with source code positions"
+optional = false
+python-versions = "*"
+files = [
+    {file = "asttokens-2.4.1-py2.py3-none-any.whl", hash = "sha256:051ed49c3dcae8913ea7cd08e46a606dba30b79993209636c4875bc1d637bc24"},
+    {file = "asttokens-2.4.1.tar.gz", hash = "sha256:b03869718ba9a6eb027e134bfdf69f38a236d681c83c160d510768af11254ba0"},
+]
+
+[package.dependencies]
+six = ">=1.12.0"
+
+[package.extras]
+astroid = ["astroid (>=1,<2)", "astroid (>=2,<4)"]
+test = ["astroid (>=1,<2)", "astroid (>=2,<4)", "pytest"]
+
+[[package]]
 name = "async-timeout"
 version = "4.0.3"
 description = "Timeout context manager for asyncio programs"
@@ -622,6 +640,20 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "executing"
+version = "2.0.1"
+description = "Get the currently executing AST node of a frame, and other information"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "executing-2.0.1-py2.py3-none-any.whl", hash = "sha256:eac49ca94516ccc753f9fb5ce82603156e590b27525a8bc32cce8ae302eb61bc"},
+    {file = "executing-2.0.1.tar.gz", hash = "sha256:35afe2ce3affba8ee97f2d69927fa823b08b472b7b994e36a52a964b93d16147"},
+]
+
+[package.extras]
+tests = ["asttokens (>=2.1.0)", "coverage", "coverage-enable-subprocess", "ipython", "littleutils", "pytest", "rich"]
+
+[[package]]
 name = "fastapi"
 version = "0.92.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -868,6 +900,23 @@ brotli = ["brotli", "brotlicffi"]
 cli = ["click (==8.*)", "pygments (==2.*)", "rich (>=10,<13)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
+
+[[package]]
+name = "icecream"
+version = "2.1.3"
+description = "Never use print() to debug again; inspect variables, expressions, and program execution with a single, simple function call."
+optional = false
+python-versions = "*"
+files = [
+    {file = "icecream-2.1.3-py2.py3-none-any.whl", hash = "sha256:757aec31ad4488b949bc4f499d18e6e5973c40cc4d4fc607229e78cfaec94c34"},
+    {file = "icecream-2.1.3.tar.gz", hash = "sha256:0aa4a7c3374ec36153a1d08f81e3080e83d8ac1eefd97d2f4fe9544e8f9b49de"},
+]
+
+[package.dependencies]
+asttokens = ">=2.0.1"
+colorama = ">=0.3.9"
+executing = ">=0.3.1"
+pygments = ">=2.2.0"
 
 [[package]]
 name = "identify"
@@ -1984,4 +2033,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.4"
-content-hash = "42ee8dd37b4896cdf0b97b9b41954b61c7fd72004fdb925c39cf9d8b70e9dc0e"
+content-hash = "9db7eaf538ad3cdd7810e3198672d29d03afcb874e14c2754335456a96c44e34"

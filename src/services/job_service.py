@@ -24,7 +24,12 @@ from services.dmss import get_document, get_personal_access_token, update_docume
 
 # TODO: Authorization. The only level of authorization at this point is to allow all that
 #  can view the job entity to also run and delete the job.
-from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
+from services.job_handler_interface import (
+    Job,
+    JobHandlerInterface,
+    JobStatus,
+    dmss_sync,
+)
 from services.job_scheduler import scheduler
 from utils.logging import logger
 
@@ -53,7 +58,7 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
     if not job.schedule:
         raise ValueError("CronJob entity is missing required attribute 'schedule'")
     try:
-        minute, hour, day, month, day_of_week = job.schedule["cron"].split(" ")
+        minute, hour, day, month, day_of_week = job.schedule["cron"].replace("  ", " ").split(" ")
         scheduled_job = job_scheduler.add_job(
             trigger="cron",
             func=function,
@@ -72,7 +77,7 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
             + f"at {scheduled_job.next_run_time} {scheduled_job.next_run_time.tzinfo}"
         )
     except ValueError as e:
-        raise ValueError(f"Failed to schedule cron job '{job.job_uid}'. {e}'")
+        raise BadRequestException(message=f"Failed to schedule cron job '{job.job_uid}'.", debug=str(e))
 
 
 def _get_job(job_uid: UUID) -> Job:
@@ -162,7 +167,7 @@ def _run_job(job_uid: UUID) -> str:
         if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler
             # Fetch the updated entity before merging data
-            job.dmss_sync()
+            job = dmss_sync(job)
         job.append_log(message)
         update_document(
             job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token
@@ -234,10 +239,11 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, list, float]:
         job.append_log(log)
 
     _set_job(job)
-    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     if job.schedule:
         cron_job = scheduler.get_job(str(job_uid), jobstore="redis_job_store")
         job.log.append(f"Next scheduled run @ {cron_job.next_run_time} {cron_job.next_run_time.tzinfo}")
+        job = dmss_sync(job)  # New runs might have been added and/or updated since last sync
+    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     return status, job.log, percentage
 
 
@@ -249,15 +255,16 @@ def remove_job(job_uid: UUID) -> str:
     """
     job = _get_job(job_uid)
     job_handler = _get_job_handler(job)
+    job_status = JobStatus.REMOVED
     try:
-        job_status, remove_message = job_handler.remove()
+        remove_message = job_handler.remove()
     except NotImplementedError:
-        job_status = JobStatus.REMOVED
         remove_message = "The job handler does not support the operation"
+        job_status = job.status
     except Exception as err:
         raise ApplicationException(data={"error": str(err)})
-    job.status = job_status
     job.append_log(remove_message)
+    job.status = job_status
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     get_job_store().delete(str(job_uid))
     return remove_message  # type: ignore
@@ -285,6 +292,8 @@ def get_job_result(job_uid: UUID) -> Tuple[str, bytes]:
 
 def update_progress(job_uid: UUID, overwrite_log, progress: Progress):
     job = _get_job(job_uid)
+    if job.schedule:
+        job = dmss_sync(job)  # New runs might have been added and updated since last sync
     if progress.percentage is not None:
         job.percentage = progress.percentage
     if progress.logs:
