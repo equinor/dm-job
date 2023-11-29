@@ -19,8 +19,8 @@ import urllib3
 
 from dm_cli.dmss_api.exceptions import ApiException, UnauthorizedException, ForbiddenException, NotFoundException, ServiceException, ApiValueError
 
-
-logger = logging.getLogger(__name__)
+# TODO: Disable this logger globally
+# logger = logging.getLogger(__name__)
 
 
 class RESTResponse(io.IOBase):

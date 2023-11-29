@@ -58,18 +58,6 @@ class Job(BaseModel):
         "exclude_keys": True,
     }
 
-    def dmss_sync(self):
-        fetched = get_document(self.dmss_id)
-        job_dict = json.loads(self.json())
-        merged_kwargs = {
-            **fetched,
-            "status": job_dict["status"],
-            "started": job_dict["started"],
-            "stopped": job_dict["stopped"],
-        }
-        for field, value in merged_kwargs.items():
-            setattr(self, field, value)
-
     def append_log(self, log: list | str):
         if not isinstance(log, list):
             log = [f"JOBAPI: {log}"]
@@ -107,3 +95,16 @@ class JobHandlerInterface(ABC):
     def teardown_service(self, service_id: str) -> str:
         """Teardown and cleanup a persistent service"""
         raise NotImplementedError
+
+
+def dmss_sync(job: Job) -> Job:
+    fetched: dict = get_document(job.dmss_id)
+    job_dict = json.loads(job.json())
+    merged_kwargs: dict = {
+        **fetched,
+        "status": job_dict["status"],
+        "started": job_dict["started"],
+        "stopped": job_dict["stopped"],
+        "dmss_id": job.dmss_id,
+    }
+    return Job.parse_obj(merged_kwargs)

@@ -29,7 +29,7 @@
       "name": "runs",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "./Job",
-      "optional": true,
+      "optional": false,
       "dimensions": "*"
     }
   ]
