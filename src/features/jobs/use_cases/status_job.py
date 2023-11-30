@@ -15,6 +15,6 @@ class StatusJobResponse(BaseModel):
         use_enum_values = True
 
 
-def status_job_use_case(job_id: str) -> StatusJobResponse:
-    status, log, percentage = status_job(UUID(job_id))
+def status_job_use_case(job_id: UUID) -> StatusJobResponse:
+    status, log, percentage = status_job(job_id)
     return StatusJobResponse(**{"status": status.value, "log": log, "percentage": percentage})
