@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter
 from starlette.responses import JSONResponse, PlainTextResponse
 
@@ -38,7 +40,7 @@ def start(job_dmss_id: str):
 
 @router.get("/{job_uid}", operation_id="job_status", response_model=StatusJobResponse)
 @create_response(JSONResponse)
-def status(job_uid: str):
+def status(job_uid: UUID):
     """Get the status for an existing job.
 
     - **job_uid**: the job API's internal uid for the job.
@@ -48,7 +50,7 @@ def status(job_uid: str):
 
 @router.delete("/{job_uid}", operation_id="remove_job")
 @create_response(PlainTextResponse)
-def remove(job_uid: str):
+def remove(job_uid: UUID):
     """Remove an existing job by calling the remove() function in the job handler for a given job.
     The job will then be deleted from the redis database used for storing jobs.
 
@@ -59,7 +61,7 @@ def remove(job_uid: str):
 
 @router.get("/{job_uid}/result", operation_id="job_result", response_model=GetJobResultResponse)
 @create_response(JSONResponse)
-def result(job_uid: str):
+def result(job_uid: UUID):
     """Get the results from a completed job, by calling the result() function in the job handler for a given job.
 
     - **job_uid**: the job API's internal uid for the job.
@@ -69,7 +71,7 @@ def result(job_uid: str):
 
 @router.put("/{job_uid}", operation_id="update_job_progress", response_model=UpdateJobProgressResponse)
 @create_response(JSONResponse)
-def progress(job_uid: str, overwrite_log: bool, job_progress: Progress):
+def progress(job_uid: UUID, overwrite_log: bool, job_progress: Progress):
     """Update the progress of the job.
 
     - **job_uid**: the job API's internal uid for the job.

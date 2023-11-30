@@ -10,6 +10,6 @@ class GetJobResultResponse(BaseModel):
     result: str
 
 
-def get_job_result_use_case(job_uid: str) -> GetJobResultResponse:
-    message, bytesvalue = get_job_result(UUID(job_uid))
+def get_job_result_use_case(job_uid: UUID) -> GetJobResultResponse:
+    message, bytesvalue = get_job_result(job_uid)
     return GetJobResultResponse(**{"message": message, "result": bytesvalue.decode("UTF-8")})
