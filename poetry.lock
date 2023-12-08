@@ -572,13 +572,13 @@ files = [
 
 [[package]]
 name = "dm-cli"
-version = "1.2.0"
+version = "1.4.1"
 description = ""
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "dm-cli-1.2.0.tar.gz", hash = "sha256:054a2b5f06bf93d9898f79d2742df292923e4a444646372c67620ab28d5fee1d"},
-    {file = "dm_cli-1.2.0-py3-none-any.whl", hash = "sha256:3919251fc300f6ceab17e04b971bba5d593b3936d9fcc614805f7c3c12fdb3e0"},
+    {file = "dm-cli-1.4.1.tar.gz", hash = "sha256:40aa419c91667ebcdae1ba92e30bfb421b045240c934b946bb433617f50d5a88"},
+    {file = "dm_cli-1.4.1-py3-none-any.whl", hash = "sha256:cfcfd235b9f27e84785222cce0082b6609880a82fba7f4a25df4bf161efc49f3"},
 ]
 
 [package.dependencies]
@@ -586,6 +586,7 @@ emoji = ">=2.8.0"
 frozendict = ">=2.3.8"
 python-dateutil = ">=2.8.2"
 requests = ">=2.31.0"
+tenacity = ">=8.2.3"
 tqdm = ">=4.66.1"
 typer = {version = ">=0.9.0", extras = ["all"]}
 typing-extensions = ">=4.7.1"
@@ -1673,6 +1674,20 @@ files = [
 pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
+name = "tenacity"
+version = "8.2.3"
+description = "Retry code until it succeeds"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tenacity-8.2.3-py3-none-any.whl", hash = "sha256:ce510e327a630c9e1beaf17d42e6ffacc88185044ad85cf74c0a8887c6a0f88c"},
+    {file = "tenacity-8.2.3.tar.gz", hash = "sha256:5398ef0d78e63f40007c1fb4c0bff96e1911394d2fa8d194f77619c05ff6cc8a"},
+]
+
+[package.extras]
+doc = ["reno", "sphinx", "tornado (>=4.5)"]
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -2033,4 +2048,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.4"
-content-hash = "9db7eaf538ad3cdd7810e3198672d29d03afcb874e14c2754335456a96c44e34"
+content-hash = "a54f8e0b5605d1f125106ede5afaf455f07d42ed40c26255e7a75a86b6aeb6d0"
