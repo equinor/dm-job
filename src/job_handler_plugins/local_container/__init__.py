@@ -59,7 +59,7 @@ class JobHandler(JobHandlerInterface):
         message = "*** Local container job started successfully ***"
         return message
 
-    def remove(self) -> Tuple[str, str]:
+    def remove(self) -> Tuple[JobStatus, str]:
         try:
             container = self.client.containers.get(self.local_container_name)
             if container.status != "exited":
