@@ -50,7 +50,7 @@ class JobHandler(JobHandlerInterface):
         self.job.state = {"job_name": result.json()["name"]}
         return str(result.status_code)
 
-    def remove(self) -> Tuple[str, str]:
+    def remove(self) -> Tuple[JobStatus, str]:
         result = requests.delete(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
             timeout=10,

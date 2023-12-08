@@ -40,13 +40,13 @@ class JobHandler(JobHandlerInterface):
         logger.info(f"ShellJob completed successfully. \n {output}")
         return output
 
-    def remove(self) -> str:
+    def remove(self) -> Tuple[JobStatus, str]:
         """Terminate and cleanup all job related resources"""
         try:
             os.remove("./script.sh")
         except FileNotFoundError:
             pass
-        return "Local shell job removed"
+        return JobStatus.REMOVED, "Local shell job removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""

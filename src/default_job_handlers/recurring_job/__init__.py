@@ -39,9 +39,9 @@ class JobHandler(JobHandlerInterface):
         self.job.append_log(msg)
         return msg
 
-    def remove(self) -> str:
+    def remove(self) -> Tuple[JobStatus, str]:
         """Terminate and cleanup all job related resources"""
-        return "OK. Nothing to clean up"
+        return JobStatus.REMOVED, "OK. Nothing to clean up"
 
     def result(self) -> Tuple[str, bytes]:
         raise NotImplementedError

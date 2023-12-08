@@ -79,7 +79,7 @@ class JobHandlerInterface(ABC):
     def start(self) -> str:
         """Run or deploy a job or job service"""
 
-    def remove(self) -> str:
+    def remove(self) -> Tuple[JobStatus, str]:
         """Terminate and cleanup all job related resources"""
         raise NotImplementedError
 
