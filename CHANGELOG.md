@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.3](https://github.com/equinor/dm-job/compare/v1.4.2...v1.4.3) (2023-12-08)
+
+
+### Bug Fixes
+
+* bad mergin of job dicts ([b97c299](https://github.com/equinor/dm-job/commit/b97c2993b1172af92bf73899f005587ae93af6bf))
+* bump dm-cli ([12eb99c](https://github.com/equinor/dm-job/commit/12eb99c55f99d6f77753b12e30787d9a6e8f988a))
+* kill docker container before remove ([1e187f9](https://github.com/equinor/dm-job/commit/1e187f942930c2db47fcbc8c0eb98f834c470910))
+* radix job handler returns int on start bug ([4e4be19](https://github.com/equinor/dm-job/commit/4e4be19fdcce3241304b16e5cee2f7296dd8d13e))
+* return status from remove job and start job ([7238c23](https://github.com/equinor/dm-job/commit/7238c237d25269fb84714badfe9d129bd946892e))
+* use UUID in the API ([209acaa](https://github.com/equinor/dm-job/commit/209acaa63733eb1efddfc5dce946ef6127c4ec08))
+
 ## [1.4.2](https://github.com/equinor/dm-job/compare/v1.4.1...v1.4.2) (2023-11-27)
 
 
