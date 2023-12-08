@@ -48,7 +48,7 @@ class JobHandler(JobHandlerInterface):
         # so that we can call the job scheduler
         # to get the progress or to remove the job.
         self.job.state = {"job_name": result.json()["name"]}
-        return result.status_code  # type: ignore
+        return str(result.status_code)
 
     def remove(self) -> Tuple[str, str]:
         result = requests.delete(
@@ -59,6 +59,8 @@ class JobHandler(JobHandlerInterface):
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
+        if not self.job.state.get("job_name"):
+            return self.job.status, "Radix job is not running yet.", 0
         result = requests.get(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
             timeout=10,
