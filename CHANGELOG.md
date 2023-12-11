@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.4](https://github.com/equinor/dm-job/compare/v1.4.3...v1.4.4) (2023-12-11)
+
+
+### Bug Fixes
+
+* change returned type from remove endpoint to JobStatus ([5afc7cc](https://github.com/equinor/dm-job/commit/5afc7cc86315e3f2bc7cc9254fb438de0cf7dc52))
+* job handler radix job name ([f1c9ada](https://github.com/equinor/dm-job/commit/f1c9ada02f9244e6ccc278703c95ba1f298bddc3))
+
 ## [1.4.3](https://github.com/equinor/dm-job/compare/v1.4.2...v1.4.3) (2023-12-08)
 
 
