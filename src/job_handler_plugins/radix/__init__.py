@@ -23,7 +23,6 @@ def list_of_env_to_dict(env_vars: list[str]) -> dict:
 class JobHandler(JobHandlerInterface):
     def __init__(self, job: Job, data_source: str):
         super().__init__(job, data_source)
-        self.job_name = ""
 
     def start(self) -> str:
         logger.info("Starting Radix job...")
@@ -59,7 +58,7 @@ class JobHandler(JobHandlerInterface):
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
-        if not self.job.state.get("job_name"):
+        if not self.job.state and not self.job.state.get("job_name"):
             return self.job.status, "Radix job is not running yet.", 0
         result = requests.get(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
