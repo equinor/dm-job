@@ -58,7 +58,7 @@ class JobHandler(JobHandlerInterface):
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
-        if not self.job.state and not self.job.state.get("job_name"):
+        if not self.job.state:
             return self.job.status, "Radix job is not running yet.", 0
         result = requests.get(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
