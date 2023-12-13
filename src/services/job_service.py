@@ -149,7 +149,7 @@ def _run_job(job_uid: UUID) -> str:
     message: list[str] | str = ""
     try:
         job_handler = _get_job_handler(job)
-        job.started = datetime.now()
+        job.started = datetime.now().replace(microsecond=0)
         try:
             message = job_handler.start()
 
@@ -193,7 +193,7 @@ def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
     kwargs = {
         **job_entity,
         "dmss_id": dmss_id,
-        "started": datetime.now(),
+        "started": datetime.now().replace(microsecond=0),
         "token": token,
         "uid": uuid4(),
     }
@@ -210,7 +210,7 @@ def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
         # Add a 5second delay on every job we run.
         # This is so that the JobService can update job state in
         # DMSS, before we get a race with the job itself trying to update it's state.
-        in_5_seconds = datetime.now() + timedelta(seconds=5)
+        in_5_seconds = datetime.now().replace(microsecond=0) + timedelta(seconds=5)
         job.status = JobStatus.STARTING
         scheduled_job = scheduler.add_job(
             func=_run_job,
