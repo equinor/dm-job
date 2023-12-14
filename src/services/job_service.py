@@ -210,7 +210,7 @@ def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
         # Add a 5second delay on every job we run.
         # This is so that the JobService can update job state in
         # DMSS, before we get a race with the job itself trying to update it's state.
-        in_5_seconds = datetime.now().replace(microsecond=0) + timedelta(seconds=5)
+        in_5_seconds = datetime.now() + timedelta(seconds=5)
         job.status = JobStatus.STARTING
         scheduled_job = scheduler.add_job(
             func=_run_job,
