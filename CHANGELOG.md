@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.6](https://github.com/equinor/dm-job/compare/v1.4.5...v1.4.6) (2023-12-14)
+
+
+### Bug Fixes
+
+* update job on status change ([09de7ba](https://github.com/equinor/dm-job/commit/09de7ba709583352b951c2c187548f0cc85b91de))
+
 ## [1.4.5](https://github.com/equinor/dm-job/compare/v1.4.4...v1.4.5) (2023-12-14)
 
 
