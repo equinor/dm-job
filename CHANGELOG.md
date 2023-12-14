@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.5](https://github.com/equinor/dm-job/compare/v1.4.4...v1.4.5) (2023-12-14)
+
+
+### Bug Fixes
+
+* radix runner access noneType ([c9b8412](https://github.com/equinor/dm-job/commit/c9b84128c44c42aebb47e9442fecc43cc0fed481))
+
 ## [1.4.4](https://github.com/equinor/dm-job/compare/v1.4.3...v1.4.4) (2023-12-11)
 
 
