@@ -156,7 +156,7 @@ def _run_job(job_uid: UUID) -> str:
         except Exception as error:
             print(traceback.format_exc())
             logger.warning(f"Failed to run job; {job_uid}")
-            job.status = JobStatus.FAILED
+            job.set_job_status(JobStatus.FAILED)
             raise error
     except NotImplementedError as error:
         message = f"The jobHandler '{type(job_handler).__name__}' is missing some implementations: {error}"
@@ -200,7 +200,7 @@ def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
     job = Job(**kwargs)
     _get_job_handler(job)  # Test for available handler before registering
     if job_entity.get("schedule"):
-        job.status = JobStatus.REGISTERED
+        job.set_job_status(JobStatus.REGISTERED)
         schedule_response = schedule_cron_job(
             scheduler,
             _run_job,
@@ -211,7 +211,7 @@ def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
         # This is so that the JobService can update job state in
         # DMSS, before we get a race with the job itself trying to update it's state.
         in_5_seconds = datetime.now() + timedelta(seconds=5)
-        job.status = JobStatus.STARTING
+        job.set_job_status(JobStatus.STARTING)
         scheduled_job = scheduler.add_job(
             func=_run_job,
             next_run_time=in_5_seconds,
@@ -267,7 +267,7 @@ def remove_job(job_uid: UUID) -> Tuple[str, str]:
     job_handler = _get_job_handler(job)
     try:
         job_status, remove_message = job_handler.remove()
-        job.status = job_status
+        job.set_job_status(job_status)
         update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
         get_job_store().delete(str(job_uid))
     except NotImplementedError:
@@ -319,7 +319,7 @@ def update_progress(job: Job, progress: Progress, overwrite_log: bool, external:
         else:
             job.append_log(progress.logs)
     if progress.status:
-        job.status = progress.status
+        job.set_job_status(progress.status)
     _set_job(job)
     update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
     return dict(json.loads(job.json()))

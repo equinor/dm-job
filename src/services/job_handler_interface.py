@@ -69,6 +69,14 @@ class Job(BaseModel):
         else:
             self.log = log
 
+    def set_job_status(self, status: JobStatus):
+        if status == self.status:
+            return
+        self.status = status
+        match status:
+            case JobStatus.COMPLETED | JobStatus.FAILED:
+                self.ended = datetime.now().replace(microsecond=0)
+
 
 class JobHandlerInterface(ABC):
     def __init__(self, job: Job, data_source: str):

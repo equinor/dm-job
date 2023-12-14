@@ -34,7 +34,7 @@ class JobHandler(JobHandlerInterface):
         with open(f"{self.results_directory}/{self.job.job_uid}", "w") as result_file:
             result_file.write(result)
         logger.info("ReverseDescription job completed")
-        self.job.status = JobStatus.COMPLETED
+        self.job.set_job_status(JobStatus.COMPLETED)
         self.job.stopped = datetime.now()
         return "OK"
 
