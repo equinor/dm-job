@@ -54,12 +54,6 @@
       "optional": true
     },
     {
-      "name": "stopped",
-      "type": "CORE:BlueprintAttribute",
-      "attributeType": "string",
-      "optional": true
-    },
-    {
       "name": "ended",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",

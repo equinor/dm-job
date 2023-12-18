@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from pathlib import Path
 from typing import Tuple
 
@@ -35,7 +34,6 @@ class JobHandler(JobHandlerInterface):
             result_file.write(result)
         logger.info("ReverseDescription job completed")
         self.job.set_job_status(JobStatus.COMPLETED)
-        self.job.stopped = datetime.now()
         return "OK"
 
     def result(self) -> Tuple[str, bytes]:

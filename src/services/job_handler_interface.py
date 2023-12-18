@@ -35,7 +35,6 @@ class Job(BaseModel):
     status: JobStatus
     application_input: dict | None = Field(alias="applicationInput")
     started: datetime | None
-    stopped: datetime | None
     ended: datetime | None
     outputTarget: str | None
     result: dict | None
@@ -115,7 +114,6 @@ def dmss_sync(job: Job) -> Job:
         **fetched,
         "status": job_dict["status"],
         "started": job_dict["started"],
-        "stopped": job_dict["stopped"],
         "dmss_id": job.dmss_id,
     }
     return Job.parse_obj(merged_kwargs)
