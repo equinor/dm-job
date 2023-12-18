@@ -19,12 +19,7 @@
       "type": "CORE:BlueprintAttribute",
       "description": "Schedule for a cronjob",
       "attributeType": "CronJob",
-      "label": "Schedule",
-      "default": {
-        "type": "CronJob",
-        "cron": "",
-        "runs": []
-      }
+      "label": "Schedule"
     }
   ]
 }
