@@ -207,7 +207,7 @@ class RESTClientObject(object):
             r = RESTResponse(r)
 
             # log response body
-            logger.debug("response body: %s", r.data)
+            #logger.debug("response body: %s", r.data)
 
         if not 200 <= r.status <= 299:
             if r.status == 401:

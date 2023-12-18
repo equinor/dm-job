@@ -16,7 +16,6 @@ from redis import AuthenticationError
 from config import config
 from domain_classes.progress import Progress
 from restful.exceptions import (
-    ApplicationException,
     BadRequestException,
     NotFoundException,
     NotImplementedException,
@@ -96,7 +95,8 @@ def _get_job(job_uid: UUID) -> Job:
 
 
 def _set_job(job: Job):
-    return get_job_store().set(str(job.job_uid), job.json())
+    # If we don't include an empty exclude dict, 'token' will be removed from the json string...
+    return get_job_store().set(str(job.job_uid), job.json(exclude={}))
 
 
 def load_cron_jobs():
@@ -178,7 +178,7 @@ def _run_job(job_uid: UUID) -> str:
         return message  # type: ignore
 
 
-def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
+def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobStatus]:
     """Register and start a job.
 
     Create an instance of the Job class from a job entity stored in DMSS, and start running the job.
@@ -186,9 +186,12 @@ def register_job(dmss_id: str) -> Tuple[str, str, JobStatus]:
     - **dmss_id**: address to the job entity to register. Can be on the formats:
       - By id: PROTOCOL://DATA SOURCE/$ID.Attribute
       - By path: PROTOCOL://DATA SOURCE/ROOT PACKAGE/SUB PACKAGE/ENTITY.Attribute
+    - **token**: optional access token for dmss. Must be passed if there is no HTTP
+        request context to get a token from (e.g. when the job api itself is creating a scheduled job
     """
+
     # A token must be created when there still is a request object.
-    token = get_personal_access_token()
+    token = token if token else get_personal_access_token()
     job_entity = get_document(dmss_id, 0, token)
     kwargs = {
         **job_entity,
@@ -272,8 +275,6 @@ def remove_job(job_uid: UUID) -> Tuple[str, str]:
         get_job_store().delete(str(job_uid))
     except NotImplementedError:
         remove_message = "The job handler does not support the operation"
-    except Exception as err:
-        raise ApplicationException(data={"error": str(err)})
     try:
         scheduler.remove_job(str(job_uid))
     except JobLookupError:
@@ -321,5 +322,13 @@ def update_progress(job: Job, progress: Progress, overwrite_log: bool, external:
     if progress.status:
         job.set_job_status(progress.status)
     _set_job(job)
-    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
+    update_document(
+        job.dmss_id,
+        job.json(
+            by_alias=True,
+            exclude_none=True,
+            exclude=job.exclude_keys,
+        ),
+        job.token,
+    )
     return dict(json.loads(job.json()))

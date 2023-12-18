@@ -109,7 +109,7 @@ class JobHandlerInterface(ABC):
 
 
 def dmss_sync(job: Job) -> Job:
-    fetched: dict = get_document(job.dmss_id)
+    fetched: dict = get_document(job.dmss_id, 0, job.token)
     job_dict = json.loads(job.json())
     merged_kwargs: dict = {
         **fetched,
@@ -118,4 +118,7 @@ def dmss_sync(job: Job) -> Job:
         "stopped": job_dict["stopped"],
         "dmss_id": job.dmss_id,
     }
-    return Job.parse_obj(merged_kwargs)
+    new_job = Job.parse_obj(merged_kwargs)
+    # For some reason, "token" does not survive the exporting and parsing...
+    new_job.token = job.token
+    return new_job

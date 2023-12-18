@@ -65,12 +65,15 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 result = func(*args, **kwargs)
                 return response_class(result, status_code=status.HTTP_200_OK)
             except HTTPError as http_error:
+                if logger.level <= logging.DEBUG:
+                    traceback.print_exc()
                 error_response = ErrorResponse()
-                if http_error.response:
+                # If we check that http_error.response exists before accessing props, it will always fail...
+                if http_error.response.text:  # type: ignore
                     error_response = ErrorResponse(
-                        status=http_error.response.status_code,
-                        message=http_error.response.text,
-                        debug=f"The HTTP call to '{http_error.response.url}' failed",
+                        status=http_error.response.status_code,  # type: ignore
+                        message=http_error.response.text,  # type: ignore
+                        debug=f"The HTTP call to '{http_error.response.url}' failed",  # type: ignore
                     )
                 logger.error(error_response)
                 return JSONResponse(error_response.dict(), status_code=error_response.status)
@@ -89,7 +92,8 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 logger.error(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_404_NOT_FOUND)
             except BadRequestException as e:
-                logger.error(e)
+                if logger.level <= logging.DEBUG:
+                    traceback.print_exc()
                 logger.error(e.dict())
                 return JSONResponse(e.dict(), status_code=status.HTTP_400_BAD_REQUEST)
             except MissingPrivilegeException as e:
