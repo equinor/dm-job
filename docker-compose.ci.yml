@@ -6,6 +6,5 @@ services:
       target: development
     image: job-api-development
     environment:
-      API_DEBUG: 1
-      API_ENV: testing
       ENVIRONMENT: local
+      AUTH_ENABLED: 0

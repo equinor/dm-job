@@ -3,8 +3,8 @@ import os
 
 class Config:
     LOGGER_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
-    API_DEBUG = os.getenv("API_DEBUG", 0)
     ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
+    AUTH_ENABLED = bool(int(os.getenv("AUTH_ENABLED", "1")))
     DMSS_API = os.getenv("DMSS_API", "http://dmss:5000")
     JOB_API_URL = os.getenv("JOB_API_URL", "http://job-api:5000")
 

@@ -21,7 +21,6 @@ class JobHandler(JobHandlerInterface):
         data_source: str,
     ):
         super().__init__(job, data_source)
-        self.headers = {"Access-Key": job.token or ""}
 
     def start(self) -> str:
         msg = f'Starting scheduled job from "{self.job.dmss_id}"'
@@ -32,7 +31,7 @@ class JobHandler(JobHandlerInterface):
         # TODO: Update DMSS to return complete address, and avoid this ugly stuff
         complete_new_job_address = self.job.dmss_id.split("$", 1)[0] + "$" + new_job_address["uid"]
 
-        new_uid, new_log, status = register_job(complete_new_job_address)
+        new_uid, new_log, status = register_job(complete_new_job_address, self.job.token)
 
         msg = f'Job: "{new_uid}", Status: "{status}"'
         logger.info(msg)
