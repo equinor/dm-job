@@ -20,7 +20,11 @@
       "description": "Schedule for a cronjob",
       "attributeType": "CronJob",
       "label": "Schedule",
-      "optional": true
+      "default": {
+        "type": "CronJob",
+        "cron": "",
+        "schedule": []
+      }
     }
   ]
 }
