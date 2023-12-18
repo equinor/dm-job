@@ -23,7 +23,7 @@
       "default": {
         "type": "CronJob",
         "cron": "",
-        "schedule": []
+        "runs": []
       }
     }
   ]
