@@ -120,3 +120,7 @@ Mac:  /Applications/IntelliJ\ IDEA.app/Contents/MacOS/idea
 `python: can't open file '/opt/.pycharm_helpers/pydev/pydevd.py': [Errno 2] No such file or directory`
 
 <https://chkr.at/wordpress/?p=227>
+
+<a id="Contributing"></a>
+## :+1: Contributing
+If you would like to contribute, please read our [Contribution guide](https://equinor.github.io/dm-docs/contributing/).
