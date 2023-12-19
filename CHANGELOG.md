@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.7](https://github.com/equinor/dm-job/compare/v1.4.6...v1.4.7) (2023-12-19)
+
+
+### Bug Fixes
+
+* recurring job pass PAT to new job ([5e66445](https://github.com/equinor/dm-job/commit/5e664459fe852fae3542e0dddffdc65f0dc9a9d7))
+* remove stopped attribute from job ([0eced09](https://github.com/equinor/dm-job/commit/0eced09ab2ee4f4ddebe0b9270dee658741e306c))
+* required schedule ([11d28c7](https://github.com/equinor/dm-job/commit/11d28c7d49a3c1ed50c99363a9ca0d77589e6772))
+* set reccuring job previous runs to required empty list ([39a4a36](https://github.com/equinor/dm-job/commit/39a4a3667826ccaac7eab05f793756585c369c7f))
+* typo ([e345d21](https://github.com/equinor/dm-job/commit/e345d219e8dff35e417ad18fde5991fba2a7519b))
+
 ## [1.4.6](https://github.com/equinor/dm-job/compare/v1.4.5...v1.4.6) (2023-12-14)
 
 
