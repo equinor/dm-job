@@ -2,9 +2,10 @@ import os
 from typing import Tuple
 
 import docker
-from docker.errors import DockerException
+from docker.errors import APIError, DockerException, ImageNotFound
 
 from config import config
+from restful.exceptions import NotFoundException, NotImplementedException
 from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
 from utils.logging import logger
 
@@ -25,12 +26,13 @@ class JobHandler(JobHandlerInterface):
         try:
             self.client = docker.from_env()
         except DockerException:
-            raise DockerException(
-                (
+            raise NotImplementedException(
+                "Support for running local containers has not been configured for this environment",
+                debug=(
                     "Failed to get a docker client. Docker must be installed on this host, or "
                     + "the /var/run/docker.sock must be made available (volume mount)."
                     + "Make sure you are aware of the serious security risk this entails."
-                )
+                ),
             )
 
     def start(self) -> str:
@@ -48,14 +50,19 @@ class JobHandler(JobHandlerInterface):
         envs.append(f"DMSS_URL={config.DMSS_API}")
         envs.append(f"JOB_API_URL={config.JOB_API_URL}")
 
-        self.client.containers.run(
-            image=full_image_name,
-            command=custom_command,
-            name=self.local_container_name,
-            environment=envs,
-            network=self.job.runner["network"],
-            detach=True,
-        )
+        try:
+            self.client.containers.run(
+                image=full_image_name,
+                command=custom_command,
+                name=self.local_container_name,
+                environment=envs,
+                network=self.job.runner["network"],
+                detach=True,
+            )
+        except (ImageNotFound, APIError) as ex:
+            raise NotFoundException(
+                f"No image named '{full_image_name}' could be found. Sure it is published and that you have access?"
+            ) from ex
         message = "*** Local container job started successfully ***"
         return message
 
