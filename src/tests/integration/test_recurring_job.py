@@ -33,7 +33,13 @@ test_job = {
         "runner": {"type": "dmss://WorkflowDS/Blueprints/ReverseDescription"},
     },
     "runner": {"type": "dmss://WorkflowDS/Blueprints/RecurringJobHandler"},
-    "schedule": {"type": "dmss://WorkflowDS/Blueprints/CronJob", "cron": "1/1 * * * *", "runs": []},
+    "schedule": {
+        "type": "dmss://WorkflowDS/Blueprints/CronJob",
+        "startDate": "2023-12-21T12:10:00.000+01:00",
+        "endDate": "2099-12-21T12:10:00.000+01:00",
+        "cron": "1/1 * * * *",
+        "runs": [],
+    },
 }
 test_client = TestClient(create_app())
 
