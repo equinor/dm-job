@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib
 import json
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable, Tuple
 from uuid import UUID, uuid4
@@ -74,7 +74,7 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
         )
         return (
             "Cron job successfully registered. Next scheduled run "
-            + f"at {scheduled_job.next_run_time} {scheduled_job.next_run_time.tzinfo}"
+            + f"at {scheduled_job.next_run_time - datetime.now(timezone.utc) + datetime.fromisoformat(job.schedule['startDate'])} {scheduled_job.next_run_time.tzinfo}"
         )
     except ValueError as e:
         raise BadRequestException(message=f"Failed to schedule cron job '{job.job_uid}'.", debug=str(e))

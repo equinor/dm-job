@@ -1,8 +1,9 @@
+from datetime import datetime, timezone
 from typing import Tuple
 
 from services.dmss import add_document
 from services.job_handler_interface import Job, JobHandlerInterface, JobStatus
-from services.job_service import register_job
+from services.job_service import register_job, remove_job
 from utils.logging import logger
 
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/RecurringJobHandler"
@@ -23,6 +24,17 @@ class JobHandler(JobHandlerInterface):
         super().__init__(job, data_source)
 
     def start(self) -> str:
+        current_date = datetime.now(timezone.utc)
+        if datetime.fromisoformat(self.job.schedule["startDate"]) > current_date:
+            msg = f"Job is not valid yet, and will run for the first time after {self.job.schedule['startDate']}."
+            logger.info(msg)
+            return msg
+        elif datetime.fromisoformat(self.job.schedule["endDate"]) <= current_date:
+            remove_job(self.job.job_uid)
+            msg = f"Recurring job {self.job.job_uid} has expired since {self.job.schedule['endDate']}. Removing..."
+            logger.info(msg)
+            return msg
+
         msg = f'Starting scheduled job from "{self.job.dmss_id}"'
         logger.info(msg)
         self.job.append_log(msg)
@@ -30,7 +42,6 @@ class JobHandler(JobHandlerInterface):
         new_job_address = add_document(f"{self.job.dmss_id}.schedule.runs", job_template, self.job.token)
         # TODO: Update DMSS to return complete address, and avoid this ugly stuff
         complete_new_job_address = self.job.dmss_id.split("$", 1)[0] + "$" + new_job_address["uid"]
-
         new_uid, new_log, status = register_job(complete_new_job_address, self.job.token)
 
         msg = f'Job: "{new_uid}", Status: "{status}"'
