@@ -163,3 +163,4 @@ api/first-run-false
 /scripts/testSTask.stask
 /web/packages/home/build/
 /src/job_handler_plugins/reverse_description/results/
+/.python-version
