@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Tuple
 from uuid import UUID
@@ -74,7 +74,7 @@ class Job(BaseModel):
         self.status = status
         match status:
             case JobStatus.COMPLETED | JobStatus.FAILED:
-                self.ended = datetime.now().replace(microsecond=0)
+                self.ended = datetime.now(timezone.utc).replace(microsecond=0)
 
 
 class JobHandlerInterface(ABC):

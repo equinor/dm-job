@@ -149,7 +149,7 @@ def _run_job(job_uid: UUID) -> str:
     message: list[str] | str = ""
     try:
         job_handler = _get_job_handler(job)
-        job.started = datetime.now().replace(microsecond=0)
+        job.started = datetime.now(timezone.utc).replace(microsecond=0)
         try:
             message = job_handler.start()
 
@@ -193,10 +193,16 @@ def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobS
     # A token must be created when there still is a request object.
     token = token if token else get_personal_access_token()
     job_entity = get_document(dmss_id, 0, token)
+    if job_entity["type"] not in (config.JOB, config.RECURRING_JOB):
+        raise BadRequestException(
+            f"Address '{dmss_id}' does not point to a Job, but an entity of type '{job_entity['type']}'",
+            data=job_entity,
+        )
+
     kwargs = {
         **job_entity,
         "dmss_id": dmss_id,
-        "started": datetime.now().replace(microsecond=0),
+        "started": datetime.now(timezone.utc).replace(microsecond=0),
         "token": token,
         "uid": uuid4(),
     }
@@ -213,7 +219,7 @@ def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobS
         # Add a 5second delay on every job we run.
         # This is so that the JobService can update job state in
         # DMSS, before we get a race with the job itself trying to update it's state.
-        in_5_seconds = datetime.now() + timedelta(seconds=5)
+        in_5_seconds = datetime.now(timezone.utc) + timedelta(seconds=5)
         job.set_job_status(JobStatus.STARTING)
         scheduled_job = scheduler.add_job(
             func=_run_job,

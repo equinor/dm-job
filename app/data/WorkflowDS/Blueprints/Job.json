@@ -36,7 +36,8 @@
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
       "optional": false,
-      "default": "Not registered"
+      "default": "not started",
+      "enumType": "./JobStatus"
     },
     {
       "name": "applicationInput",
