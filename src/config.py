@@ -33,6 +33,7 @@ class Config:
     OAUTH_AUTH_SCOPE: str | None = os.getenv("OAUTH_AUTH_SCOPE")
 
     RECURRING_JOB = "dmss://WorkflowDS/Blueprints/RecurringJob"
+    JOB = "dmss://WorkflowDS/Blueprints/Job"
 
 
 config = Config()
