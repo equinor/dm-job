@@ -6,7 +6,7 @@
       "host": "db",
       "port": 27017,
       "username": "maf",
-      "password": "maf",
+      "password": "$MONGO_PASSWORD",
       "tls": false,
       "database": "workflowDS",
       "collection": "default",

@@ -6,7 +6,7 @@ ENTRYPOINT ["/code/src/init.sh"]
 CMD ["/code/src/init.sh", "api"]
 EXPOSE 5000
 
-RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y curl
+RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y curl gettext
 
 RUN pip install --upgrade pip && \
     pip install poetry && \
@@ -20,7 +20,7 @@ WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
 COPY .flake8 .bandit ./
-RUN chown -R 1000:1000 /code/app/data_sources/WorkflowDS.json
+RUN chown -R 1000:1000 /code/app/
 USER 0
 
 FROM base as prod
@@ -28,5 +28,5 @@ RUN poetry install --no-dev
 WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
-RUN chown -R 1000:1000 /code/app/data_sources/WorkflowDS.json
+RUN chown -R 1000:1000 /code/app/
 USER 1000

@@ -16,7 +16,7 @@ uvicorn = {extras = ["standard"], version = "^0.18.2"}
 azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
 azure-identity = "^1.11.0"
-dm-cli = "^1.4.1"
+dm-cli = "^1.4.3"
 
 
 [tool.poetry.dev-dependencies]

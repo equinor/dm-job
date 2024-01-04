@@ -164,3 +164,4 @@ api/first-run-false
 /web/packages/home/build/
 /src/job_handler_plugins/reverse_description/results/
 /.python-version
+/app/data_sources/WorkflowDS.json

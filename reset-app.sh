@@ -31,4 +31,4 @@ service_is_ready() {
 service_is_ready
 
 echo "Upload Job API blueprints to DMSS"
-eval $compose run --rm job-api dm --url http://dmss:5000 reset ../app
+$compose run --rm job-api dm --url http://dmss:5000 reset ../app
