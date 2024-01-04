@@ -6,5 +6,6 @@ services:
       target: development
     image: job-api-development
     environment:
+      MONGO_PASSWORD: maf
       ENVIRONMENT: local
       AUTH_ENABLED: 0

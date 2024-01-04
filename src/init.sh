@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 ENVIRON=${ENVIRONMENT:="production"}
 
 # Wait until the storage services is ready before continuing.
@@ -21,9 +21,10 @@ service_is_ready() {
   echo "DMSS is ready!"
 }
 
-if [ "${DATA_SOURCE_FILES:-""}" != "" ]; then
-  echo "$DATA_SOURCE_FILES" > /code/app/data_sources/WorkflowDS.json
-fi
+mkdir -p /code/app/data_sources/
+TEMPFILE=$(mktemp)
+envsubst < /code/app/WorkflowDS_template.json > $TEMPFILE
+mv $TEMPFILE /code/app/data_sources/WorkflowDS.json
 
 if [ "$1" = 'api' ]; then
   service_is_ready

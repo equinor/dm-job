@@ -572,13 +572,13 @@ files = [
 
 [[package]]
 name = "dm-cli"
-version = "1.4.1"
+version = "1.4.3"
 description = ""
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "dm-cli-1.4.1.tar.gz", hash = "sha256:40aa419c91667ebcdae1ba92e30bfb421b045240c934b946bb433617f50d5a88"},
-    {file = "dm_cli-1.4.1-py3-none-any.whl", hash = "sha256:cfcfd235b9f27e84785222cce0082b6609880a82fba7f4a25df4bf161efc49f3"},
+    {file = "dm-cli-1.4.3.tar.gz", hash = "sha256:c6f4092079573b2c4f4cb33fe7269f816c3be39b870b16a6f55aa2fbe341040d"},
+    {file = "dm_cli-1.4.3-py3-none-any.whl", hash = "sha256:c18a1cd5aa01aaa96d972f1161ee8a9afd92f646024888565b384ddf6e0b203e"},
 ]
 
 [package.dependencies]
@@ -2048,4 +2048,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.4"
-content-hash = "a54f8e0b5605d1f125106ede5afaf455f07d42ed40c26255e7a75a86b6aeb6d0"
+content-hash = "65f841b7d4acc8fb1a2ae9b810ffd67e11cca1c8b0cb2e369c99ceef091becbe"
