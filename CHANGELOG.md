@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.0](https://github.com/equinor/dm-job/compare/v1.4.7...v1.5.0) (2024-01-05)
+
+
+### Features
+
+* timerange for which recurring job is able to register jobs ([6038426](https://github.com/equinor/dm-job/commit/6038426473ab06ad3a7cbe0744858610ea767f17))
+
+
+### Bug Fixes
+
+* local container, no raise exceptions causing 500 ([ad8bfb7](https://github.com/equinor/dm-job/commit/ad8bfb70ec9294f4bf84c3c31094625cbe1999d5))
+* make jobStatus an enum ([712de4c](https://github.com/equinor/dm-job/commit/712de4c8ab66819882b06463914fb8bb03aab638))
+
+
+### Build System
+
+* use a data source template and subst envvars ([de383c3](https://github.com/equinor/dm-job/commit/de383c3adcc8a86e62e58eaa057c919b6eb04a52))
+
 ## [1.4.7](https://github.com/equinor/dm-job/compare/v1.4.6...v1.4.7) (2023-12-19)
 
 
