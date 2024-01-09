@@ -140,7 +140,7 @@ def _get_job_handler(job: Job) -> JobHandlerInterface:
             + "with the string, tuple, or list value of the job type(s)."
         )
 
-    raise NotImplementedError(f"No handler for a job of type '{job.runner['type']}' is configured")
+    raise NotImplementedException(f"No handler for a job of type '{job.runner['type']}' is configured")
 
 
 def _run_job(job_uid: UUID) -> str:
