@@ -10,6 +10,12 @@
       "optional": false
     },
     {
+      "name": "name",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
+      "optional": true
+    },
+    {
       "name": "environmentVariables",
       "type": "CORE:BlueprintAttribute",
       "description": "a list of strings on format 'myVar=myValue'",
