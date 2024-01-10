@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1](https://github.com/equinor/dm-job/compare/v1.5.0...v1.5.1) (2024-01-10)
+
+
+### Bug Fixes
+
+* add optional name to JobHandler ([2f5d997](https://github.com/equinor/dm-job/commit/2f5d9977cc0f92507914d4c355fdc9a34ba3f540))
+* raise ApplicationException (no 500's) ([2e17f25](https://github.com/equinor/dm-job/commit/2e17f2505d3b524cc70af367a51ef2cad31f1a2e))
+
 ## [1.5.0](https://github.com/equinor/dm-job/compare/v1.4.7...v1.5.0) (2024-01-05)
 
 
