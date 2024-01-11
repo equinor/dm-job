@@ -276,11 +276,14 @@ def remove_job(job_uid: UUID) -> Tuple[str, str]:
     job_handler = _get_job_handler(job)
     try:
         job_status, remove_message = job_handler.remove()
-        job.set_job_status(job_status)
-        update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
-        get_job_store().delete(str(job_uid))
     except NotImplementedError:
         remove_message = "The job handler does not support the operation"
+        job_status = JobStatus.REMOVED
+
+    job.set_job_status(job_status)
+    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
+    get_job_store().delete(str(job_uid))
+
     try:
         scheduler.remove_job(str(job_uid))
     except JobLookupError:
