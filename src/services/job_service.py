@@ -149,7 +149,7 @@ def _run_job(job_uid: UUID) -> str:
     message: list[str] | str = ""
     try:
         job_handler = _get_job_handler(job)
-        job.started = datetime.now(timezone.utc).replace(microsecond=0)
+        job.started = datetime.now(timezone.utc).replace(microsecond=0).ctime()
         try:
             message = job_handler.start()
 
