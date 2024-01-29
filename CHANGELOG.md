@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.2](https://github.com/equinor/dm-job/compare/v1.5.1...v1.5.2) (2024-01-29)
+
+
+### Bug Fixes
+
+* recurring job template with relative ref ([f297b8c](https://github.com/equinor/dm-job/commit/f297b8cf2e6d2d543f8f3bd9f6dc6cc4f6124825))
+* remove job even if handler does not implement ([0727239](https://github.com/equinor/dm-job/commit/07272394bafe35e82fae492f6ddcfb498c1ff220))
+
 ## [1.5.1](https://github.com/equinor/dm-job/compare/v1.5.0...v1.5.1) (2024-01-10)
 
 
