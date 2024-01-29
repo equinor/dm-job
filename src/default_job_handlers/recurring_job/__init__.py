@@ -39,6 +39,10 @@ class JobHandler(JobHandlerInterface):
         logger.info(msg)
         self.job.append_log(msg)
         job_template = self.job.application_input
+        actual_app_input_address = job_template["applicationInput"]["address"]
+        # Relative references will be wrong when we move the template into "schedule.runs"
+        if actual_app_input_address[0] == "~":
+            job_template["applicationInput"]["address"] = f"~.{actual_app_input_address}"
         new_job_address = add_document(f"{self.job.dmss_id}.schedule.runs", job_template, self.job.token)
         # TODO: Update DMSS to return complete address, and avoid this ugly stuff
         complete_new_job_address = self.job.dmss_id.split("$", 1)[0] + "$" + new_job_address["uid"]
