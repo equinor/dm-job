@@ -72,10 +72,9 @@ def schedule_cron_job(job_scheduler: BackgroundScheduler, function: Callable, jo
             replace_existing=True,
             jobstore="redis_job_store",
         )
-        return (
-            "Cron job successfully registered. Next scheduled run "
-            + f"at {scheduled_job.next_run_time - datetime.now(timezone.utc) + datetime.fromisoformat(job.schedule['startDate'])} {scheduled_job.next_run_time.tzinfo}"
-        )
+        if datetime.fromisoformat(job.schedule["startDate"]) > datetime.now(timezone.utc):
+            return f"Cron job successfully registered. Next run wil be after {datetime.fromisoformat(job.schedule['startDate'])}"
+        return f"Cron job successfully registered. Next scheduled run at {scheduled_job.next_run_time}"
     except ValueError as e:
         raise BadRequestException(message=f"Failed to schedule cron job '{job.job_uid}'.", debug=str(e))
 
