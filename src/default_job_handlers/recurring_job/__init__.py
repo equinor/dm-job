@@ -39,6 +39,7 @@ class JobHandler(JobHandlerInterface):
         logger.info(msg)
         self.job.append_log(msg)
         job_template = self.job.application_input
+        job_template["triggeredBy"] = f"Schedule ({self.job.job_uid})"
         actual_app_input_address = job_template["applicationInput"]["address"]
         # Relative references will be wrong when we move the template into "schedule.runs"
         if actual_app_input_address[0] == "~":
