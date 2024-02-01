@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.3](https://github.com/equinor/dm-job/compare/v1.5.2...v1.5.3) (2024-02-01)
+
+
+### Bug Fixes
+
+* insert "triggeredBy" for scheduled jobs ([bd346da](https://github.com/equinor/dm-job/commit/bd346dae64caa03bc92a476b8fc0112aec15cdfa))
+* next schedule run message ([b6d2d07](https://github.com/equinor/dm-job/commit/b6d2d07ff9154030642767b13847ba0d8035d6aa))
+
 ## [1.5.2](https://github.com/equinor/dm-job/compare/v1.5.1...v1.5.2) (2024-01-29)
 
 
