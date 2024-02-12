@@ -31,7 +31,8 @@ if [ "$1" = 'api' ]; then
 
   if [ "$ENVIRON" != "local" ]; then
     cat version.txt || true
-    gunicorn app:create_app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5000
+    # APScheduler v3 does not running with multiple gunicorn workers
+    gunicorn app:create_app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5000
   else
     python ./app.py run
   fi

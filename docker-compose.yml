@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   dmss:
-    image: datamodelingtool.azurecr.io/dmss:v1.16.0
+    image: datamodelingtool.azurecr.io/dmss:v1.18.5
     restart: unless-stopped
     environment:
       ENVIRONMENT: local
@@ -26,6 +26,7 @@ services:
     image: datamodelingtool.azurecr.io/dm-job
     restart: unless-stopped
     environment:
+      MONGO_PASSWORD: maf
       ENVIRONMENT: azure
       SCHEDULER_ENVS_TO_EXPORT: "PUBLIC_DMSS_API,SIMA_LICENSE"
       SCHEDULER_REDIS_HOST: job-store
