@@ -81,6 +81,8 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 logger.error(dmss_exception)
                 return PlainTextResponse(str(dmss_exception), status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
             except ValidationException as e:
+                if logger.level <= logging.DEBUG:
+                    traceback.print_exc()
                 logger.error(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
             except ValidationError as e:
