@@ -28,14 +28,8 @@ mv $TEMPFILE /code/app/data_sources/WorkflowDS.json
 
 if [ "$1" = 'api' ]; then
   service_is_ready
-
-  if [ "$ENVIRON" != "local" ]; then
-    cat version.txt || true
-    # APScheduler v3 does not running with multiple gunicorn workers
-    gunicorn app:create_app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5000
-  else
-    python ./app.py run
-  fi
+  cat version.txt || true
+  python ./app.py run
 else
   exec "$@"
 fi
