@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.4](https://github.com/equinor/dm-job/compare/v1.5.3...v1.5.4) (2024-02-12)
+
+
+### Bug Fixes
+
+* ApScheduler only with one worker ([d88c6cc](https://github.com/equinor/dm-job/commit/d88c6cc5a9ad203a7c1be270a045b5a88a34139a))
+
+
+### Miscellaneous Chores
+
+* remove gunicorn ([f80519b](https://github.com/equinor/dm-job/commit/f80519b822cc8c464fc5addf3166ccee1512cb7c))
+
 ## [1.5.3](https://github.com/equinor/dm-job/compare/v1.5.2...v1.5.3) (2024-02-01)
 
 
