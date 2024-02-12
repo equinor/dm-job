@@ -146,12 +146,12 @@ def _run_job(job_uid: UUID) -> str:
     """Start a job, by calling the start() function for the job's job handler."""
     job: Job = _get_job(job_uid)
     message: list[str] | str = ""
+    logger.info(f"Starting job; {job_uid}")
     try:
         job_handler = _get_job_handler(job)
         job.started = datetime.now(timezone.utc).replace(microsecond=0)
         try:
             message = job_handler.start()
-
         except Exception as error:
             print(traceback.format_exc())
             logger.warning(f"Failed to run job; {job_uid}")
@@ -215,21 +215,24 @@ def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobS
             job,
         )
     else:
-        # Add a 5second delay on every job we run.
-        # This is so that the JobService can update job state in
-        # DMSS, before we get a race with the job itself trying to update it's state.
-        in_5_seconds = datetime.now(timezone.utc) + timedelta(seconds=5)
-        job.set_job_status(JobStatus.STARTING)
-        scheduled_job = scheduler.add_job(
-            func=_run_job,
-            next_run_time=in_5_seconds,
-            args=[job.job_uid],
-            jobstore="redis_job_store",
-            id=str(job.job_uid),
-        )
-        schedule_response = (
-            f"Job starting in 5 seconds: {scheduled_job.next_run_time} {scheduled_job.next_run_time.tzinfo}"
-        )
+        try:
+            # Add a 5second delay on every job we run.
+            # This is so that the JobService can update job state in
+            # DMSS, before we get a race with the job itself trying to update it's state.
+            in_5_seconds = datetime.now(timezone.utc) + timedelta(seconds=5)
+            scheduled_job = scheduler.add_job(
+                func=_run_job,
+                next_run_time=in_5_seconds,
+                args=[job.job_uid],
+                jobstore="redis_job_store",
+                id=str(job.job_uid),
+            )
+            schedule_response = (
+                f"Job starting in 5 seconds: {scheduled_job.next_run_time} {scheduled_job.next_run_time.tzinfo}"
+            )
+            job.set_job_status(JobStatus.STARTING)
+        except Exception as e:
+            raise BadRequestException(message=f"Failed to schedule job '{job.job_uid}'.", debug=str(e))
 
     job.append_log(schedule_response)
     result = str(job.job_uid), schedule_response, job.status
