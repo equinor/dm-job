@@ -1,8 +1,10 @@
 import uvicorn
+from azure.monitor.opentelemetry import configure_azure_monitor
 from fastapi import APIRouter, FastAPI, Security
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2AuthorizationCodeBearer
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse
 
@@ -56,6 +58,10 @@ def create_app():
 
     all_routes.include_router(authenticated_routes, dependencies=[Security(auth_with_jwt)])
     app.include_router(all_routes)
+
+    if config.APPINSIGHTS_BE_CONNECTION_STRING:
+        configure_azure_monitor(connection_string=config.APPINSIGHTS_BE_CONNECTION_STRING, logger_name="API")
+        FastAPIInstrumentor.instrument_app(app)
 
     @app.get("/", operation_id="redirect_to_docs", response_class=RedirectResponse, include_in_schema=False)
     def redirect_to_docs():

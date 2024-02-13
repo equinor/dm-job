@@ -20,6 +20,7 @@ from restful.exceptions import (
     NotFoundException,
     NotImplementedException,
 )
+from restful.responses import get_traceback
 from services.dmss import get_document, get_personal_access_token, update_document
 
 # TODO: Authorization. The only level of authorization at this point is to allow all that
@@ -154,7 +155,7 @@ def _run_job(job_uid: UUID) -> str:
 
         except Exception as error:
             print(traceback.format_exc())
-            logger.warning(f"Failed to run job; {job_uid}")
+            logger.error(f"Failed to run job; {job_uid}", extra={"Traceback": get_traceback()})
             job.set_job_status(JobStatus.FAILED)
             raise error
     except NotImplementedError as error:
@@ -163,6 +164,7 @@ def _run_job(job_uid: UUID) -> str:
         message = f"The jobHandler '{type(job_handler).__name__}' " f"tried to access a missing attribute: {error}"
     except Exception as error:
         message = str(error)
+        logger.error(f"Could not start job: {error}", extra={"Traceback": get_traceback()})
     finally:
         if job.type == config.RECURRING_JOB:
             # The recurring job has been updated within the JobHandler

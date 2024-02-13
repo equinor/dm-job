@@ -35,5 +35,7 @@ class Config:
     RECURRING_JOB = "dmss://WorkflowDS/Blueprints/RecurringJob"
     JOB = "dmss://WorkflowDS/Blueprints/Job"
 
+    APPINSIGHTS_BE_CONNECTION_STRING: str = os.getenv("APPINSIGHTS_BE_CONNECTION_STRING", "")
+
 
 config = Config()

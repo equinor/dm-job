@@ -16,6 +16,7 @@ services:
       ENVIRONMENT: local
       AUTH_ENABLED: 0
       LOGGING_LEVEL: DEBUG
+      OTEL_SERVICE_NAME: "JOB API - local"
 #      AZURE_JOB_SUBSCRIPTION: 14d57366-b2ae-4da8-8b75-e273c6fdabe2
 #      AZURE_JOB_RESOURCE_GROUP: dmt-test-containers
 #      AZURE_SP_SECRET: ${AZURE_SP_SECRET}
