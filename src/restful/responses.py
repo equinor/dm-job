@@ -1,7 +1,9 @@
 import functools
 import logging
+import sys
 import traceback
 from typing import Callable, Type, TypeVar
+from uuid import uuid4
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
@@ -96,7 +98,7 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
             except BadRequestException as e:
                 if logger.level <= logging.DEBUG:
                     traceback.print_exc()
-                logger.error(e.dict())
+                logger.error(e.dict(), extra={"Traceback": get_traceback()})
                 return JSONResponse(e.dict(), status_code=status.HTTP_400_BAD_REQUEST)
             except MissingPrivilegeException as e:
                 logger.warning(e)
@@ -105,10 +107,23 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 logger.warning(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_501_NOT_IMPLEMENTED)
             except Exception as e:
+                error_id = uuid4()
                 traceback.print_exc()
-                logger.error(f"Unexpected unhandled exception: {e}")
+                logger.error(
+                    f"Unexpected unhandled exception: {e}", extra={"UUID": str(error_id), "Traceback": get_traceback()}
+                )
                 return JSONResponse(ErrorResponse().dict(), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return wrapper_decorator
 
     return func_wrapper
+
+
+def get_traceback() -> str:
+    """Get traceback as a log-friendly format."""
+    exc_info = sys.exc_info()
+    stack = traceback.extract_stack()
+    tb = traceback.extract_tb(exc_info[2])
+    full_tb = stack[:-1] + tb
+    exc_line = traceback.format_exception_only(*exc_info[:2])
+    return "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)

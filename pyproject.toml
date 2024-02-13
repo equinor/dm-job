@@ -16,7 +16,8 @@ azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
 azure-identity = "^1.11.0"
 dm-cli = "^1.4.3"
-
+azure-monitor-opentelemetry = "^1.2.0"
+opentelemetry-instrumentation-fastapi = "^0.43b0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"
