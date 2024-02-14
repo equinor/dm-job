@@ -80,12 +80,13 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 logger.error(error_response)
                 return JSONResponse(error_response.dict(), status_code=error_response.status)
             except ServiceException as dmss_exception:
-                logger.error(dmss_exception)
+                error_id = uuid4()
+                logger.error(dmss_exception, extra={"UUID": str(error_id), "Traceback": get_traceback()})
                 return PlainTextResponse(str(dmss_exception), status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
             except ValidationException as e:
                 if logger.level <= logging.DEBUG:
                     traceback.print_exc()
-                logger.error(e)
+                logger.debug(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
             except ValidationError as e:
                 validation_exception = ValidationException(message=str(e))
@@ -93,12 +94,12 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                     traceback.print_exc()
                 return JSONResponse(validation_exception.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
             except NotFoundException as e:
-                logger.error(e)
+                logger.debug(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_404_NOT_FOUND)
             except BadRequestException as e:
                 if logger.level <= logging.DEBUG:
                     traceback.print_exc()
-                logger.error(e.dict(), extra={"Traceback": get_traceback()})
+                logger.debug(e.dict(), extra={"Traceback": get_traceback()})
                 return JSONResponse(e.dict(), status_code=status.HTTP_400_BAD_REQUEST)
             except MissingPrivilegeException as e:
                 logger.warning(e)
