@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dm-job"
-version="1.5.4"  # x-release-please-version
+version="1.6.0"  # x-release-please-version
 description = "REST API running jobs in development framework"
 authors = ["Equinor <fg_team_hermes@equinor.com>"]
 license = "MIT"

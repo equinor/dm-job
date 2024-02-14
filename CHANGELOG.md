@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/equinor/dm-job/compare/v1.5.4...v1.6.0) (2024-02-14)
+
+
+### Features
+
+* add azure app insights ([90f3b7c](https://github.com/equinor/dm-job/commit/90f3b7cd2fdc56ff4cd56497dbaf49ab7289ae53))
+
+
+### Code Refactoring
+
+* change some of logs from error to debug ([bc344b6](https://github.com/equinor/dm-job/commit/bc344b6d142336442a1dcbd15cb7e57e40c009d4))
+
 ## [1.5.4](https://github.com/equinor/dm-job/compare/v1.5.3...v1.5.4) (2024-02-12)
 
 
