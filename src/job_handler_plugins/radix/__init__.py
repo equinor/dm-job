@@ -66,7 +66,7 @@ class JobHandler(JobHandlerInterface):
         )
         result.raise_for_status()
         response_json = result.json()
-        match (response_json["status"]):
+        match (response_json.get("status")):
             case "Running":  # noqa
                 return JobStatus.RUNNING, "Job is running", None
             case "Failed":  # noqa
@@ -77,5 +77,7 @@ class JobHandler(JobHandlerInterface):
                 )
             case "Succeeded":  # noqa
                 return JobStatus.COMPLETED, "Radix job completed successfully", 1
+            case None:
+                return JobStatus.STARTING, "Radix job is starting", 1
             case _:
                 return JobStatus.UNKNOWN, "Radix returned an unknown status code", 0
