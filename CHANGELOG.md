@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/equinor/dm-job/compare/v1.6.0...v1.6.1) (2024-02-23)
+
+
+### Bug Fixes
+
+* handle redix response with no status ([327dffe](https://github.com/equinor/dm-job/commit/327dffe5fc127e69d4adf36537845a84e813bb7d))
+
 ## [1.6.0](https://github.com/equinor/dm-job/compare/v1.5.4...v1.6.0) (2024-02-14)
 
 
