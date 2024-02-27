@@ -45,9 +45,7 @@ class JobHandler(JobHandlerInterface):
         if actual_app_input_address[0] == "~":
             job_template["applicationInput"]["address"] = f"~.{actual_app_input_address}"
         new_job_address = add_document(f"{self.job.dmss_id}.schedule.runs", job_template, self.job.token)
-        # TODO: Update DMSS to return complete address, and avoid this ugly stuff
-        complete_new_job_address = self.job.dmss_id.split("$", 1)[0] + "$" + new_job_address["uid"]
-        new_uid, new_log, status = register_job(complete_new_job_address, self.job.token)
+        new_uid, new_log, status = register_job(new_job_address["uid"], self.job.token)
 
         msg = f'Job: "{new_uid}", Status: "{status}"'
         logger.info(msg)
