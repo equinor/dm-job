@@ -48,7 +48,7 @@ class TestRecurringJob(unittest.TestCase):
     def test_starting_and_get_result(self):
         add_document("dmss://WorkflowDS/TestEntities", application_input)
         job_document_dmss_id = add_document("dmss://WorkflowDS/TestEntities", test_job)
-        recurring_job_address = f"dmss://WorkflowDS/${job_document_dmss_id['uid']}"
+        recurring_job_address = job_document_dmss_id["uid"]
         start_job_response = test_client.post("/" + recurring_job_address)
         start_job_response.raise_for_status()
         sleep(100)

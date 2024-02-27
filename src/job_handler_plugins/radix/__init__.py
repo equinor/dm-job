@@ -61,6 +61,8 @@ class JobHandler(JobHandlerInterface):
         return JobStatus.REMOVED, "Removed"
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
+        if self.job.status == JobStatus.FAILED:
+            return JobStatus.FAILED, self.job.log, None
         if not self.job.state:
             return self.job.status, "Radix job is not running yet.", 0
         result = requests.get(
