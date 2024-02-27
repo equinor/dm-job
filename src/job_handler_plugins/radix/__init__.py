@@ -50,6 +50,9 @@ class JobHandler(JobHandlerInterface):
         return str(result.status_code)
 
     def remove(self) -> Tuple[JobStatus, str]:
+        if not self.job.state:
+            return JobStatus.REMOVED, "Removed"
+
         result = requests.delete(
             f"{_get_job_url(self.job)}/{self.job.state['job_name']}",
             timeout=10,
