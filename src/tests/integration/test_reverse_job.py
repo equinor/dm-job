@@ -33,7 +33,7 @@ class TestReverseDescription(unittest.TestCase):
     def test_starting_and_get_result(self):
         add_document("dmss://WorkflowDS/TestEntities", application_input)
         job_document_dmss_id = add_document("dmss://WorkflowDS/TestEntities", test_job)
-        start_job_response = test_client.post(f"WorkflowDS/${job_document_dmss_id['uid']}")
+        start_job_response = test_client.post("/" + job_document_dmss_id["uid"])
         start_job_response.raise_for_status()
         sleep(8)  # Let the job run...
         get_results_response = test_client.get(f"/{start_job_response.json()['uid']}/result")
