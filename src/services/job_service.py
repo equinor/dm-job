@@ -195,6 +195,11 @@ def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobS
     logger.info(f"Registering job '{dmss_id}'")
     token = token if token else get_personal_access_token()
     job_entity = get_document(dmss_id, 1, token)
+    if not isinstance(job_entity, dict):
+        raise BadRequestException(
+            f"Address '{dmss_id}' does not point to a Job, but an entity of type '{type(job_entity)}'",
+            data=job_entity,
+        )
     if job_entity["type"] not in (config.JOB, config.RECURRING_JOB):
         raise BadRequestException(
             f"Address '{dmss_id}' does not point to a Job, but an entity of type '{job_entity['type']}'",
@@ -323,7 +328,7 @@ def update_progress_from_uid(job_uid: UUID, progress: Progress, overwrite_log: b
     return update_progress(job, progress, overwrite_log, external)
 
 
-def update_progress(job: Job, progress: Progress, overwrite_log: bool, external: bool = False) -> dict:
+def update_progress(job: Job, progress: Progress, overwrite_log: bool = False, external: bool = False) -> dict:
     job.external_progress = external or job.external_progress
     if progress.percentage is not None:
         job.percentage = progress.percentage
