@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.6.2](https://github.com/equinor/dm-job/compare/v1.6.1...v1.6.2) (2024-03-01)
+
+
+### Bug Fixes
+
+* failing to remove a radix job that never started on radix ([cadc03d](https://github.com/equinor/dm-job/commit/cadc03d7d8ec3caaeaa914120bfbf4c04d2cfb24))
+* fetching progres from a radix job with no status failes ([ed5e09f](https://github.com/equinor/dm-job/commit/ed5e09f82427786e7b8d02e4264e2718092928f5))
+* If a job fails to start, log the error ([62e80df](https://github.com/equinor/dm-job/commit/62e80df065af74fe940ef68dac997ad4108808bf))
+* no need for address manipulation when creating scheduled jobs ([57bad76](https://github.com/equinor/dm-job/commit/57bad768eaa6a8d980ea086051bb259088733d47))
+
 ## [1.6.1](https://github.com/equinor/dm-job/compare/v1.6.0...v1.6.1) (2024-02-23)
 
 
