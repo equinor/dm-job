@@ -257,10 +257,11 @@ def status_job(job_uid: UUID) -> Tuple[JobStatus, list[str], float]:
     If the job does not implement progress tracking, the job handler tries to evaluate the status of the job.
     """
     job = _get_job(job_uid)
-    job_handler = _get_job_handler(job)
-    if job.external_progress:
+    if job.external_progress:  # Progress/Status is controlled externally
         return job.status, job.log, job.percentage
+
     try:
+        job_handler = _get_job_handler(job)
         status, log, percentage = job_handler.progress()
     except NotImplementedError:
         raise NotImplementedException(

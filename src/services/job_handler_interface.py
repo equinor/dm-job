@@ -62,11 +62,12 @@ class Job(BaseModel):
     def append_log(self, log: list | str):
         if not isinstance(log, list):
             logs = log.split("\n")
-            log = [f"JOBAPI: {log}" for log in logs]
+            log = [line for line in logs if line]
         if self.log:
             self.log.extend(log)
-        else:
-            self.log = log
+            return
+
+        self.log = log
 
     def set_job_status(self, status: JobStatus):
         if status == self.status:
