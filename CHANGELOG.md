@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/equinor/dm-job/compare/v1.6.2...v1.6.3) (2024-03-05)
+
+
+### Bug Fixes
+
+* don't prefix every log entry with 'JOBAPI' ([a0f5fe1](https://github.com/equinor/dm-job/commit/a0f5fe1c80a64cfa28160277452e8773965505b5))
+
 ## [1.6.2](https://github.com/equinor/dm-job/compare/v1.6.1...v1.6.2) (2024-03-01)
 
 
