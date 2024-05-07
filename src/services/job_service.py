@@ -39,7 +39,7 @@ def get_job_store():
     return redis.Redis(
         host=config.SCHEDULER_REDIS_HOST,
         port=config.SCHEDULER_REDIS_PORT,
-        db=0,
+        db=5,  # DMSS is using 0-3
         password=config.SCHEDULER_REDIS_PASSWORD,
         ssl=config.SCHEDULER_REDIS_SSL,
         socket_timeout=5,
