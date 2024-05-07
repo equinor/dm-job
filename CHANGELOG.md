@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://github.com/equinor/dm-job/compare/v1.6.3...v1.6.4) (2024-05-07)
+
+
+### Bug Fixes
+
+* allow for ssl for redis ([c189910](https://github.com/equinor/dm-job/commit/c189910b70f6ff24b023d5a2f09470854b927d67))
+
 ## [1.6.3](https://github.com/equinor/dm-job/compare/v1.6.2...v1.6.3) (2024-03-05)
 
 
