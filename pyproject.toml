@@ -14,7 +14,7 @@ fastapi = "^0.92.0"
 uvicorn = {extras = ["standard"], version = "^0.18.2"}
 azure-mgmt-containerinstance = "^10.0.0"
 azure-mgmt-resource = "^21.2.0"
-azure-identity = "^1.11.0"
+azure-identity = "^1.16.1"
 dm-cli = "^1.4.3"
 azure-monitor-opentelemetry = "^1.2.0"
 opentelemetry-instrumentation-fastapi = "^0.43b0"
