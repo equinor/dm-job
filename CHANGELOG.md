@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.5](https://github.com/equinor/dm-job/compare/v1.6.4...v1.6.5) (2024-06-12)
+
+
+### Miscellaneous Chores
+
+* bump dependencies ([27a9c1a](https://github.com/equinor/dm-job/commit/27a9c1ad3039fdea6e31d748ec13959f0273d0b3))
+
 ## [1.6.4](https://github.com/equinor/dm-job/compare/v1.6.3...v1.6.4) (2024-05-07)
 
 
