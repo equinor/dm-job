@@ -1,5 +1,3 @@
-version: "3.4"
-
 services:
   dmss:
     image: datamodelingtool.azurecr.io/dmss:v1.27.1
@@ -16,7 +14,7 @@ services:
       - redis
 
   db:
-    image: bitnami/mongodb:6.0.9
+    image: bitnami/mongodb:latest
     environment:
       MONGODB_ROOT_PASSWORD: maf
       MONGODB_ROOT_USER: maf
