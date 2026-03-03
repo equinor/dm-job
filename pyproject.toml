@@ -1,9 +1,13 @@
-[tool.poetry]
+[project]
 name = "dm-job"
-version="1.6.4"  # x-release-please-version
+version = "1.6.4"  # x-release-please-version
 description = "REST API running jobs in development framework"
-authors = ["Equinor <fg_team_hermes@equinor.com>"]
-license = "MIT"
+authors = [ {name = "Equinor", email = "fg_team_hermes@equinor.com"}]
+license = { text = "MIT" }
+
+[tool.poetry]
+requires-poetry = ">=2.0"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10.4"
@@ -19,7 +23,7 @@ dm-cli = "^1.7.1"
 azure-monitor-opentelemetry = "^1.2.0"
 opentelemetry-instrumentation-fastapi = "^0.43b0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
 pre-commit = "^3.3.3"
 flake8 = "^5.0.4"
@@ -27,8 +31,6 @@ bandit = "^1.7.4"
 black = "^22.6.0"
 types-redis = "^4.3.21"
 httpx = "^0.23.3"
-
-[tool.poetry.group.dev.dependencies]
 icecream = "^2.1.3"
 
 [tool.isort]
