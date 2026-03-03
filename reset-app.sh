@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-# Get the available docker-compose command
+# Get the available docker compose command
 docker compose &> /dev/null
 if [[ $? == 0 ]]; then
   compose="docker compose"
