@@ -53,7 +53,7 @@ class Job(BaseModel):
         "dmss_id": True,
         "log": True,
         "percentage": True,
-        "token": True,
+        "token": True,  # nosec B105
         "state": True,
         "external_progress": True,
         "exclude_keys": True,
