@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.6.5](https://github.com/equinor/dm-job/compare/v1.6.4...v1.6.5) (2026-03-04)
+
+
+### Bug Fixes
+
+* --without dev in dockerfile ([c2318f4](https://github.com/equinor/dm-job/commit/c2318f4b7c787fda70303cd29fe014c17f8351c9))
+
+
+### Miscellaneous Chores
+
+* bump dependencies ([27a9c1a](https://github.com/equinor/dm-job/commit/27a9c1ad3039fdea6e31d748ec13959f0273d0b3))
+
+
+### Build System
+
+* poetry2.0 syntax ([d5c04bf](https://github.com/equinor/dm-job/commit/d5c04bf3739e5fdfe67cc1582bdb37b9852c2e27))
+* same python version in pre-commit and tests ([8213b88](https://github.com/equinor/dm-job/commit/8213b881fd81fc5d340601b6ecd3a1d633d6182f))
+* updated deps and python3.13 ([23f2514](https://github.com/equinor/dm-job/commit/23f25140d1e8e8860eb81172f67a258924751ef5))
+
+
+### Continuous Integration
+
+* add dependabot config ([940b2b9](https://github.com/equinor/dm-job/commit/940b2b990f45a9244548c54097a5445be8fbb3e2))
+* build when no secret available ([23f0307](https://github.com/equinor/dm-job/commit/23f03074b1bee497f0c98cd7029d7a00be453a5a))
+* new docker compose syntax ([3882dee](https://github.com/equinor/dm-job/commit/3882dee16bb2ab81af0293eb8a026dad44f64f7b))
+* remove codeql as a workflow ([75f07c4](https://github.com/equinor/dm-job/commit/75f07c41488366bc095a7a74a0c6797b4b691183))
+* remove outdated versions mongodb + dc files ([093cd74](https://github.com/equinor/dm-job/commit/093cd7458b520f207cab58cbaeabd55766904c3d))
+
 ## [1.6.4](https://github.com/equinor/dm-job/compare/v1.6.3...v1.6.4) (2024-05-07)
 
 
