@@ -1,10 +1,10 @@
 on:
   workflow_dispatch:
-  workflow_call:  # Workflow is meant to be called from another workflow, with the image tag as input
+  workflow_call: # Workflow is meant to be called from another workflow, with the image tag as input
     inputs:
       image-tags:
-        description: 'Which tag to set for the produced docker images'
-        default: 'latest'
+        description: "Which tag to set for the produced docker images"
+        default: "latest"
         required: true
         type: string
     secrets:
@@ -19,7 +19,6 @@ env:
   REGISTRY_USER: datamodelingtool
   DOCKER_IMAGE: datamodelingtool.azurecr.io/dm-job
 
-
 jobs:
   build-and-push:
     name: Build and push
@@ -33,7 +32,6 @@ jobs:
 
       - name: "Docker Login"
         run: docker login -u $REGISTRY_USER -p ${{ secrets.ACR_SECRET }} $IMAGE_REGISTRY
-
 
       - name: "Pull Docker image"
         run: docker pull $DOCKER_IMAGE
