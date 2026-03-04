@@ -13,7 +13,7 @@ jobs:
   set-tag-ref:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
       - id: create-ref
         run: |
           TAG_REF=$(echo $GITHUB_REF | cut -d / -f 3)
@@ -25,8 +25,6 @@ jobs:
     needs: [set-tag-ref, tests]
     uses: ./.github/workflows/publish.yaml
     with:
-      image-tag: ${{ needs.set-tag-ref.outputs.tag-ref }}
+      image-tags: ${{ needs.set-tag-ref.outputs.tag-ref }}
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
-
-
