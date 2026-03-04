@@ -11,6 +11,9 @@ on:
       ACR_SECRET:
         required: false
 
+permissions:
+  contents: read
+
 env:
   IMAGE_REGISTRY: datamodelingtool.azurecr.io
   REGISTRY_USER: datamodelingtool
