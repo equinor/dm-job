@@ -54,9 +54,15 @@ jobs:
 
       - name: Build API image
         run: |
-          echo ${{ secrets.ACR_SECRET }} | docker login $IMAGE_REGISTRY -u datamodelingtool --password-stdin
-          docker pull $API_IMAGE
-          DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development --cache-from $API_IMAGE .
+          if [ -n "$ACR_SECRET" ]; then
+            echo "$ACR_SECRET" | docker login $IMAGE_REGISTRY -u datamodelingtool --password-stdin
+            docker pull $API_IMAGE
+            DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development --cache-from $API_IMAGE .
+          else
+            DOCKER_BUILDKIT=1 docker build --target development --tag job-api-development .
+          fi
+        env:
+          ACR_SECRET: ${{ secrets.ACR_SECRET }}
 
       - name: Pytest tests
         run: |
