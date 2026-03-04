@@ -6,6 +6,9 @@ on:
     tags-ignore:
       - v*
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     uses: ./.github/workflows/tests.yaml

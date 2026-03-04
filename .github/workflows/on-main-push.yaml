@@ -4,14 +4,20 @@ on:
     branches:
       - main
 
+permissions: {}
+
 jobs:
   tests:
+    permissions:
+      contents: read
     uses: ./.github/workflows/tests.yaml
     secrets:
       ACR_SECRET: ${{ secrets.ACR_SECRET }}
 
   publish-latest:
     needs: tests
+    permissions:
+      contents: read
     uses: ./.github/workflows/publish.yaml
     with:
       image-tags: latest
@@ -20,11 +26,16 @@ jobs:
 
   release-please:
     needs: [tests]
+    permissions:
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/create-release-pr.yaml
 
   publish-tagged-docker-image:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/publish.yaml
     with:
       image-tags: production,${{ needs.release-please.outputs.tag_name }}

@@ -7,6 +7,9 @@ on:
       ACR_SECRET:
         required: false
 
+permissions:
+  contents: read
+
 env:
   IMAGE_REGISTRY: datamodelingtool.azurecr.io
   API_IMAGE: datamodelingtool.azurecr.io/dm-job
