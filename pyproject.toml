@@ -11,7 +11,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10.4"
-redis = "^5.0.5"
+redis = "^7.2.1"
 APScheduler = "^3.10.4"
 docker = "^7.1.0"
 fastapi = "0.92.0"  # Migrate to pydantic V2 before upgrading
