@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from domain_classes.progress import Progress
 from services.job_service import update_progress_from_uid

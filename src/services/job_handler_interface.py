@@ -1,11 +1,10 @@
-import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Tuple
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from services.dmss import get_document
 
@@ -22,30 +21,28 @@ class JobStatus(str, Enum):
 
 
 class Job(BaseModel):
-    class Config:
-        json_encoders = {UUID: lambda uuid: str(uuid)}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     type: str
     dmss_id: str
     job_uid: UUID = Field(alias="uid")
-    name: str | None
-    label: str | None
-    triggeredBy: str | None
-    status: JobStatus
-    application_input: dict | None = Field(alias="applicationInput")
-    started: datetime | None
-    ended: datetime | None
-    outputTarget: str | None
-    result: dict | None
-    runner: dict | None
-    referenceTarget: str | None
-    schedule: dict | None
+    name: str | None = None
+    label: str | None = None
+    triggeredBy: str | None = None
+    status: JobStatus = JobStatus.NOT_STARTED
+    application_input: dict | None = Field(default=None, alias="applicationInput")
+    started: datetime | None = None
+    ended: datetime | None = None
+    outputTarget: str | None = None
+    result: dict | None = None
+    runner: dict | None = None
+    referenceTarget: str | None = None
+    schedule: dict | None = None
 
     log: list | None = []
-    percentage: float | None
-    token: str | None
-    state: dict | None
+    percentage: float | None = None
+    token: str | None = None
+    state: dict | None = None
     external_progress: bool = False
 
     # Fields that are not sendt to DMSS
@@ -110,14 +107,14 @@ class JobHandlerInterface(ABC):
 
 def dmss_sync(job: Job) -> Job:
     fetched: dict = get_document(job.dmss_id, 0, job.token)
-    job_dict = json.loads(job.json())
+    job_dict = job.model_dump(mode="json")
     merged_kwargs: dict = {
         **fetched,
         "status": job_dict["status"],
         "started": job_dict["started"],
         "dmss_id": job.dmss_id,
     }
-    new_job = Job.parse_obj(merged_kwargs)
+    new_job = Job.model_validate(merged_kwargs)
     # For some reason, "token" does not survive the exporting and parsing...
     new_job.token = job.token
     return new_job

@@ -91,7 +91,7 @@ class ValidationException(ApplicationException):
     ):
         super().__init__(message, debug, data)
         self.type = self.__class__.__name__
-        self.status = request_status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.status = request_status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 class NotImplementedException(ApplicationException):

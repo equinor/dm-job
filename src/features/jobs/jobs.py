@@ -35,7 +35,7 @@ def start(job_dmss_id: str):
 
     The PROTOCOL is optional, and the default is dmss.
     """
-    return start_job_use_case(job_dmss_id=job_dmss_id).dict()
+    return start_job_use_case(job_dmss_id=job_dmss_id).model_dump()
 
 
 @router.get("/{job_uid}", operation_id="job_status", response_model=StatusJobResponse)
@@ -45,7 +45,7 @@ def status(job_uid: UUID):
 
     - **job_uid**: the job API's internal uid for the job.
     """
-    return status_job_use_case(job_id=job_uid).dict()
+    return status_job_use_case(job_id=job_uid).model_dump()
 
 
 @router.delete("/{job_uid}", operation_id="remove_job", response_model=DeleteJobResponse)
@@ -56,7 +56,7 @@ def remove(job_uid: UUID):
 
     - **job_uid**: the job API's internal uid for the job.
     """
-    return delete_job_use_case(job_id=job_uid).dict()
+    return delete_job_use_case(job_id=job_uid).model_dump()
 
 
 @router.get("/{job_uid}/result", operation_id="job_result", response_model=GetJobResultResponse)
@@ -66,7 +66,7 @@ def result(job_uid: UUID):
 
     - **job_uid**: the job API's internal uid for the job.
     """
-    return get_job_result_use_case(job_uid=job_uid).dict()
+    return get_job_result_use_case(job_uid=job_uid).model_dump()
 
 
 @router.put("/{job_uid}", operation_id="update_job_progress", response_model=UpdateJobProgressResponse)
@@ -77,4 +77,6 @@ def progress(job_uid: UUID, overwrite_log: bool, job_progress: Progress):
     - **job_uid**: the job API's internal uid for the job.
     - **progress**: progress object with percentage and logs
     """
-    return update_job_progress_use_case(job_uid=job_uid, overwrite_log=overwrite_log, progress=job_progress).dict()
+    return update_job_progress_use_case(
+        job_uid=job_uid, overwrite_log=overwrite_log, progress=job_progress
+    ).model_dump()
