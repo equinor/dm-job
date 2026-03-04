@@ -18,11 +18,11 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
 
       - name: Set up python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -32,7 +32,7 @@ jobs:
       # Caches the venv at the end of the job and reloads for quicker pre-commit.
       # Uses pyproject.toml and pre-commit-config file to create hash.
       - name: Cache venv
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         id: cache
         with:
           path: |
@@ -53,7 +53,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
 
       - name: Build API image
         run: |
