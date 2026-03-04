@@ -95,8 +95,7 @@ def _get_job(job_uid: UUID) -> Job:
 
 
 def _set_job(job: Job):
-    # If we don't include an empty exclude dict, 'token' will be removed from the json string...
-    return get_job_store().set(str(job.job_uid), job.json(exclude={}))
+    return get_job_store().set(str(job.job_uid), job.model_dump_json())
 
 
 def load_cron_jobs():
@@ -172,7 +171,7 @@ def _run_job(job_uid: UUID) -> str:
             job = dmss_sync(job)
         job.append_log(message)
         update_document(
-            job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token
+            job.dmss_id, job.model_dump_json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token
         )  # Update in DMSS with status etc.
 
         _set_job(job)
@@ -245,7 +244,9 @@ def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobS
     result = str(job.job_uid), schedule_response, job.status
 
     _set_job(job)
-    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), token=job.token)
+    update_document(
+        job.dmss_id, job.model_dump_json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), token=job.token
+    )
     return result
 
 
@@ -291,7 +292,9 @@ def remove_job(job_uid: UUID) -> Tuple[str, str]:
         job_status = JobStatus.REMOVED
 
     job.set_job_status(job_status)
-    update_document(job.dmss_id, job.json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token)
+    update_document(
+        job.dmss_id, job.model_dump_json(by_alias=True, exclude_none=True, exclude=job.exclude_keys), job.token
+    )
     get_job_store().delete(str(job_uid))
 
     try:
@@ -343,11 +346,11 @@ def update_progress(job: Job, progress: Progress, overwrite_log: bool = False, e
     _set_job(job)
     update_document(
         job.dmss_id,
-        job.json(
+        job.model_dump_json(
             by_alias=True,
             exclude_none=True,
             exclude=job.exclude_keys,
         ),
         job.token,
     )
-    return dict(json.loads(job.json()))
+    return job.model_dump(mode="json")  # type: ignore[no-any-return]

@@ -5,8 +5,7 @@ import traceback
 from typing import Callable, Type, TypeVar
 from uuid import uuid4
 
-from pydantic import BaseModel
-from pydantic.error_wrappers import ValidationError
+from pydantic import BaseModel, ValidationError
 from requests import HTTPError
 from starlette import status
 from starlette.responses import JSONResponse, PlainTextResponse, Response
@@ -40,7 +39,7 @@ responses = {
             "application/json": {
                 "example": ErrorResponse(
                     status=401, type="UnauthorizedException", message="Token validation failed"
-                ).dict()
+                ).model_dump()
             }
         },
     },
@@ -78,7 +77,7 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                         debug=f"The HTTP call to '{http_error.response.url}' failed",  # type: ignore
                     )
                 logger.error(error_response)
-                return JSONResponse(error_response.dict(), status_code=error_response.status)
+                return JSONResponse(error_response.model_dump(), status_code=error_response.status)
             except ServiceException as dmss_exception:
                 error_id = uuid4()
                 logger.error(dmss_exception, extra={"UUID": str(error_id), "Traceback": get_traceback()})
@@ -87,12 +86,12 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 if logger.level <= logging.DEBUG:
                     traceback.print_exc()
                 logger.debug(e)
-                return JSONResponse(e.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                return JSONResponse(e.dict(), status_code=status.HTTP_422_UNPROCESSABLE_CONTENT)
             except ValidationError as e:
                 validation_exception = ValidationException(message=str(e))
                 if logger.level <= logging.DEBUG:
                     traceback.print_exc()
-                return JSONResponse(validation_exception.dict(), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                return JSONResponse(validation_exception.dict(), status_code=status.HTTP_422_UNPROCESSABLE_CONTENT)
             except NotFoundException as e:
                 logger.debug(e)
                 return JSONResponse(e.dict(), status_code=status.HTTP_404_NOT_FOUND)
@@ -113,7 +112,7 @@ def create_response(response_class: Type[TResponse]) -> Callable[..., Callable[.
                 logger.error(
                     f"Unexpected unhandled exception: {e}", extra={"UUID": str(error_id), "Traceback": get_traceback()}
                 )
-                return JSONResponse(ErrorResponse().dict(), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return JSONResponse(ErrorResponse().model_dump(), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return wrapper_decorator
 

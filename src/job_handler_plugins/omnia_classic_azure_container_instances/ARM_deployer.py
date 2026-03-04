@@ -1,6 +1,4 @@
 from azure.mgmt.resource import ResourceManagementClient
-from azure.mgmt.resource.resources.models import DeploymentMode
-from azure.mgmt.resource.resources.v2021_04_01.models import Deployment
 
 
 class Deployer:
@@ -13,12 +11,12 @@ class Deployer:
 
     def deploy(self, template: dict, deployment_name: str, parameters: dict):
         deployment_properties = {
-            "mode": DeploymentMode.incremental,
+            "mode": "Incremental",
             "template": template,
             "parameters": {k: {"value": v} for k, v in parameters.items()} if parameters else {},
         }
 
         deployment_async_operation = self.client.deployments.begin_create_or_update(
-            self.resource_group, deployment_name, Deployment(properties=deployment_properties)
+            self.resource_group, deployment_name, {"properties": deployment_properties}
         )
         return deployment_async_operation.wait()

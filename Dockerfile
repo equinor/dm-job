@@ -1,4 +1,4 @@
-FROM python:3.10-slim as base
+FROM python:3.13-slim AS base
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/code/src
 WORKDIR /code
@@ -14,7 +14,7 @@ RUN pip install --upgrade pip && \
 
 COPY pyproject.toml poetry.lock ./
 
-FROM base as development
+FROM base AS development
 RUN poetry install
 WORKDIR /code/src
 COPY src /code/src/
@@ -23,7 +23,7 @@ COPY .flake8 .bandit ./
 RUN chown -R 1000:1000 /code/app/
 USER 0
 
-FROM base as prod
+FROM base AS prod
 RUN poetry install --without dev
 WORKDIR /code/src
 COPY src /code/src/

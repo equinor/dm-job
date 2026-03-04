@@ -10,11 +10,11 @@ from restful.responses import ErrorResponse
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         ErrorResponse(
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status=status.HTTP_422_UNPROCESSABLE_CONTENT,
             type="RequestValidationError",
             message="The received values are invalid",
             debug="The received values are invalid according to the endpoints model definition",
             extra=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
-        ).dict(),
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        ).model_dump(),
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     )

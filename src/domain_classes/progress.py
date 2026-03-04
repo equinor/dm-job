@@ -1,4 +1,4 @@
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from services.job_handler_interface import JobStatus
 
