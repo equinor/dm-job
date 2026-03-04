@@ -16,7 +16,7 @@ jobs:
   set-tag-ref:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: create-ref
         run: |
           TAG_REF=$(echo $GITHUB_REF | cut -d / -f 3)
