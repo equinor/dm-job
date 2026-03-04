@@ -24,7 +24,7 @@ RUN chown -R 1000:1000 /code/app/
 USER 0
 
 FROM base as prod
-RUN poetry install --no-dev
+RUN poetry install --without dev
 WORKDIR /code/src
 COPY src /code/src/
 COPY app /code/app/
