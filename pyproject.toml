@@ -25,7 +25,7 @@ opentelemetry-instrumentation-fastapi = "^0.43b0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
-pre-commit = "^3.3.3"
+pre-commit = "^4.5.1"
 flake8 = "^5.0.4"
 bandit = "^1.7.4"
 black = "^22.6.0"
