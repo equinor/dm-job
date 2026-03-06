@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.6](https://github.com/equinor/dm-job/compare/v1.6.5...v1.6.6) (2026-03-06)
+
+
+### Build System
+
+* use new "dm-cli" ([5c0436a](https://github.com/equinor/dm-job/commit/5c0436aa5d64c539e34393606e4458b3bbdd510d))
+
 ## [1.6.5](https://github.com/equinor/dm-job/compare/v1.6.4...v1.6.5) (2026-03-04)
 
 
