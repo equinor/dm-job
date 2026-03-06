@@ -685,6 +685,31 @@ test = ["certifi (>=2024)", "cryptography-vectors (==46.0.5)", "pretend (>=0.7)"
 test-randomorder = ["pytest-randomly"]
 
 [[package]]
+name = "development-framework-cli"
+version = "1.7.3"
+description = "CLI tool for working with Data Modelling Storage Service"
+optional = false
+python-versions = ">=3.13"
+groups = ["main"]
+files = [
+    {file = "development_framework_cli-1.7.3-py3-none-any.whl", hash = "sha256:e11aed997f4f6797846a4761f34c663921ebc3624acafdd5d5921e1a314a1b63"},
+    {file = "development_framework_cli-1.7.3.tar.gz", hash = "sha256:d5c86cb17a3fa46da1373a7a2285a709b73071fce075ad6d2efec55490c9f246"},
+]
+
+[package.dependencies]
+emoji = ">=2.15.0"
+frozendict = ">=2.4.7"
+python-dateutil = ">=2.9.0.post0"
+requests = ">=2.32.5"
+tenacity = ">=9.1.4"
+tqdm = ">=4.67.3"
+typer = {version = ">=0.24.1", extras = ["all"]}
+typing-extensions = ">=4.15.0"
+
+[package.extras]
+dev = ["pre-commit (>=4.5.1)", "pytest (>=9.0.2)"]
+
+[[package]]
 name = "distlib"
 version = "0.4.0"
 description = "Distribution utilities"
@@ -695,28 +720,6 @@ files = [
     {file = "distlib-0.4.0-py2.py3-none-any.whl", hash = "sha256:9659f7d87e46584a30b5780e43ac7a2143098441670ff0a49d5f9034c54a6c16"},
     {file = "distlib-0.4.0.tar.gz", hash = "sha256:feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f401a4e0d"},
 ]
-
-[[package]]
-name = "dm-cli"
-version = "1.7.1"
-description = ""
-optional = false
-python-versions = ">=3.8"
-groups = ["main"]
-files = [
-    {file = "dm-cli-1.7.1.tar.gz", hash = "sha256:972f24c81021b026063648fa1dfd3082b2504bf7987f92dc28122c489575c50a"},
-    {file = "dm_cli-1.7.1-py3-none-any.whl", hash = "sha256:7c94003de89b70bcaf2dab806d0a35f7f21f3c91da507ae8a21ea6010d83b73e"},
-]
-
-[package.dependencies]
-emoji = ">=2.8.0"
-frozendict = ">=2.3.8"
-python-dateutil = ">=2.8.2"
-requests = ">=2.31.0"
-tenacity = ">=8.2.3"
-tqdm = ">=4.66.1"
-typer = {version = ">=0.9.0", extras = ["all"]}
-typing-extensions = ">=4.7.1"
 
 [[package]]
 name = "docker"
@@ -2573,4 +2576,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "05c191d1619bf749a716af0e41364093cfa9806408466cc15ae10f6d3d99fa89"
+content-hash = "7978d418c25d547a518d97b84b9b3069901752e6ef3a6ff26cdcedead856ccf9"
