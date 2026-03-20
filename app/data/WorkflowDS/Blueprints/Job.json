@@ -20,6 +20,12 @@
       "optional": true
     },
     {
+      "name": "description",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "string",
+      "optional": true
+    },    
+    {
       "name": "label",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
