@@ -11,27 +11,27 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.13"
-redis = "^7.2.1"
+redis = "^7.4.0"
 APScheduler = "^3.11.2"
 docker = "^7.1.0"
-fastapi = "^0.135.1"
-uvicorn = "^0.41.0"
+fastapi = "^0.135.3"
+uvicorn = "^0.44.0"
 azure-mgmt-containerinstance = "^10.1.0"
 azure-mgmt-resource = "^25.0.0"
-azure-identity = "^1.25.2"
+azure-identity = "^1.25.3"
 development-framework-cli = "^1.7.3"
 azure-monitor-opentelemetry = "^1.8.6"
 opentelemetry-instrumentation-fastapi = "0.60b0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^9.0.2"
+pytest = "^9.0.3"
 pre-commit = "^4.5.1"
 flake8 = "^7.3.0"
 bandit = "^1.9.4"
-black = "^26.1.0"
+black = "^26.3.1"
 types-redis = "^4.6.0.20241004"
 httpx = "^0.28.1"
-icecream = "^2.1.10"
+icecream = "^2.2.0"
 
 [tool.isort]
 profile = "black"
