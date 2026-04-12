@@ -7,7 +7,7 @@ from dmss_api.apis import DefaultApi
 from middleware.store_headers import get_access_key_header, get_auth_header
 
 dmss_api = DefaultApi()
-dmss_api.api_client.configuration.host = Config.DMSS_API
+dmss_api.api_client.configuration.host = Config.DMSS_URL
 
 
 def get_access_token() -> str:
@@ -30,7 +30,7 @@ def get_document(reference: str, depth: int = 0, token: str | None = None) -> di
 
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or ""}
     params = {"depth": depth}
-    req = requests.get(f"{Config.DMSS_API}/api/documents/{reference}", params=params, headers=headers, timeout=10)
+    req = requests.get(f"{Config.DMSS_URL}/api/documents/{reference}", params=params, headers=headers, timeout=10)
     req.raise_for_status()
 
     return req.json()  # type: ignore
@@ -39,7 +39,7 @@ def get_document(reference: str, depth: int = 0, token: str | None = None) -> di
 def update_document(reference: str, document_json: str, token: str | None = None) -> dict:
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or ""}
     req = requests.put(
-        f"{Config.DMSS_API}/api/documents/{reference}",
+        f"{Config.DMSS_URL}/api/documents/{reference}",
         data={"data": document_json},
         headers=headers,
         timeout=10,
@@ -52,7 +52,7 @@ def add_document(reference: str, document: dict, token: str | None = None) -> di
     headers = {"Authorization": f"Bearer {token or get_access_token()}", "Access-Key": token or ""}
     # form_data = {k: json.dumps(v) if isinstance(v, dict) else str(v) for k, v in document.items()}
     req = requests.post(
-        f"{Config.DMSS_API}/api/documents/{reference}",
+        f"{Config.DMSS_URL}/api/documents/{reference}",
         data={"document": json.dumps(document)},
         headers=headers,
         timeout=10,

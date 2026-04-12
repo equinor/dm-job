@@ -33,7 +33,7 @@ services:
       SCHEDULER_REDIS_PASSWORD: maf
       SCHEDULER_REDIS_PORT: 6379
       SCHEDULER_REDIS_SSL: "false"
-      DMSS_API: http://dmss:5000
+      DMSS_URL: http://dmss:5000
     depends_on:
       - redis
     ports:

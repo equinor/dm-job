@@ -5,13 +5,18 @@ class Config:
     LOGGER_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
     ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
     AUTH_ENABLED = bool(int(os.getenv("AUTH_ENABLED", "1")))
-    DMSS_API = os.getenv("DMSS_API", "http://dmss:5000")
-    JOB_API_URL = os.getenv("JOB_API_URL", "http://job-api:5000")
+    DMSS_URL = os.getenv("DMSS_URL", "http://dmss:5000")
+    DM_JOB_URL = os.getenv("DM_JOB_URL", "http://job-api:5000")
 
     # Azure stuff
     # Where to run jobs in Azure
     AZURE_JOB_SUBSCRIPTION = os.getenv("AZURE_JOB_SUBSCRIPTION")
     AZURE_JOB_RESOURCE_GROUP = os.getenv("AZURE_JOB_RESOURCE_GROUP")
+    AZURE_JOB_RESOURCE_GROUP = "common"
+
+    IMAGE_REGISTRY_USERNAME = os.getenv("IMAGE_REGISTRY_USERNAME")
+    IMAGE_REGISTRY_PASSWORD = os.getenv("IMAGE_REGISTRY_PASSWORD")
+
     # Which ServicePrincipal to authenticate with
     AZURE_JOB_SP_SECRET = os.getenv("AZURE_SP_SECRET")
     AZURE_JOB_SP_CLIENT_ID = os.getenv("AZURE_JOB_CLIENT_ID")
