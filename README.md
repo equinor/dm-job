@@ -20,7 +20,7 @@ The `dm-job-api` service could then be defined like this;
       SCHEDULER_REDIS_HOST: job-store
       SCHEDULER_REDIS_PORT: 6379
       SCHEDULER_REDIS_SSL: "false"
-      DMSS_API: http://dmss:5000
+      DMSS_URL: http://dmss:5000
       AZURE_JOB_SUBSCRIPTION: 14d57366-b2ae-4da8-8b75-e273c6fdabe2
       AZURE_JOB_RESOURCE_GROUP: dmt-test-containers
       AZURE_SP_SECRET: ${AZURE_SP_SECRET}

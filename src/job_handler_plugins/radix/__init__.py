@@ -34,9 +34,9 @@ class JobHandler(JobHandlerInterface):
                 f"Malformed environment variable received by job handler of type {_SUPPORTED_TYPE}. Should be on the format <key>=<value> (location: {self.job.dmss_id})"
             )
         payload["DMSS_TOKEN"] = self.job.token
-        payload["DMSS_URL"] = config.DMSS_API
-        payload["JOB_API_URL"] = config.JOB_API_URL
-        payload["DMSS_ID"] = self.job.dmss_id
+        payload["DMSS_URL"] = config.DMSS_URL
+        payload["DM_JOB_URL"] = config.DM_JOB_URL
+        payload["JOB_DMSS_ID"] = self.job.dmss_id
         result = requests.post(
             _get_job_url(self.job),
             json={"payload": json.dumps(payload)},
