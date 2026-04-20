@@ -12,10 +12,10 @@ from azure.mgmt.containerinstance.models import (
     ContainerGroup,
     ContainerGroupRestartPolicy,
     EnvironmentVariable,
+    ImageRegistryCredential,
     OperatingSystemTypes,
     ResourceRequests,
     ResourceRequirements,
-    ImageRegistryCredential
 )
 
 from config import config
@@ -86,9 +86,7 @@ class JobHandler(JobHandlerInterface):
             + f"Image: '{full_image_name}'\n\t"
             + "RegistryUsername: 'None'"
         )
-        command_list = [
-            "/app/main/start.sh"
-        ]
+        command_list = ["/app/main/start.sh"]
         if reference_target:
             command_list.append(f"--reference-target={reference_target}")
         compute_resources = ResourceRequests(memory_in_gb=1.5, cpu=1.0)
@@ -99,9 +97,11 @@ class JobHandler(JobHandlerInterface):
             command=command_list,
             environment_variables=env_vars,
         )
-        image_registry_credential = ImageRegistryCredential(server=runner_entity["image"]["registryName"], 
-                                                            username=config.IMAGE_REGISTRY_USERNAME, 
-                                                            password=config.IMAGE_REGISTRY_PASSWORD)
+        image_registry_credential = ImageRegistryCredential(
+            server=runner_entity["image"]["registryName"],
+            username=config.IMAGE_REGISTRY_USERNAME,
+            password=config.IMAGE_REGISTRY_PASSWORD,
+        )
 
         # Configure the container group
         group = ContainerGroup(
@@ -124,7 +124,7 @@ class JobHandler(JobHandlerInterface):
         result.result()  # This blocks until the operation completes
 
         # Poll until the container is actually running or has terminated
-        max_wait_seconds = 120*5
+        max_wait_seconds = 120 * 5
         poll_interval = 5
         waited = 0
         while waited < max_wait_seconds:
@@ -146,7 +146,7 @@ class JobHandler(JobHandlerInterface):
                 # Handle ContainerGroupDeploymentNotReady and similar errors
                 if "ContainerGroupDeploymentNotReady" in str(e) or "not ready" in str(e).lower():
                     logger.info(f"Container group not ready yet: {e.message}")
-                    print(f"Container group not ready yet, waiting...")
+                    print("Container group not ready yet, waiting...")
                 else:
                     raise  # Re-raise if it's a different error
             sleep(poll_interval)
@@ -155,7 +155,6 @@ class JobHandler(JobHandlerInterface):
         logger.info("*** Azure container job started successfully ***")
         print("*** Azure container job started successfully ***")
 
-    
         return "Azure container started"
 
     def remove(self) -> Tuple[JobStatus, str]:

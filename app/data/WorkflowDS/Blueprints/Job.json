@@ -24,7 +24,7 @@
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
       "optional": true
-    },    
+    },
     {
       "name": "label",
       "type": "CORE:BlueprintAttribute",
