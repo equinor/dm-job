@@ -28,6 +28,7 @@ logging.getLogger("azure").setLevel(logging.WARNING)
 
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/AzureContainer"
 
+#Interface for Azure
 
 class JobHandler(JobHandlerInterface):
     """
