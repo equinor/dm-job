@@ -11,8 +11,7 @@ class Config:
     # Azure stuff
     # Where to run jobs in Azure
     AZURE_JOB_SUBSCRIPTION = os.getenv("AZURE_JOB_SUBSCRIPTION")
-    AZURE_JOB_RESOURCE_GROUP = os.getenv("AZURE_JOB_RESOURCE_GROUP")
-    AZURE_JOB_RESOURCE_GROUP = "common"
+    AZURE_JOB_RESOURCE_GROUP = os.getenv("AZURE_JOB_RESOURCE_GROUP", "common")
 
     IMAGE_REGISTRY_USERNAME = os.getenv("IMAGE_REGISTRY_USERNAME")
     IMAGE_REGISTRY_PASSWORD = os.getenv("IMAGE_REGISTRY_PASSWORD")
