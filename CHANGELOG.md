@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.7](https://github.com/equinor/dm-job/compare/v1.6.6...v1.6.7) (2026-04-20)
+
+
+### Bug Fixes
+
+* adding description to Job Blueprint. ([c3eae9d](https://github.com/equinor/dm-job/commit/c3eae9dcca46028ce012fd66d7fa5b90c6a4b200))
+* clean up env variables, fix azure container instances runner ([caa4f9b](https://github.com/equinor/dm-job/commit/caa4f9bab96a22ec369dcf92e4b2d5fce09a7630))
+* pre-commit ([c4ce480](https://github.com/equinor/dm-job/commit/c4ce480a64ae050dccb3510a97ea69f83e624a44))
+
 ## [1.6.6](https://github.com/equinor/dm-job/compare/v1.6.5...v1.6.6) (2026-03-06)
 
 
