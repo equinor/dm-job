@@ -16,7 +16,6 @@ from azure.mgmt.containerinstance.models import (
     OperatingSystemTypes,
     ResourceRequests,
     ResourceRequirements,
-    ImageRegistryCredential
 )
 
 from config import config
