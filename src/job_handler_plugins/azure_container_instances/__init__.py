@@ -28,7 +28,8 @@ logging.getLogger("azure").setLevel(logging.WARNING)
 
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/AzureContainer"
 
-#Interface for Azure
+# Interface for Azure
+
 
 class JobHandler(JobHandlerInterface):
     """
@@ -76,8 +77,10 @@ class JobHandler(JobHandlerInterface):
                 key, value = env_string.split("=", 1)
             else:
                 key = env_string
-                if not key in os.environ:
-                    logger.warning(f"Environment variable '{key}' specified in job runner but not found in environment. Skipping.")
+                if key not in os.environ:
+                    logger.warning(
+                        f"Environment variable '{key}' specified in job runner but not found in environment. Skipping."
+                    )
                     continue
                 value = os.getenv(key)
             env_vars.append(EnvironmentVariable(name=key, value=value))
