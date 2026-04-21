@@ -71,8 +71,15 @@ class JobHandler(JobHandlerInterface):
         # Parse env-vars from job entity
         print("*****  Injecting env vars from job entity *****")
         for env_string in self.job.runner.get("environmentVariables", []):
-            key = env_string
-            env_vars.append(EnvironmentVariable(name=key, value=os.getenv(env_string)))
+            if "=" in env_string:
+                key, value = env_string.split("=", 1)
+            else:
+                key = env_string
+                if not key in os.environ:
+                    logger.warning(f"Environment variable '{key}' specified in job runner but not found in environment. Skipping.")
+                    continue
+                value = os.getenv(key)
+            env_vars.append(EnvironmentVariable(name=key, value=value))
 
         reference_target: str = self.job.referenceTarget
         runner_entity: dict = self.job.runner
