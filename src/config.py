@@ -7,8 +7,10 @@ class Config:
     AUTH_ENABLED = bool(int(os.getenv("AUTH_ENABLED", "1")))
     DMSS_URL = os.getenv("DMSS_URL", "http://dmss:5000")
     DM_JOB_URL = os.getenv("DM_JOB_URL", "http://job-api:5000")
+    #for Azure Container Instance where global addresses of DMSS and DM_JOB are needed
+    GLOBAL_DMSS_URL = os.getenv("GLOBAL_DMSS_URL", "")
+    GLOBAL_DM_JOB_URL = os.getenv("GLOBAL_DM_JOB_URL", "")    # Azure stuff
 
-    # Azure stuff
     # Where to run jobs in Azure
     AZURE_JOB_SUBSCRIPTION = os.getenv("AZURE_JOB_SUBSCRIPTION")
     AZURE_JOB_RESOURCE_GROUP = os.getenv("AZURE_JOB_RESOURCE_GROUP", "common")
