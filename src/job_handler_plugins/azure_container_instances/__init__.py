@@ -66,6 +66,7 @@ class JobHandler(JobHandlerInterface):
 
         env_vars.append(EnvironmentVariable(name="DMSS_TOKEN", value=self.job.token))
         env_vars.append(EnvironmentVariable(name="DMSS_URL", value=config.DMSS_URL))
+        env_vars.append(EnvironmentVariable(name="DM_JOB_URL", value=config.DM_JOB_URL))
         env_vars.append(EnvironmentVariable(name="JOB_DMSS_ID", value=self.job.dmss_id))
 
         # Parse env-vars from job entity
