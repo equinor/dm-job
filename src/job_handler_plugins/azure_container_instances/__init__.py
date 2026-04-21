@@ -28,6 +28,8 @@ logging.getLogger("azure").setLevel(logging.WARNING)
 
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/AzureContainer"
 
+# Interface for Azure
+
 
 class JobHandler(JobHandlerInterface):
     """
@@ -64,14 +66,24 @@ class JobHandler(JobHandlerInterface):
         ]
 
         env_vars.append(EnvironmentVariable(name="DMSS_TOKEN", value=self.job.token))
-        env_vars.append(EnvironmentVariable(name="DMSS_URL", value=config.DMSS_URL))
+        env_vars.append(EnvironmentVariable(name="DMSS_URL", value=config.GLOBAL_DMSS_URL))
+        env_vars.append(EnvironmentVariable(name="DM_JOB_URL", value=config.GLOBAL_DM_JOB_URL))
         env_vars.append(EnvironmentVariable(name="JOB_DMSS_ID", value=self.job.dmss_id))
 
         # Parse env-vars from job entity
         print("*****  Injecting env vars from job entity *****")
         for env_string in self.job.runner.get("environmentVariables", []):
-            key = env_string
-            env_vars.append(EnvironmentVariable(name=key, value=os.getenv(env_string)))
+            if "=" in env_string:
+                key, value = env_string.split("=", 1)
+            else:
+                key = env_string
+                if key not in os.environ:
+                    logger.warning(
+                        f"Environment variable '{key}' specified in job runner but not found in environment. Skipping."
+                    )
+                    continue
+                value = os.getenv(key)
+            env_vars.append(EnvironmentVariable(name=key, value=value))
 
         reference_target: str = self.job.referenceTarget
         runner_entity: dict = self.job.runner
