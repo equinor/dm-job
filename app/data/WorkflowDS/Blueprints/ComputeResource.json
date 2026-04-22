@@ -1,0 +1,23 @@
+{
+  "name": "ComputeResource",
+  "type": "CORE:Blueprint",
+  "description": "computing resources required to run a job",
+  "extends": [
+    "CORE:Entity"
+  ],
+  "attributes": [
+    {
+      "name": "memory",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "double",
+      "description": "memory in GB",
+      "optional": true
+    },
+    {
+      "name": "cpu",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "double",
+      "optional": true
+    }
+  ]
+}
