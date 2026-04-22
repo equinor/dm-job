@@ -9,14 +9,14 @@
     {
       "name": "memory",
       "type": "CORE:BlueprintAttribute",
-      "attributeType": "double",
+      "attributeType": "number",
       "description": "memory in GB",
       "optional": true
     },
     {
       "name": "cpu",
       "type": "CORE:BlueprintAttribute",
-      "attributeType": "double",
+      "attributeType": "number",
       "optional": true
     }
   ]
