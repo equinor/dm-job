@@ -18,6 +18,12 @@
       "attributeType": "ContainerImage"
     },
     {
+      "name": "computeResource",
+      "type": "CORE:BlueprintAttribute",
+      "attributeType": "ComputeResource",
+      "optional": true
+    },
+    {
       "name": "customCommand",
       "type": "CORE:BlueprintAttribute",
       "attributeType": "string",
