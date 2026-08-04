@@ -1,6 +1,6 @@
 [project]
 name = "dm-job"
-version = "1.6.6"  # x-release-please-version
+version = "1.6.8"  # x-release-please-version
 description = "REST API running jobs in development framework"
 authors = [ {name = "Equinor", email = "fg_team_hermes@equinor.com"}]
 license = { text = "MIT" }
@@ -28,7 +28,7 @@ pytest = "^9.0.3"
 pre-commit = "^4.5.1"
 flake8 = "^7.3.0"
 bandit = "^1.9.4"
-black = "^26.1.0"
+black = "^26.3.1"
 types-redis = "^4.6.0.20241004"
 httpx = "^0.28.1"
 icecream = "^2.1.10"

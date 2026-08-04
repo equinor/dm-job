@@ -7,14 +7,14 @@ ENVIRON=${ENVIRONMENT:="production"}
 service_is_ready() {
   ATTEMPT_COUNTER=1
   MAX_ATTEMPTS=100
-  echo "Testing availability of DMSS: $DMSS_API"
-  until $(curl --silent --output /dev/null --fail "$DMSS_API/api/healthcheck"); do
+  echo "Testing availability of DMSS: $DMSS_URL"
+  until $(curl --silent --output /dev/null --fail "$DMSS_URL/api/healthcheck"); do
     if [ ${ATTEMPT_COUNTER} -eq ${MAX_ATTEMPTS} ];then
-      echo "ERROR: Max attempts reached. Data Modelling Storage API($DMSS_API) did not respond. Exiting..."
+      echo "ERROR: Max attempts reached. Data Modelling Storage API($DMSS_URL) did not respond. Exiting..."
       exit 1
     fi
 
-    echo "Waiting for $DMSS_API... (${ATTEMPT_COUNTER})"
+    echo "Waiting for $DMSS_URL... (${ATTEMPT_COUNTER})"
     ATTEMPT_COUNTER=$((ATTEMPT_COUNTER+1))
     sleep 5
   done

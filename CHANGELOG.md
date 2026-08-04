@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.6.8](https://github.com/equinor/dm-job/compare/v1.6.7...v1.6.8) (2026-04-21)
+
+
+### Bug Fixes
+
+* adding dm_job_url to env variables of azure CI ([9f7e1b5](https://github.com/equinor/dm-job/commit/9f7e1b5da6ff21988a866e2157720d3988a11c34))
+* adding global addresses for dmss and dm_job so Azure CI can reach the services ([f9c0820](https://github.com/equinor/dm-job/commit/f9c0820eca41ebd242b4ebba1edcc2a825d5a976))
+* checking env variables before importing them. allow for direct definition of envs inside the runner ([b6f663b](https://github.com/equinor/dm-job/commit/b6f663b1df44add7ec44e5dff283f40f90782dd9))
+* pre-commit ([4b891ad](https://github.com/equinor/dm-job/commit/4b891ad71c81e345ad3cdebc5a2d598e035b9a36))
+
+## [1.6.7](https://github.com/equinor/dm-job/compare/v1.6.6...v1.6.7) (2026-04-20)
+
+
+### Bug Fixes
+
+* adding description to Job Blueprint. ([c3eae9d](https://github.com/equinor/dm-job/commit/c3eae9dcca46028ce012fd66d7fa5b90c6a4b200))
+* clean up env variables, fix azure container instances runner ([caa4f9b](https://github.com/equinor/dm-job/commit/caa4f9bab96a22ec369dcf92e4b2d5fce09a7630))
+* pre-commit ([c4ce480](https://github.com/equinor/dm-job/commit/c4ce480a64ae050dccb3510a97ea69f83e624a44))
+
 ## [1.6.6](https://github.com/equinor/dm-job/compare/v1.6.5...v1.6.6) (2026-03-06)
 
 

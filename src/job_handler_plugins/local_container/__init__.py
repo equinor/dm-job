@@ -46,9 +46,9 @@ class JobHandler(JobHandlerInterface):
         custom_command = self.job.runner.get("customCommands")
         envs = envs + runner_entity.get("environmentVariables", [])
         envs.append(f"DMSS_TOKEN={self.job.token}")
-        envs.append(f"DMSS_ID={self.job.dmss_id}")
-        envs.append(f"DMSS_URL={config.DMSS_API}")
-        envs.append(f"JOB_API_URL={config.JOB_API_URL}")
+        envs.append(f"JOB_DMSS_ID={self.job.dmss_id}")
+        envs.append(f"DMSS_URL={config.DMSS_URL}")
+        envs.append(f"DM_JOB_URL={config.DM_JOB_URL}")
 
         try:
             self.client.containers.run(
