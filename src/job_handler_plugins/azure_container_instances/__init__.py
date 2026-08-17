@@ -4,7 +4,7 @@ from collections import namedtuple
 from time import sleep
 from typing import Tuple
 
-from azure.core.exceptions import HttpResponseError, ResourceNotFoundError
+from azure.core.exceptions import ClientAuthenticationError, HttpResponseError, ResourceNotFoundError
 from azure.identity import ClientSecretCredential
 from azure.mgmt.containerinstance import ContainerInstanceManagementClient
 from azure.mgmt.containerinstance.models import (
@@ -28,6 +28,43 @@ logging.getLogger("azure").setLevel(logging.WARNING)
 
 _SUPPORTED_TYPE = "dmss://WorkflowDS/Blueprints/AzureContainer"
 
+# Settings that must be present on job-api for this handler to run.
+# Only enforced when an AzureContainer job is actually submitted, so deployments
+# that use other backends (Radix, LocalContainer, ...) do not need Azure secrets.
+_REQUIRED_CONFIG = (
+    "AZURE_JOB_SP_CLIENT_ID",
+    "AZURE_JOB_SP_SECRET",
+    "AZURE_JOB_SP_TENANT_ID",
+    "AZURE_JOB_SUBSCRIPTION",
+    "AZURE_JOB_RESOURCE_GROUP",
+    "IMAGE_REGISTRY_USERNAME",
+    "IMAGE_REGISTRY_PASSWORD",
+)
+
+
+class AzureHandlerConfigError(RuntimeError):
+    """Missing or invalid Azure configuration.
+
+    Only raised when an AzureContainer job is actually acted on. Other job
+    handlers are unaffected, so a deployment that never uses this backend can
+    run without any Azure secrets being set.
+    """
+
+
+class AzureHandlerAuthError(RuntimeError):
+    """Azure credentials are present but rejected by AAD (expired secret, etc.)."""
+
+
+def _check_required_config() -> None:
+    missing = [name for name in _REQUIRED_CONFIG if not getattr(config, name, None)]
+    if missing:
+        raise AzureHandlerConfigError(
+            "The Azure Container Instances handler cannot service this job because "
+            f"job-api is missing required settings: {', '.join(missing)}. "
+            "Set them as Radix secrets on the job-api component and redeploy. "
+            "Other job handlers are unaffected."
+        )
+
 # Interface for Azure
 
 
@@ -39,17 +76,39 @@ class JobHandler(JobHandlerInterface):
 
     def __init__(self, job, data_source: str):
         super().__init__(job, data_source)
-        logger.setLevel(logging.WARNING)  # I could not find the correctly named logger for this...
-        azure_credentials = ClientSecretCredential(
-            client_id=config.AZURE_JOB_SP_CLIENT_ID,
-            client_secret=config.AZURE_JOB_SP_SECRET,
-            tenant_id=config.AZURE_JOB_SP_TENANT_ID,
+        # No config access or SDK construction here. This constructor runs
+        # whenever the dispatcher touches a job whose runner.type happens to be
+        # 'AzureContainer' - including status polls for completed jobs - and
+        # would otherwise crash deployments that only use other backends.
+        self.azure_valid_container_name = (
+            self.job.runner["name"].lower().replace(".", "-").replace("_", "-")
         )
-        self.azure_valid_container_name = self.job.runner["name"].lower().replace(".", "-").replace("_", "-")
-        self.aci_client = ContainerInstanceManagementClient(
-            azure_credentials, subscription_id=config.AZURE_JOB_SUBSCRIPTION
-        )
-        logger.setLevel(config.LOGGER_LEVEL)
+        self._aci_client: ContainerInstanceManagementClient | None = None
+
+    @property
+    def aci_client(self) -> ContainerInstanceManagementClient:
+        """ContainerInstanceManagementClient built on first use.
+
+        Config validation and credential construction are deferred until an
+        Azure operation is actually needed, so a job-api without Azure secrets
+        can still service Radix/LocalContainer jobs.
+        """
+        if self._aci_client is None:
+            _check_required_config()
+            try:
+                credentials = ClientSecretCredential(
+                    client_id=config.AZURE_JOB_SP_CLIENT_ID,
+                    client_secret=config.AZURE_JOB_SP_SECRET,
+                    tenant_id=config.AZURE_JOB_SP_TENANT_ID,
+                )
+            except ValueError as exc:  # e.g. tenant_id not a valid GUID
+                raise AzureHandlerConfigError(
+                    f"Invalid Azure credential configuration: {exc}"
+                ) from exc
+            self._aci_client = ContainerInstanceManagementClient(
+                credentials, subscription_id=config.AZURE_JOB_SUBSCRIPTION
+            )
+        return self._aci_client
 
     def teardown_service(self, service_id: str) -> str:
         raise NotImplementedError
@@ -88,7 +147,10 @@ class JobHandler(JobHandlerInterface):
         reference_target: str = self.job.referenceTarget
         runner_entity: dict = self.job.runner
         if not runner_entity["image"]["registryName"]:
-            raise ValueError("Container image in job runner")
+            raise ValueError(
+                "Runner entity is missing 'image.registryName'. "
+                f"(runner: {runner_entity.get('name', '<unknown>')})"
+            )
         full_image_name: str = (
             f"{runner_entity['image']['registryName']}/{runner_entity['image']['imageName']}"
             + f":{runner_entity['image']['version']}"
@@ -148,15 +210,25 @@ class JobHandler(JobHandlerInterface):
         )
 
         # Create the container group
-        result = self.aci_client.container_groups.begin_create_or_update(
-            config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name, group
-        )
+        try:
+            result = self.aci_client.container_groups.begin_create_or_update(
+                config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name, group
+            )
 
-        # Wait for the container group to be created and running
-        # The begin_create_or_update() returns an LROPoller, we need to wait for it to complete
-        logger.info("Waiting for Azure container group to be provisioned...")
-        print("Waiting for Azure container group to be provisioned...")
-        result.result()  # This blocks until the operation completes
+            # Wait for the container group to be created and running
+            # The begin_create_or_update() returns an LROPoller, we need to wait for it to complete
+            logger.info("Waiting for Azure container group to be provisioned...")
+            print("Waiting for Azure container group to be provisioned...")
+            result.result()  # This blocks until the operation completes
+        except ClientAuthenticationError as exc:
+            # AADSTS7000215 (invalid secret), 7000222 (expired secret),
+            # 700016 (unknown app), etc. Surface as a distinct exception so the
+            # FastAPI boundary can return 502 instead of a bare 500.
+            raise AzureHandlerAuthError(
+                "Azure rejected the service principal credentials while starting "
+                "the container group. The secret is most likely invalid or expired "
+                f"(check the Radix job-api secrets). AAD detail: {exc.message}"
+            ) from exc
 
         # Poll until the container is actually running or has terminated
         max_wait_seconds = 120 * 5
