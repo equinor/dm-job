@@ -17,6 +17,13 @@
       "type": "CORE:BlueprintAttribute",
       "description": "The schedulerPort defined in the radixconfig.yaml file",
       "attributeType": "string"
+    },
+    {
+      "name": "imageTagName",
+      "type": "CORE:BlueprintAttribute",
+      "description": "Overrides the {imageTagName} placeholder in the Radix component's image tag. If omitted, the default declared in radixconfig.yaml is used.",
+      "attributeType": "string",
+      "optional": true
     }
   ]
 }
