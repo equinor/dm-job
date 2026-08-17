@@ -339,4 +339,16 @@ class JobHandler(JobHandlerInterface):
                 job_status = JobStatus.FAILED
             case ("Waiting", None):  # noqa
                 job_status = JobStatus.STARTING
+            case ("Succeeded", _):  # noqa - ACI provisioning succeeded, container not yet Running
+                job_status = JobStatus.STARTING
+            case ("Pending", _):  # noqa
+                job_status = JobStatus.STARTING
+            case ("Failed", _) | ("Canceled", _):  # noqa - ACI-side failures (image pull, quota, ...)
+                job_status = JobStatus.FAILED
+            case _:  # noqa - any state we haven't mapped
+                logger.warning(
+                    f"Unmapped ACI container state for job '{self.job.job_uid}': "
+                    f"status='{status}', exit_code={exit_code}"
+                )
+                job_status = JobStatus.UNKNOWN
         return job_status, logs, self.job.percentage
