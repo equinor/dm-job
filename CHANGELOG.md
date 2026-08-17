@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.8.0](https://github.com/equinor/dm-job/compare/v1.7.0...v1.8.0) (2026-08-17)
+
+
+### Features
+
+* **azure:** FastAPI handlers map Azure errors to 502/503 ([2773f73](https://github.com/equinor/dm-job/commit/2773f7386f3bde5fa8d27e2ee8522e04185f7bc8))
+* **azure:** local GUID validation in _check_required_config ([cbac430](https://github.com/equinor/dm-job/commit/cbac4307d2402a693f3a1d81f4761e6ed13c0fdf))
+* **azure:** typed AzureHandlerProvisionError for non-auth ARM failures ([e1c4140](https://github.com/equinor/dm-job/commit/e1c4140c74a174300a1a5af2967cbd2fdf40bdd7))
+
+
+### Bug Fixes
+
+* **azure:** clamp compute resources instead of silently defaulting ([12d3c1c](https://github.com/equinor/dm-job/commit/12d3c1ca0b0b36b0e61a31e4794236bf712301ea))
+* **azure:** cover all ACI container states in progress() match ([30c7aef](https://github.com/equinor/dm-job/commit/30c7aeffebb92348d2255cdbfdf392b380690625))
+* **azure:** proper error/status handling in remove() ([7291ba2](https://github.com/equinor/dm-job/commit/7291ba23f38c0b8dc6b01664b116ec9622db59ce))
+* **azure:** raise TimeoutError when start() poll never reaches Running ([9ff7717](https://github.com/equinor/dm-job/commit/9ff7717fa9dcd7d73279ed31f3a1950f3691beab))
+* **azure:** treat negative container exit codes as FAILED ([c221792](https://github.com/equinor/dm-job/commit/c2217927aaa2062ffdd6bd9599f450edeb93dfb1))
+
+
+### Performance Improvements
+
+* **azure:** single ARM fetch in progress(), skip logs until useful ([b43d16d](https://github.com/equinor/dm-job/commit/b43d16d9499d1af484994cef662cc47203beb390))
+
+
+### Miscellaneous Chores
+
+* **main:** release 1.7.0 ([19d8ce5](https://github.com/equinor/dm-job/commit/19d8ce5f452d790096420a87552917da6d5bf69d))
+* nudge github merge check ([9122cbb](https://github.com/equinor/dm-job/commit/9122cbba21d81f71cba9da3f93a898cc569e8238))
+
+
+### Code Refactoring
+
+* **azure:** drop print() duplicates of logger calls ([2a52082](https://github.com/equinor/dm-job/commit/2a520823905ebc03bce8b2fea4ace5bb1fd9ea36))
+* **azure:** drop racy logger.setLevel toggles ([7610d3e](https://github.com/equinor/dm-job/commit/7610d3ee99e36e5a0fbb73aa6537773bdba77bb8))
+* **azure:** lazy credential init + typed auth/config errors ([51ccd5a](https://github.com/equinor/dm-job/commit/51ccd5a6c7fc2cf8657b31c29dd1347071bd53f8))
+* **azure:** structured job_uid logging via LoggerAdapter ([7fca842](https://github.com/equinor/dm-job/commit/7fca842a4561ea47a650529329836af2ad73561b))
+
 ## [1.7.0](https://github.com/equinor/dm-job/compare/v1.6.9...v1.7.0) (2026-08-17)
 
 
