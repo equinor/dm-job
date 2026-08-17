@@ -265,11 +265,9 @@ class JobHandler(JobHandlerInterface):
         return "Azure container started"
 
     def remove(self) -> Tuple[JobStatus, str]:
-        logger.setLevel(logging.WARNING)
         operation = self.aci_client.container_groups.begin_delete(
             config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name
         )
-        logger.setLevel(config.LOGGER_LEVEL)
         status = operation.status()
         for i in range(4):
             status = operation.status()
@@ -287,11 +285,9 @@ class JobHandler(JobHandlerInterface):
             # If setup fails, the container is not started
             return self.job.status, self.job.log, self.job.percentage
         try:
-            logger.setLevel(logging.WARNING)
             logs = self.aci_client.containers.list_logs(
                 config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name, self.azure_valid_container_name
             ).content
-            logger.setLevel(config.LOGGER_LEVEL)
         except ResourceNotFoundError:
             raise NotFoundException(
                 f"The container '{self.azure_valid_container_name}' does not exist. "
