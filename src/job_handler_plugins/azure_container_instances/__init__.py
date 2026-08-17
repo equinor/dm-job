@@ -101,6 +101,17 @@ def _check_required_config() -> None:
             f"{', '.join(bad_guids)}. Fix the job-api secrets and redeploy."
         )
 
+
+class _JobLoggerAdapter(logging.LoggerAdapter):
+    """LoggerAdapter that prepends '[job_uid=<uid>]' to every message.
+
+    Callers can log without repeating self.job.job_uid in every f-string,
+    and log aggregators can group by the prefix.
+    """
+
+    def process(self, msg, kwargs):
+        return f"[job_uid={self.extra['job_uid']}] {msg}", kwargs
+
 # Interface for Azure
 
 
@@ -120,6 +131,7 @@ class JobHandler(JobHandlerInterface):
             self.job.runner["name"].lower().replace(".", "-").replace("_", "-")
         )
         self._aci_client: ContainerInstanceManagementClient | None = None
+        self._log = _JobLoggerAdapter(logger, {"job_uid": self.job.job_uid})
 
     @property
     def aci_client(self) -> ContainerInstanceManagementClient:
@@ -153,7 +165,7 @@ class JobHandler(JobHandlerInterface):
         raise NotImplementedError
 
     def start(self) -> str:
-        logger.info(f"JobName: '{self.job.job_uid}'. Starting Azure Container job...")
+        self._log.info("Starting Azure Container job...")
 
         # Add env-vars from deployment first
         env_vars: list[EnvironmentVariable] = [
@@ -211,10 +223,10 @@ class JobHandler(JobHandlerInterface):
             memory_in_gb = max(_MEM_MIN, min(_MEM_MAX, float(requested_memory)))
             cpu = max(_CPU_MIN, min(_CPU_MAX, float(requested_cpu)))
             if memory_in_gb != requested_memory or cpu != requested_cpu:
-                logger.warning(
-                    f"Job '{self.job.job_uid}': requested compute resources "
-                    f"(cpu={requested_cpu}, memory={requested_memory} GB) "
-                    f"clamped to ACI limits (cpu={cpu}, memory={memory_in_gb} GB)."
+                self._log.warning(
+                    f"Requested compute resources (cpu={requested_cpu}, "
+                    f"memory={requested_memory} GB) clamped to ACI limits "
+                    f"(cpu={cpu}, memory={memory_in_gb} GB)."
                 )
 
         command_list = ["/app/main/start.sh"]
@@ -267,8 +279,8 @@ class JobHandler(JobHandlerInterface):
             # name collisions, etc. Carry status/error codes for the API layer.
             error_code = getattr(getattr(exc, "error", None), "code", None)
             raise AzureHandlerProvisionError(
-                f"Azure rejected the container-group provisioning request for job "
-                f"'{self.job.job_uid}' (container '{self.azure_valid_container_name}'). "
+                f"Azure rejected the container-group provisioning request "
+                f"(container '{self.azure_valid_container_name}'). "
                 f"ARM status={exc.status_code}, code={error_code}: {exc.message}",
                 status_code=exc.status_code,
                 error_code=error_code,
@@ -303,11 +315,11 @@ class JobHandler(JobHandlerInterface):
         else:
             # Loop exited via the while-condition, not via break: we timed out.
             raise TimeoutError(
-                f"Azure container '{self.azure_valid_container_name}' for job "
-                f"'{self.job.job_uid}' did not reach Running/Terminated within "
-                f"{max_wait_seconds}s (last observed state: {container_state!r}). "
-                "The container group has been created but is stuck - inspect ACI "
-                "events (image pull, quota, networking) and remove() when done."
+                f"Azure container '{self.azure_valid_container_name}' did not "
+                f"reach Running/Terminated within {max_wait_seconds}s "
+                f"(last observed state: {container_state!r}). The container "
+                "group has been created but is stuck - inspect ACI events "
+                "(image pull, quota, networking) and remove() when done."
             )
 
         logger.info("*** Azure container job started successfully ***")
@@ -438,9 +450,8 @@ class JobHandler(JobHandlerInterface):
             case ("Failed", _) | ("Canceled", _):  # noqa - ACI-side failures (image pull, quota, ...)
                 job_status = JobStatus.FAILED
             case _:  # noqa - any state we haven't mapped
-                logger.warning(
-                    f"Unmapped ACI container state for job '{self.job.job_uid}': "
-                    f"status='{status}', exit_code={exit_code}"
+                self._log.warning(
+                    f"Unmapped ACI container state: status={status!r}, exit_code={exit_code}"
                 )
                 job_status = JobStatus.UNKNOWN
         return job_status, logs, self.job.percentage
