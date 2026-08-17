@@ -44,7 +44,15 @@ class JobHandler(JobHandlerInterface):
         envs = [f"{e}={os.getenv(e)}" for e in config.SCHEDULER_ENVS_TO_EXPORT if os.getenv(e)]
 
         custom_command = self.job.runner.get("customCommands")
-        envs = envs + runner_entity.get("environmentVariables", [])
+        # 'environmentVariables' on the runner is a list of variable NAMES to look up in
+        # this process's environment. The Azure handler treats it that way; do the same
+        # here so a runner entity can be used unchanged against either handler.
+        # Older runners used 'NAME=value' strings, so those are still passed through.
+        for entry in runner_entity.get("environmentVariables", []):
+            if "=" in entry:
+                envs.append(entry)
+            elif value := os.getenv(entry):
+                envs.append(f"{entry}={value}")
         envs.append(f"DMSS_TOKEN={self.job.token}")
         envs.append(f"JOB_DMSS_ID={self.job.dmss_id}")
         envs.append(f"DMSS_URL={config.DMSS_URL}")
