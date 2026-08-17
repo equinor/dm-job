@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.0](https://github.com/equinor/dm-job/compare/v1.6.9...v1.7.0) (2026-08-17)
+
+
+### Features
+
+* config for selecting resources in azure ci ([2fbf1c7](https://github.com/equinor/dm-job/commit/2fbf1c7b47cd960e741e3f4b8e4c63adeb7ea659))
+* config for selecting resources in azure ci ([695dcd6](https://github.com/equinor/dm-job/commit/695dcd658e6bd2f6abc51e6427cf25551e981c69))
+* config for selecting resources in azure ci ([ee9c5ee](https://github.com/equinor/dm-job/commit/ee9c5ee36b0414d216ee67f3416835b242ed97d2))
+
 ## [1.6.9](https://github.com/equinor/dm-job/compare/v1.6.8...v1.6.9) (2026-08-04)
 
 
