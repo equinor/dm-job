@@ -334,7 +334,8 @@ class JobHandler(JobHandlerInterface):
                 job_status = JobStatus.RUNNING
             case ("Terminated", 0):  # noqa
                 job_status = JobStatus.COMPLETED
-            case ("Terminated", exit_code) if exit_code >= 1:  # noqa
+            case ("Terminated", exit_code) if exit_code is not None and exit_code != 0:  # noqa
+                # Includes negative exit codes (SIGKILL, OOM = -9, SIGSEGV = -11, ...)
                 job_status = JobStatus.FAILED
             case ("Waiting", None):  # noqa
                 job_status = JobStatus.STARTING
