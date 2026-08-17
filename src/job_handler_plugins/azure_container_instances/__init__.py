@@ -100,23 +100,23 @@ class JobHandler(JobHandlerInterface):
         )
         memory_in_gb = 2.0
         cpu = 2.0
-        if 'computeResource' in runner_entity:
-            compute_resource = runner_entity['computeResource']
-            if 'memory' in compute_resource:
-                memory_in_gb = compute_resource['memory']
-            if 'cpu' in compute_resource:
-                cpu = compute_resource['cpu']
+        if "computeResource" in runner_entity:
+            compute_resource = runner_entity["computeResource"]
+            if "memory" in compute_resource:
+                memory_in_gb = compute_resource["memory"]
+            if "cpu" in compute_resource:
+                cpu = compute_resource["cpu"]
             if memory_in_gb < 0.5 or cpu < 0.5:
                 logger.warning(
                     f"Specified compute resources for job '{self.job.job_uid}' are below the minimum of 0.5 CPU and 0.5 GB memory. "
-                    + f"Using default values of 2 CPU and 2 GB memory."
+                    + "Using default values of 2 CPU and 2 GB memory."
                 )
                 memory_in_gb = 2.0
                 cpu = 2.0
-            if memory_in_gb > 16.0 or cpu > 4.0:   
+            if memory_in_gb > 16.0 or cpu > 4.0:
                 logger.warning(
                     f"Specified compute resources for job '{self.job.job_uid}' are above the maximum of 16 CPU and 4 GB memory. "
-                    + f"Using default values of 2 CPU and 2 GB memory."
+                    + "Using default values of 2 CPU and 2 GB memory."
                 )
                 memory_in_gb = 2.0
                 cpu = 2.0
