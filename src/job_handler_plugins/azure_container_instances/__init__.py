@@ -294,19 +294,49 @@ class JobHandler(JobHandlerInterface):
         return "Azure container started"
 
     def remove(self) -> Tuple[JobStatus, str]:
-        operation = self.aci_client.container_groups.begin_delete(
-            config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name
-        )
+        try:
+            operation = self.aci_client.container_groups.begin_delete(
+                config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name
+            )
+        except ResourceNotFoundError:
+            # Idempotent: already gone counts as successfully removed.
+            logger.info(
+                f"Container group '{self.azure_valid_container_name}' already absent; "
+                "treating remove() as completed."
+            )
+            return JobStatus.COMPLETED, "already removed"
+        except ClientAuthenticationError as exc:
+            raise AzureHandlerAuthError(
+                "Azure rejected the service principal credentials during remove(). "
+                f"AAD detail: {exc.message}"
+            ) from exc
+        except HttpResponseError as exc:
+            error_code = getattr(getattr(exc, "error", None), "code", None)
+            raise AzureHandlerProvisionError(
+                f"Azure rejected the container-group delete request "
+                f"(container '{self.azure_valid_container_name}'). "
+                f"ARM status={exc.status_code}, code={error_code}: {exc.message}",
+                status_code=exc.status_code,
+                error_code=error_code,
+            ) from exc
+
+        # Poll deletion status
         status = operation.status()
-        for i in range(4):
+        for _ in range(4):
             status = operation.status()
-            if status == "Succeeded":
+            if status in ("Succeeded", "Failed", "Canceled"):
                 break
             sleep(2)
-        job_status = JobStatus.UNKNOWN
+
         if status == "Succeeded":
-            job_status = JobStatus.COMPLETED
-        return job_status, status
+            return JobStatus.COMPLETED, status
+        if status in ("Failed", "Canceled"):
+            logger.warning(
+                f"Delete of container '{self.azure_valid_container_name}' ended with status={status}"
+            )
+            return JobStatus.FAILED, status
+        # Still InProgress after the polling budget - not an error, just not done.
+        return JobStatus.UNKNOWN, status
 
     def progress(self) -> Tuple[JobStatus, None | list[str] | str, None | float]:
         """Poll progress from the job instance"""
