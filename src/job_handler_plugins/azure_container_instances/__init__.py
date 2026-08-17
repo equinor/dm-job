@@ -55,6 +55,21 @@ class AzureHandlerAuthError(RuntimeError):
     """Azure credentials are present but rejected by AAD (expired secret, etc.)."""
 
 
+class AzureHandlerProvisionError(RuntimeError):
+    """ARM rejected the container-group create/update call.
+
+    Covers quota exhaustion, invalid image references, region capacity,
+    name collisions, and other non-auth ARM failures. Carries the ARM
+    status code and error code so the FastAPI boundary can render a
+    meaningful upstream response.
+    """
+
+    def __init__(self, message: str, status_code: int | None = None, error_code: str | None = None):
+        super().__init__(message)
+        self.status_code = status_code
+        self.error_code = error_code
+
+
 def _check_required_config() -> None:
     missing = [name for name in _REQUIRED_CONFIG if not getattr(config, name, None)]
     if missing:
@@ -225,6 +240,17 @@ class JobHandler(JobHandlerInterface):
                 "Azure rejected the service principal credentials while starting "
                 "the container group. The secret is most likely invalid or expired "
                 f"(check the Radix job-api secrets). AAD detail: {exc.message}"
+            ) from exc
+        except HttpResponseError as exc:
+            # Non-auth ARM failures: quota, invalid image, region capacity,
+            # name collisions, etc. Carry status/error codes for the API layer.
+            error_code = getattr(getattr(exc, "error", None), "code", None)
+            raise AzureHandlerProvisionError(
+                f"Azure rejected the container-group provisioning request for job "
+                f"'{self.job.job_uid}' (container '{self.azure_valid_container_name}'). "
+                f"ARM status={exc.status_code}, code={error_code}: {exc.message}",
+                status_code=exc.status_code,
+                error_code=error_code,
             ) from exc
 
         # Poll until the container is actually running or has terminated
