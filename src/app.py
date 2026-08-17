@@ -42,7 +42,7 @@ def create_app():
     app = FastAPI(
         title="Data Modelling Job API",
         responses=responses,
-        version="1.7.0",  # x-release-please-version
+        version="1.8.0",  # x-release-please-version
         description="REST API used with the Data Modelling framework to schedule jobs",
         exception_handlers={
             RequestValidationError: validation_exception_handler,
