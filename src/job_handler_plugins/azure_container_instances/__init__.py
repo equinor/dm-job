@@ -5,7 +5,11 @@ from collections import namedtuple
 from time import sleep
 from typing import Tuple
 
-from azure.core.exceptions import ClientAuthenticationError, HttpResponseError, ResourceNotFoundError
+from azure.core.exceptions import (
+    ClientAuthenticationError,
+    HttpResponseError,
+    ResourceNotFoundError,
+)
 from azure.identity import ClientSecretCredential
 from azure.mgmt.containerinstance import ContainerInstanceManagementClient
 from azure.mgmt.containerinstance.models import (
@@ -112,6 +116,7 @@ class _JobLoggerAdapter(logging.LoggerAdapter):
     def process(self, msg, kwargs):
         return f"[job_uid={self.extra['job_uid']}] {msg}", kwargs
 
+
 # Interface for Azure
 
 
@@ -127,9 +132,7 @@ class JobHandler(JobHandlerInterface):
         # whenever the dispatcher touches a job whose runner.type happens to be
         # 'AzureContainer' - including status polls for completed jobs - and
         # would otherwise crash deployments that only use other backends.
-        self.azure_valid_container_name = (
-            self.job.runner["name"].lower().replace(".", "-").replace("_", "-")
-        )
+        self.azure_valid_container_name = self.job.runner["name"].lower().replace(".", "-").replace("_", "-")
         self._aci_client: ContainerInstanceManagementClient | None = None
         self._log = _JobLoggerAdapter(logger, {"job_uid": self.job.job_uid})
 
@@ -150,9 +153,7 @@ class JobHandler(JobHandlerInterface):
                     tenant_id=config.AZURE_JOB_SP_TENANT_ID,
                 )
             except ValueError as exc:  # e.g. tenant_id not a valid GUID
-                raise AzureHandlerConfigError(
-                    f"Invalid Azure credential configuration: {exc}"
-                ) from exc
+                raise AzureHandlerConfigError(f"Invalid Azure credential configuration: {exc}") from exc
             self._aci_client = ContainerInstanceManagementClient(
                 credentials, subscription_id=config.AZURE_JOB_SUBSCRIPTION
             )
@@ -196,8 +197,7 @@ class JobHandler(JobHandlerInterface):
         runner_entity: dict = self.job.runner
         if not runner_entity["image"]["registryName"]:
             raise ValueError(
-                "Runner entity is missing 'image.registryName'. "
-                f"(runner: {runner_entity.get('name', '<unknown>')})"
+                "Runner entity is missing 'image.registryName'. " f"(runner: {runner_entity.get('name', '<unknown>')})"
             )
         full_image_name: str = (
             f"{runner_entity['image']['registryName']}/{runner_entity['image']['imageName']}"
@@ -340,8 +340,7 @@ class JobHandler(JobHandlerInterface):
             return JobStatus.COMPLETED, "already removed"
         except ClientAuthenticationError as exc:
             raise AzureHandlerAuthError(
-                "Azure rejected the service principal credentials during remove(). "
-                f"AAD detail: {exc.message}"
+                "Azure rejected the service principal credentials during remove(). " f"AAD detail: {exc.message}"
             ) from exc
         except HttpResponseError as exc:
             error_code = getattr(getattr(exc, "error", None), "code", None)
@@ -364,9 +363,7 @@ class JobHandler(JobHandlerInterface):
         if status == "Succeeded":
             return JobStatus.COMPLETED, status
         if status in ("Failed", "Canceled"):
-            logger.warning(
-                f"Delete of container '{self.azure_valid_container_name}' ended with status={status}"
-            )
+            logger.warning(f"Delete of container '{self.azure_valid_container_name}' ended with status={status}")
             return JobStatus.FAILED, status
         # Still InProgress after the polling budget - not an error, just not done.
         return JobStatus.UNKNOWN, status
@@ -390,8 +387,7 @@ class JobHandler(JobHandlerInterface):
             )
         except ClientAuthenticationError as exc:
             raise AzureHandlerAuthError(
-                "Azure rejected the service principal credentials during progress(). "
-                f"AAD detail: {exc.message}"
+                "Azure rejected the service principal credentials during progress(). " f"AAD detail: {exc.message}"
             ) from exc
         except HttpResponseError as e:
             if "ContainerGroupDeploymentNotReady" in str(e) or "not ready" in str(e).lower():
@@ -450,8 +446,6 @@ class JobHandler(JobHandlerInterface):
             case ("Failed", _) | ("Canceled", _):  # noqa - ACI-side failures (image pull, quota, ...)
                 job_status = JobStatus.FAILED
             case _:  # noqa - any state we haven't mapped
-                self._log.warning(
-                    f"Unmapped ACI container state: status={status!r}, exit_code={exit_code}"
-                )
+                self._log.warning(f"Unmapped ACI container state: status={status!r}, exit_code={exit_code}")
                 job_status = JobStatus.UNKNOWN
         return job_status, logs, self.job.percentage
