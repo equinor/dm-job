@@ -343,43 +343,59 @@ class JobHandler(JobHandlerInterface):
         if self.job.status == JobStatus.FAILED:
             # If setup fails, the container is not started
             return self.job.status, self.job.log, self.job.percentage
-        try:
-            logs = self.aci_client.containers.list_logs(
-                config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name, self.azure_valid_container_name
-            ).content
-        except ResourceNotFoundError:
-            raise NotFoundException(
-                f"The container '{self.azure_valid_container_name}' does not exist. "
-                + "Either it has not been created, or it's not ready to accept requests."
-            )
-        except HttpResponseError as e:
-            # Handle ContainerGroupDeploymentNotReady - container is still initializing
-            if "ContainerGroupDeploymentNotReady" in str(e) or "not ready" in str(e).lower():
-                logger.info(f"Container group not ready yet for log retrieval: {e}")
-                return JobStatus.STARTING, "Container is still initializing...", self.job.percentage
-            raise
 
+        # Fetch container group first (cheap, single ARM round-trip). Only pull
+        # logs if the container has actually reached a state that produces them.
         try:
             container_group = self.aci_client.container_groups.get(
                 config.AZURE_JOB_RESOURCE_GROUP, self.azure_valid_container_name
             )
-            status = container_group.containers[0].instance_view.current_state.state
-            exit_code = container_group.containers[0].instance_view.current_state.exit_code
+        except ResourceNotFoundError:
+            raise NotFoundException(
+                f"The container '{self.azure_valid_container_name}' does not exist. "
+                "Either it has not been created, or it's not ready to accept requests."
+            )
+        except ClientAuthenticationError as exc:
+            raise AzureHandlerAuthError(
+                "Azure rejected the service principal credentials during progress(). "
+                f"AAD detail: {exc.message}"
+            ) from exc
         except HttpResponseError as e:
-            # Handle ContainerGroupDeploymentNotReady when getting container group status
             if "ContainerGroupDeploymentNotReady" in str(e) or "not ready" in str(e).lower():
                 logger.info(f"Container group not ready yet: {e}")
                 return JobStatus.STARTING, "Container is still initializing...", self.job.percentage
             raise
+
+        try:
+            current_state = container_group.containers[0].instance_view.current_state
+            status = current_state.state
+            exit_code = current_state.exit_code
         except (AttributeError, TypeError):
             # instance_view may not be available yet
             return JobStatus.STARTING, "Container instance view not yet available", self.job.percentage
-        if not logs:  # If no container logs, get the Container Instance events instead
+
+        # Only request logs once the container has content to produce.
+        logs: None | list[str] | str = None
+        if status in ("Running", "Terminated"):
+            try:
+                logs = self.aci_client.containers.list_logs(
+                    config.AZURE_JOB_RESOURCE_GROUP,
+                    self.azure_valid_container_name,
+                    self.azure_valid_container_name,
+                ).content
+            except ResourceNotFoundError:
+                logs = None
+            except HttpResponseError as e:
+                if "ContainerGroupDeploymentNotReady" in str(e) or "not ready" in str(e).lower():
+                    logger.info(f"Container group not ready yet for log retrieval: {e}")
+                    return JobStatus.STARTING, "Container is still initializing...", self.job.percentage
+                raise
+
+        if not logs:  # Fall back to Container Instance events
             try:
                 logs = container_group.containers[0].instance_view.events[-1].message
-            except TypeError:
+            except (AttributeError, TypeError, IndexError):
                 logs = self.job.log
-                pass
 
         job_status = self.job.status
 
