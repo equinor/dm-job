@@ -130,7 +130,7 @@ class JobHandler(JobHandlerInterface):
         env_vars.append(EnvironmentVariable(name="JOB_DMSS_ID", value=self.job.dmss_id))
 
         # Parse env-vars from job entity
-        print("*****  Injecting env vars from job entity *****")
+        logger.info("Injecting env vars from job entity")
         for env_string in self.job.runner.get("environmentVariables", []):
             if "=" in env_string:
                 key, value = env_string.split("=", 1)
@@ -218,7 +218,6 @@ class JobHandler(JobHandlerInterface):
             # Wait for the container group to be created and running
             # The begin_create_or_update() returns an LROPoller, we need to wait for it to complete
             logger.info("Waiting for Azure container group to be provisioned...")
-            print("Waiting for Azure container group to be provisioned...")
             result.result()  # This blocks until the operation completes
         except ClientAuthenticationError as exc:
             # AADSTS7000215 (invalid secret), 7000222 (expired secret),
@@ -244,23 +243,19 @@ class JobHandler(JobHandlerInterface):
                     logger.info(f"Container is now in state: {container_state}")
                     break
                 logger.info(f"Container state: {container_state}, waiting...")
-                print(f"Container state: {container_state}, waiting...")
             except (AttributeError, TypeError):
                 # instance_view may not be available yet
                 logger.info("Container instance view not yet available, waiting...")
-                print("Container instance view not yet available, waiting...")
             except HttpResponseError as e:
                 # Handle ContainerGroupDeploymentNotReady and similar errors
                 if "ContainerGroupDeploymentNotReady" in str(e) or "not ready" in str(e).lower():
                     logger.info(f"Container group not ready yet: {e.message}")
-                    print(f"Container group not ready yet, waiting. : {e.message}")
                 else:
                     raise  # Re-raise if it's a different error
             sleep(poll_interval)
             waited += poll_interval
 
         logger.info("*** Azure container job started successfully ***")
-        print("*** Azure container job started successfully ***")
 
         return "Azure container started"
 
