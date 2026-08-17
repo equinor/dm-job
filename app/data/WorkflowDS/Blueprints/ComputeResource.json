@@ -9,8 +9,8 @@
     {
       "name": "memory",
       "type": "CORE:BlueprintAttribute",
-      "attributeType": "number",
       "description": "memory in GB",
+      "attributeType": "number",
       "optional": true
     },
     {

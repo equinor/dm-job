@@ -10,9 +10,19 @@ from starlette.responses import RedirectResponse
 
 from config import config
 from features.jobs import jobs
+from job_handler_plugins.azure_container_instances import (
+    AzureHandlerAuthError,
+    AzureHandlerConfigError,
+    AzureHandlerProvisionError,
+)
 from middleware.store_headers import StoreHeadersMiddleware
 from restful.responses import responses
-from utils.exception_handlers import validation_exception_handler
+from utils.exception_handlers import (
+    azure_auth_exception_handler,
+    azure_config_exception_handler,
+    azure_provision_exception_handler,
+    validation_exception_handler,
+)
 from utils.logging import logger
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(authorizationUrl="", tokenUrl="", auto_error=False)
@@ -34,7 +44,12 @@ def create_app():
         responses=responses,
         version="1.7.0",  # x-release-please-version
         description="REST API used with the Data Modelling framework to schedule jobs",
-        exception_handlers={RequestValidationError: validation_exception_handler},
+        exception_handlers={
+            RequestValidationError: validation_exception_handler,
+            AzureHandlerConfigError: azure_config_exception_handler,
+            AzureHandlerAuthError: azure_auth_exception_handler,
+            AzureHandlerProvisionError: azure_provision_exception_handler,
+        },
         middleware=[Middleware(StoreHeadersMiddleware)],
         swagger_ui_init_oauth={
             "clientId": config.OAUTH_CLIENT_ID,
