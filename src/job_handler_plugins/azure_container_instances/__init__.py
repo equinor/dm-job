@@ -1,5 +1,6 @@
 import logging
 import os
+import uuid
 from collections import namedtuple
 from time import sleep
 from typing import Tuple
@@ -78,6 +79,26 @@ def _check_required_config() -> None:
             f"job-api is missing required settings: {', '.join(missing)}. "
             "Set them as Radix secrets on the job-api component and redeploy. "
             "Other job handlers are unaffected."
+        )
+
+    # Cheap sanity check on GUID-shaped fields. AAD would reject these anyway,
+    # but only after a network round-trip; a local check gives a clearer error.
+    _GUID_FIELDS = (
+        "AZURE_JOB_SP_CLIENT_ID",
+        "AZURE_JOB_SP_TENANT_ID",
+        "AZURE_JOB_SUBSCRIPTION",
+    )
+    bad_guids: list[str] = []
+    for name in _GUID_FIELDS:
+        value = getattr(config, name)
+        try:
+            uuid.UUID(str(value))
+        except (ValueError, TypeError, AttributeError):
+            bad_guids.append(f"{name}={value!r}")
+    if bad_guids:
+        raise AzureHandlerConfigError(
+            "Azure configuration contains values that are not valid GUIDs: "
+            f"{', '.join(bad_guids)}. Fix the job-api secrets and redeploy."
         )
 
 # Interface for Azure
