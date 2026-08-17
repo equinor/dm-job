@@ -162,26 +162,24 @@ class JobHandler(JobHandlerInterface):
         )
         memory_in_gb = 2.0
         cpu = 2.0
+        # ACI Norway East limits (per container group, at time of writing):
+        #   CPU:    0.5 .. 4.0 cores
+        #   Memory: 0.5 .. 16.0 GB
+        # See: https://learn.microsoft.com/en-us/azure/container-instances/container-instances-region-availability
+        _CPU_MIN, _CPU_MAX = 0.5, 4.0
+        _MEM_MIN, _MEM_MAX = 0.5, 16.0
         if "computeResource" in runner_entity:
             compute_resource = runner_entity["computeResource"]
-            if "memory" in compute_resource:
-                memory_in_gb = compute_resource["memory"]
-            if "cpu" in compute_resource:
-                cpu = compute_resource["cpu"]
-            if memory_in_gb < 0.5 or cpu < 0.5:
+            requested_memory = compute_resource.get("memory", memory_in_gb)
+            requested_cpu = compute_resource.get("cpu", cpu)
+            memory_in_gb = max(_MEM_MIN, min(_MEM_MAX, float(requested_memory)))
+            cpu = max(_CPU_MIN, min(_CPU_MAX, float(requested_cpu)))
+            if memory_in_gb != requested_memory or cpu != requested_cpu:
                 logger.warning(
-                    f"Specified compute resources for job '{self.job.job_uid}' are below the minimum of 0.5 CPU and 0.5 GB memory. "
-                    + "Using default values of 2 CPU and 2 GB memory."
+                    f"Job '{self.job.job_uid}': requested compute resources "
+                    f"(cpu={requested_cpu}, memory={requested_memory} GB) "
+                    f"clamped to ACI limits (cpu={cpu}, memory={memory_in_gb} GB)."
                 )
-                memory_in_gb = 2.0
-                cpu = 2.0
-            if memory_in_gb > 16.0 or cpu > 4.0:
-                logger.warning(
-                    f"Specified compute resources for job '{self.job.job_uid}' are above the maximum of 16 CPU and 4 GB memory. "
-                    + "Using default values of 2 CPU and 2 GB memory."
-                )
-                memory_in_gb = 2.0
-                cpu = 2.0
 
         command_list = ["/app/main/start.sh"]
         if reference_target:
