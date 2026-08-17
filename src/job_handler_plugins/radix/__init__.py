@@ -37,9 +37,17 @@ class JobHandler(JobHandlerInterface):
         payload["DMSS_URL"] = config.DMSS_URL
         payload["DM_JOB_URL"] = config.DM_JOB_URL
         payload["JOB_DMSS_ID"] = self.job.dmss_id
+
+        # Optional per-submission override of the Radix component's image tag.
+        # The template's 'image' must contain '{imageTagName}' for this to take effect;
+        # if the runner omits it, Radix falls back to the default in radixconfig.yaml.
+        body: dict = {"payload": json.dumps(payload)}
+        if image_tag := self.job.runner.get("imageTagName"):
+            body["imageTagName"] = image_tag
+
         result = requests.post(
             _get_job_url(self.job),
-            json={"payload": json.dumps(payload)},
+            json=body,
             timeout=10,
         )
         result.raise_for_status()
