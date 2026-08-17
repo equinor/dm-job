@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.6.9](https://github.com/equinor/dm-job/compare/v1.6.8...v1.6.9) (2026-08-04)
+
+
+### Build System
+
+* **deps-dev:** bump black from 26.1.0 to 26.3.1 ([a2abfb5](https://github.com/equinor/dm-job/commit/a2abfb5780a4fab25c91269782d91fe7c88f1970))
+* **deps-dev:** bump pytest from 9.0.2 to 9.0.3 ([41a317b](https://github.com/equinor/dm-job/commit/41a317bb228143b5e69717cd429ecbf6e3c27363))
+* **deps:** bump cryptography from 46.0.5 to 50.0.0 ([4a1787d](https://github.com/equinor/dm-job/commit/4a1787d73c50d595b32e1e49c3bcdf4b8d1d8409))
+* **deps:** bump cryptography from 46.0.5 to 50.0.0 ([8e4123e](https://github.com/equinor/dm-job/commit/8e4123e057039da27b5208c4537785fff8c7b455))
+* **deps:** bump googleapis/release-please-action from 4 to 5 ([f15be09](https://github.com/equinor/dm-job/commit/f15be09978ebd4a5e7b12580446538951aa5d313))
+* **deps:** bump googleapis/release-please-action from 4 to 5 ([54996f5](https://github.com/equinor/dm-job/commit/54996f514af7daba89b014e9ff6ce07b7a2da8de))
+* **deps:** bump idna from 3.11 to 3.15 ([0a9aed5](https://github.com/equinor/dm-job/commit/0a9aed5db518aa0591c81a72a4848b483e73f749))
+* **deps:** bump idna from 3.11 to 3.15 ([b8f5da8](https://github.com/equinor/dm-job/commit/b8f5da89629e03f5fc43d681caa00cbb513a17ce))
+* **deps:** bump pyjwt from 2.11.0 to 2.13.0 ([a7abdca](https://github.com/equinor/dm-job/commit/a7abdca183e2fecb041e48dc7a68a1cb0b6c420b))
+* **deps:** bump pyjwt from 2.11.0 to 2.13.0 ([28ed029](https://github.com/equinor/dm-job/commit/28ed02916b5c5bf8fbc8d7e116e9788d3b46ac93))
+* **deps:** bump python from 3.10-slim to 3.14-slim in the docker group ([24c8193](https://github.com/equinor/dm-job/commit/24c819369426087d74263a35931252ffaa585c86))
+* **deps:** bump python from 3.13-slim to 3.14-slim in the docker group across 1 directory ([2765ae4](https://github.com/equinor/dm-job/commit/2765ae44bbe077f01fc4d0e659e160059ffe2649))
+* **deps:** bump requests from 2.32.5 to 2.33.0 ([af77c5a](https://github.com/equinor/dm-job/commit/af77c5aeab041e647b619e48b93e7d97615ec78f))
+* **deps:** bump requests from 2.32.5 to 2.33.0 ([a626618](https://github.com/equinor/dm-job/commit/a626618b0f2f5de3deb2fa507922b33bef610570))
+* **deps:** bump requests from 2.32.5 to 2.33.0 ([5ed7cbc](https://github.com/equinor/dm-job/commit/5ed7cbc11124ba67c4a26906e4b4e39536478a55))
+* **deps:** bump starlette from 0.52.1 to 1.3.1 ([b1e062d](https://github.com/equinor/dm-job/commit/b1e062dc848b68f3a532d0116c3e159de1b956f0))
+* **deps:** bump starlette from 0.52.1 to 1.3.1 ([ef7f48d](https://github.com/equinor/dm-job/commit/ef7f48dca3dc349f49f3c416235d2c1d32f49ce6))
+* **deps:** bump the api group across 1 directory with 7 updates ([7ada338](https://github.com/equinor/dm-job/commit/7ada3388457fda619f6f96f63f25c23c5438c12c))
+* **deps:** bump the api group across 1 directory with 7 updates ([81451c2](https://github.com/equinor/dm-job/commit/81451c22215293ef41b0080933f0878370fb1dbb))
+* **deps:** bump urllib3 from 2.6.3 to 2.7.0 ([cf73812](https://github.com/equinor/dm-job/commit/cf73812d568a7e75cdb4c594c921280c854debbd))
+* **deps:** bump urllib3 from 2.6.3 to 2.7.0 ([9458f26](https://github.com/equinor/dm-job/commit/9458f26e65ee7a50fbacd235e1962ee892b6ec26))
+
+## [1.6.8](https://github.com/equinor/dm-job/compare/v1.6.7...v1.6.8) (2026-04-21)
+
+
+### Bug Fixes
+
+* adding dm_job_url to env variables of azure CI ([9f7e1b5](https://github.com/equinor/dm-job/commit/9f7e1b5da6ff21988a866e2157720d3988a11c34))
+* adding global addresses for dmss and dm_job so Azure CI can reach the services ([f9c0820](https://github.com/equinor/dm-job/commit/f9c0820eca41ebd242b4ebba1edcc2a825d5a976))
+* checking env variables before importing them. allow for direct definition of envs inside the runner ([b6f663b](https://github.com/equinor/dm-job/commit/b6f663b1df44add7ec44e5dff283f40f90782dd9))
+* pre-commit ([4b891ad](https://github.com/equinor/dm-job/commit/4b891ad71c81e345ad3cdebc5a2d598e035b9a36))
+
 ## [1.6.7](https://github.com/equinor/dm-job/compare/v1.6.6...v1.6.7) (2026-04-20)
 
 
