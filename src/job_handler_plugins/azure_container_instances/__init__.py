@@ -257,6 +257,7 @@ class JobHandler(JobHandlerInterface):
         max_wait_seconds = 120 * 5
         poll_interval = 5
         waited = 0
+        container_state: str | None = None
         while waited < max_wait_seconds:
             try:
                 container_group = self.aci_client.container_groups.get(
@@ -278,6 +279,15 @@ class JobHandler(JobHandlerInterface):
                     raise  # Re-raise if it's a different error
             sleep(poll_interval)
             waited += poll_interval
+        else:
+            # Loop exited via the while-condition, not via break: we timed out.
+            raise TimeoutError(
+                f"Azure container '{self.azure_valid_container_name}' for job "
+                f"'{self.job.job_uid}' did not reach Running/Terminated within "
+                f"{max_wait_seconds}s (last observed state: {container_state!r}). "
+                "The container group has been created but is stuck - inspect ACI "
+                "events (image pull, quota, networking) and remove() when done."
+            )
 
         logger.info("*** Azure container job started successfully ***")
 
