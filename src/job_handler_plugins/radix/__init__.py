@@ -79,18 +79,35 @@ class JobHandler(JobHandlerInterface):
         )
         result.raise_for_status()
         response_json = result.json()
+        # Radix batch-job scheduler statuses:
+        #   Waiting   - pod scheduled, pulling image / waiting for a node
+        #   Active    - job resource created, first pod not yet Running
+        #   Running   - container process is up
+        #   Succeeded - terminal, exit 0
+        #   Failed    - terminal, non-zero exit or runtime failure
+        #   Stopping  - kubectl delete in progress after a stop request
+        #   Stopped   - terminated by an operator/user
+        #   DeadlineExceeded - killed because activeDeadlineSeconds elapsed
+        # Anything else is a genuine surprise and stays UNKNOWN.
         match (response_json.get("status")):
             case "Running":  # noqa
                 return JobStatus.RUNNING, "Job is running", None
+            case "Waiting" | "Active":  # noqa - image pull / node scheduling
+                return JobStatus.STARTING, "Radix job is starting (pod scheduling / image pull)", 0
             case "Failed":  # noqa
                 return (
                     JobStatus.FAILED,
                     "Job failed for an unknown reason. Consider implementing job progress update for more details.",
                     0,
                 )
+            case "Stopping" | "Stopped":  # noqa - operator-initiated termination
+                return JobStatus.FAILED, "Radix job was stopped", 0
+            case "DeadlineExceeded":  # noqa
+                return JobStatus.FAILED, "Radix job exceeded its active deadline", 0
             case "Succeeded":  # noqa
                 return JobStatus.COMPLETED, "Radix job completed successfully", 1
             case None:
                 return JobStatus.STARTING, "Radix job is starting", 1
-            case _:
-                return JobStatus.UNKNOWN, "Radix returned an unknown status code", 0
+            case unknown:
+                logger.warning(f"Radix returned an unmapped job status: {unknown!r}")
+                return JobStatus.UNKNOWN, f"Radix returned an unknown status: {unknown}", 0
