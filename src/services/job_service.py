@@ -34,6 +34,40 @@ from services.job_handler_interface import (
 from services.job_scheduler import scheduler
 from utils.logging import logger
 
+REFERENCE_TYPE = "dmss://system/SIMOS/Reference"
+
+
+def _resolve_runner(job_entity: dict, token: str) -> dict:
+    """Resolve the 'runner' attribute of a job entity if it is defined as a reference.
+
+    Some job entities define 'runner' as a CORE:Reference (link) to another entity, rather than
+    embedding the runner configuration directly. In that case DMSS does not automatically dereference
+    it into the target entity's content when fetching the job (it stays as the raw reference object,
+    with type 'dmss://system/SIMOS/Reference'). This function detects that case and replaces
+    'runner' with the resolved target document, so the job handler can be matched on its real type.
+    """
+    runner = job_entity.get("runner")
+    if not isinstance(runner, dict) or runner.get("type") != REFERENCE_TYPE:
+        return job_entity
+
+    address = runner.get("address")
+    if not address:
+        raise BadRequestException(
+            "Job's 'runner' attribute is a reference, but it is missing the 'address' to resolve it.",
+            data=runner,
+        )
+
+    logger.debug(f"Resolving job runner reference '{address}'")
+    resolved_runner = get_document(address, depth=1, token=token)
+    if not isinstance(resolved_runner, dict):
+        raise BadRequestException(
+            f"Failed to resolve job's 'runner' reference '{address}'; got an entity of type '{type(resolved_runner)}'",
+            data=resolved_runner,
+        )
+
+    job_entity["runner"] = resolved_runner
+    return job_entity
+
 
 def get_job_store():
     return redis.Redis(
@@ -204,6 +238,8 @@ def register_job(dmss_id: str, token: str | None = None) -> Tuple[str, str, JobS
             f"Address '{dmss_id}' does not point to a Job, but an entity of type '{job_entity['type']}'",
             data=job_entity,
         )
+
+    job_entity = _resolve_runner(job_entity, token)
 
     kwargs = {
         **job_entity,
