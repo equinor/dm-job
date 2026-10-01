@@ -79,17 +79,32 @@ class JobHandler(JobHandlerInterface):
         )
         result.raise_for_status()
         response_json = result.json()
+        # Radix may provide a human-readable message alongside the status
+        # (e.g. pod-scheduling failures like "0/80 nodes are available: ...").
+        # Surface it when present instead of a generic status message.
+        message = response_json.get("message")
         match (response_json.get("status")):
-            case "Running":  # noqa
-                return JobStatus.RUNNING, "Job is running", None
+            case "Running" | "Active":  # noqa
+                return JobStatus.RUNNING, message or "Job is running", None
             case "Failed":  # noqa
                 return (
                     JobStatus.FAILED,
-                    "Job failed for an unknown reason. Consider implementing job progress update for more details.",
+                    message
+                    or "Job failed for an unknown reason. Consider implementing job progress update for more details.",
                     0,
                 )
-            case "Succeeded":  # noqa
+            case "Succeeded" | "Completed":  # noqa
                 return JobStatus.COMPLETED, "Radix job completed successfully", 1
+            case "Waiting" | "Stopping":  # noqa
+                # "Waiting" covers the Radix replica states shown as "Starting"/
+                # "Pending" in the Radix console (job created, pod not yet
+                # scheduled/running, e.g. waiting for available cluster
+                # resources). "Stopping" means a stop was requested but the
+                # job hasn't fully terminated yet; treat both as still
+                # starting/in-progress rather than unknown.
+                return JobStatus.STARTING, message or "Radix job is starting", 0
+            case "Stopped":  # noqa
+                return JobStatus.FAILED, message or "Job was stopped", 0
             case None:
                 return JobStatus.STARTING, "Radix job is starting", 1
             case _:
