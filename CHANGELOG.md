@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.1](https://github.com/equinor/dm-job/compare/v1.8.0...v1.8.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **radix:** handle Waiting/Active/Completed/Stopped job statuses ([1c5f07e](https://github.com/equinor/dm-job/commit/1c5f07e9066cb7d5d9e2a41cddfbfa52458cbd85))
+* **radix:** handle Waiting/Active/Completed/Stopped job statuses ([dd2d1b0](https://github.com/equinor/dm-job/commit/dd2d1b0596a205982571ff7ac3440957800ebc06))
+
 ## [1.8.0](https://github.com/equinor/dm-job/compare/v1.7.0...v1.8.0) (2026-09-28)
 
 
